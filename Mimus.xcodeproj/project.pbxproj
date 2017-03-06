@@ -1,0 +1,657 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10115C321E6DA39B0001E9A2 /* Mimus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10115C281E6DA39B0001E9A2 /* Mimus.framework */; };
+		10115C371E6DA39B0001E9A2 /* MatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10115C361E6DA39B0001E9A2 /* MatcherTests.swift */; };
+		10115C391E6DA39B0001E9A2 /* Mimus.h in Headers */ = {isa = PBXBuildFile; fileRef = 10115C2B1E6DA39B0001E9A2 /* Mimus.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		10539B5D1E7BF218006EA51F /* Mimus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10115C281E6DA39B0001E9A2 /* Mimus.framework */; };
+		40E02008909FD2CA1A151AFC /* VerificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E025D445548E064AEFED58 /* VerificationHandler.swift */; };
+		40E0204F99A9FCC36C0ED04A /* FakeAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E0239656117918B2B508D2 /* FakeAuthenticationManager.swift */; };
+		40E020D8834DFFDA2780CF58 /* FoundationMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E022E305486CA788515B57 /* FoundationMatcherTests.swift */; };
+		40E020F0008AFC5EA96FB250 /* AnyMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02F8414344A935EE3A304 /* AnyMatcher.swift */; };
+		40E0217043DED2C29D5CE013 /* AuthenticationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E025D4F7B199795EEBE417 /* AuthenticationCoordinator.swift */; };
+		40E0227031E79D0304201F64 /* Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02F2190DBA2AAA3AD3A12 /* Mock.swift */; };
+		40E02284F87CD8F68F75F631 /* FoundationMatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E024EB9A53254A5D8F4FCD /* FoundationMatchers.swift */; };
+		40E02468F3763AACE6F79040 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E0209036FA4582F38027DB /* AuthenticationManager.swift */; };
+		40E02770F499510C4A2A5137 /* TestExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02DF5C47DB361FFEDB796 /* TestExtensions.swift */; };
+		40E02A11CF409F881CB7414B /* MockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02E3B63740D357AB49610 /* MockTests.swift */; };
+		40E02A9090F3F6AE9F3D4E38 /* TestLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02F215A9DF8B857C63421 /* TestLocation.swift */; };
+		40E02B8EE6D8674EB13C9E5A /* SwiftMatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E021E9A1894D23BDC1F0F5 /* SwiftMatchers.swift */; };
+		40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02877AF79612BC1F09CDD /* Matcher.swift */; };
+		40E02C7766A981C1DB7E990C /* CaptureArgumentMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */; };
+		40E02F5C3603EB017407264E /* Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E021D799D22B9FF27D61DC /* Examples.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		10115C331E6DA39B0001E9A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 10115C1F1E6DA39B0001E9A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 10115C271E6DA39B0001E9A2;
+			remoteInfo = Mimus;
+		};
+		10539B5E1E7BF218006EA51F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 10115C1F1E6DA39B0001E9A2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 10115C271E6DA39B0001E9A2;
+			remoteInfo = Mimus;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		10115C281E6DA39B0001E9A2 /* Mimus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mimus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		10115C2B1E6DA39B0001E9A2 /* Mimus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mimus.h; sourceTree = "<group>"; };
+		10115C2C1E6DA39B0001E9A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		10115C311E6DA39B0001E9A2 /* MimusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MimusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		10115C361E6DA39B0001E9A2 /* MatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatcherTests.swift; sourceTree = "<group>"; };
+		10115C381E6DA39B0001E9A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		10539B581E7BF218006EA51F /* MimusExamples.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MimusExamples.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		10539B5C1E7BF218006EA51F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		108EB0A31E7149CE0006E2EF /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		40E0209036FA4582F38027DB /* AuthenticationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
+		40E021D799D22B9FF27D61DC /* Examples.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Examples.swift; sourceTree = "<group>"; };
+		40E021E9A1894D23BDC1F0F5 /* SwiftMatchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMatchers.swift; sourceTree = "<group>"; };
+		40E022E305486CA788515B57 /* FoundationMatcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoundationMatcherTests.swift; sourceTree = "<group>"; };
+		40E0239656117918B2B508D2 /* FakeAuthenticationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FakeAuthenticationManager.swift; sourceTree = "<group>"; };
+		40E024EB9A53254A5D8F4FCD /* FoundationMatchers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoundationMatchers.swift; sourceTree = "<group>"; };
+		40E025D445548E064AEFED58 /* VerificationHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerificationHandler.swift; sourceTree = "<group>"; };
+		40E025D4F7B199795EEBE417 /* AuthenticationCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationCoordinator.swift; sourceTree = "<group>"; };
+		40E02877AF79612BC1F09CDD /* Matcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matcher.swift; sourceTree = "<group>"; };
+		40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureArgumentMatcher.swift; sourceTree = "<group>"; };
+		40E02DF5C47DB361FFEDB796 /* TestExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestExtensions.swift; sourceTree = "<group>"; };
+		40E02E3B63740D357AB49610 /* MockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTests.swift; sourceTree = "<group>"; };
+		40E02F215A9DF8B857C63421 /* TestLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestLocation.swift; sourceTree = "<group>"; };
+		40E02F2190DBA2AAA3AD3A12 /* Mock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
+		40E02F8414344A935EE3A304 /* AnyMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyMatcher.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		10115C241E6DA39B0001E9A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10115C2E1E6DA39B0001E9A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10115C321E6DA39B0001E9A2 /* Mimus.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10539B551E7BF218006EA51F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10539B5D1E7BF218006EA51F /* Mimus.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10115C1E1E6DA39B0001E9A2 = {
+			isa = PBXGroup;
+			children = (
+				10115C2A1E6DA39B0001E9A2 /* Mimus */,
+				10115C351E6DA39B0001E9A2 /* MimusTests */,
+				10539B591E7BF218006EA51F /* MimusExamples */,
+				10115C291E6DA39B0001E9A2 /* Products */,
+				108EB0A21E7149CD0006E2EF /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		10115C291E6DA39B0001E9A2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10115C281E6DA39B0001E9A2 /* Mimus.framework */,
+				10115C311E6DA39B0001E9A2 /* MimusTests.xctest */,
+				10539B581E7BF218006EA51F /* MimusExamples.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		10115C2A1E6DA39B0001E9A2 /* Mimus */ = {
+			isa = PBXGroup;
+			children = (
+				10115C2B1E6DA39B0001E9A2 /* Mimus.h */,
+				10115C2C1E6DA39B0001E9A2 /* Info.plist */,
+				40E02C1B2B0E69FD67456760 /* Source */,
+			);
+			path = Mimus;
+			sourceTree = "<group>";
+		};
+		10115C351E6DA39B0001E9A2 /* MimusTests */ = {
+			isa = PBXGroup;
+			children = (
+				10115C361E6DA39B0001E9A2 /* MatcherTests.swift */,
+				10115C381E6DA39B0001E9A2 /* Info.plist */,
+				40E022E305486CA788515B57 /* FoundationMatcherTests.swift */,
+				40E02E3B63740D357AB49610 /* MockTests.swift */,
+				40E02F19CAE87139D2C32A88 /* Helpers */,
+			);
+			path = MimusTests;
+			sourceTree = "<group>";
+		};
+		10539B591E7BF218006EA51F /* MimusExamples */ = {
+			isa = PBXGroup;
+			children = (
+				10539B5C1E7BF218006EA51F /* Info.plist */,
+				40E026C3216E3A22C57481FC /* Test Helpers */,
+				40E021D799D22B9FF27D61DC /* Examples.swift */,
+			);
+			path = MimusExamples;
+			sourceTree = "<group>";
+		};
+		108EB0A21E7149CD0006E2EF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				108EB0A31E7149CE0006E2EF /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		40E0208F3BAFEBDD4890B88F /* Matchers */ = {
+			isa = PBXGroup;
+			children = (
+				40E021E9A1894D23BDC1F0F5 /* SwiftMatchers.swift */,
+				40E024EB9A53254A5D8F4FCD /* FoundationMatchers.swift */,
+				40E02F8414344A935EE3A304 /* AnyMatcher.swift */,
+				40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */,
+			);
+			path = Matchers;
+			sourceTree = "<group>";
+		};
+		40E026C3216E3A22C57481FC /* Test Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				40E0209036FA4582F38027DB /* AuthenticationManager.swift */,
+				40E0239656117918B2B508D2 /* FakeAuthenticationManager.swift */,
+				40E025D4F7B199795EEBE417 /* AuthenticationCoordinator.swift */,
+			);
+			path = "Test Helpers";
+			sourceTree = "<group>";
+		};
+		40E027095E35B74C275553BA /* Verification */ = {
+			isa = PBXGroup;
+			children = (
+				40E025D445548E064AEFED58 /* VerificationHandler.swift */,
+			);
+			path = Verification;
+			sourceTree = "<group>";
+		};
+		40E02C1B2B0E69FD67456760 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				40E02EB1FB5A4F12C5B122B6 /* Helpers */,
+				40E0208F3BAFEBDD4890B88F /* Matchers */,
+				40E027095E35B74C275553BA /* Verification */,
+				40E02877AF79612BC1F09CDD /* Matcher.swift */,
+				40E02F2190DBA2AAA3AD3A12 /* Mock.swift */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		40E02EB1FB5A4F12C5B122B6 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				40E02F215A9DF8B857C63421 /* TestLocation.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		40E02F19CAE87139D2C32A88 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				40E02DF5C47DB361FFEDB796 /* TestExtensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		10115C251E6DA39B0001E9A2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10115C391E6DA39B0001E9A2 /* Mimus.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		10115C271E6DA39B0001E9A2 /* Mimus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10115C3C1E6DA39B0001E9A2 /* Build configuration list for PBXNativeTarget "Mimus" */;
+			buildPhases = (
+				10115C231E6DA39B0001E9A2 /* Sources */,
+				10115C241E6DA39B0001E9A2 /* Frameworks */,
+				10115C251E6DA39B0001E9A2 /* Headers */,
+				10115C261E6DA39B0001E9A2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Mimus;
+			productName = Mimus;
+			productReference = 10115C281E6DA39B0001E9A2 /* Mimus.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		10115C301E6DA39B0001E9A2 /* MimusTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10115C3F1E6DA39B0001E9A2 /* Build configuration list for PBXNativeTarget "MimusTests" */;
+			buildPhases = (
+				10115C2D1E6DA39B0001E9A2 /* Sources */,
+				10115C2E1E6DA39B0001E9A2 /* Frameworks */,
+				10115C2F1E6DA39B0001E9A2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				10115C341E6DA39B0001E9A2 /* PBXTargetDependency */,
+			);
+			name = MimusTests;
+			productName = MimusTests;
+			productReference = 10115C311E6DA39B0001E9A2 /* MimusTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		10539B571E7BF218006EA51F /* MimusExamples */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10539B601E7BF218006EA51F /* Build configuration list for PBXNativeTarget "MimusExamples" */;
+			buildPhases = (
+				10539B541E7BF218006EA51F /* Sources */,
+				10539B551E7BF218006EA51F /* Frameworks */,
+				10539B561E7BF218006EA51F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				10539B5F1E7BF218006EA51F /* PBXTargetDependency */,
+			);
+			name = MimusExamples;
+			productName = MimusExamples;
+			productReference = 10539B581E7BF218006EA51F /* MimusExamples.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		10115C1F1E6DA39B0001E9A2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0820;
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = AirHelp;
+				TargetAttributes = {
+					10115C271E6DA39B0001E9A2 = {
+						CreatedOnToolsVersion = 8.2;
+						ProvisioningStyle = Manual;
+					};
+					10115C301E6DA39B0001E9A2 = {
+						CreatedOnToolsVersion = 8.2;
+						DevelopmentTeam = PDY79HZ4XW;
+						ProvisioningStyle = Automatic;
+					};
+					10539B571E7BF218006EA51F = {
+						CreatedOnToolsVersion = 8.2;
+						DevelopmentTeam = PDY79HZ4XW;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 10115C221E6DA39B0001E9A2 /* Build configuration list for PBXProject "Mimus" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 10115C1E1E6DA39B0001E9A2;
+			productRefGroup = 10115C291E6DA39B0001E9A2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				10115C271E6DA39B0001E9A2 /* Mimus */,
+				10115C301E6DA39B0001E9A2 /* MimusTests */,
+				10539B571E7BF218006EA51F /* MimusExamples */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		10115C261E6DA39B0001E9A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10115C2F1E6DA39B0001E9A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10539B561E7BF218006EA51F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		10115C231E6DA39B0001E9A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40E02A9090F3F6AE9F3D4E38 /* TestLocation.swift in Sources */,
+				40E02B8EE6D8674EB13C9E5A /* SwiftMatchers.swift in Sources */,
+				40E02284F87CD8F68F75F631 /* FoundationMatchers.swift in Sources */,
+				40E020F0008AFC5EA96FB250 /* AnyMatcher.swift in Sources */,
+				40E02C7766A981C1DB7E990C /* CaptureArgumentMatcher.swift in Sources */,
+				40E02008909FD2CA1A151AFC /* VerificationHandler.swift in Sources */,
+				40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */,
+				40E0227031E79D0304201F64 /* Mock.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10115C2D1E6DA39B0001E9A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10115C371E6DA39B0001E9A2 /* MatcherTests.swift in Sources */,
+				40E020D8834DFFDA2780CF58 /* FoundationMatcherTests.swift in Sources */,
+				40E02A11CF409F881CB7414B /* MockTests.swift in Sources */,
+				40E02770F499510C4A2A5137 /* TestExtensions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10539B541E7BF218006EA51F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40E02468F3763AACE6F79040 /* AuthenticationManager.swift in Sources */,
+				40E02F5C3603EB017407264E /* Examples.swift in Sources */,
+				40E0204F99A9FCC36C0ED04A /* FakeAuthenticationManager.swift in Sources */,
+				40E0217043DED2C29D5CE013 /* AuthenticationCoordinator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		10115C341E6DA39B0001E9A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 10115C271E6DA39B0001E9A2 /* Mimus */;
+			targetProxy = 10115C331E6DA39B0001E9A2 /* PBXContainerItemProxy */;
+		};
+		10539B5F1E7BF218006EA51F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 10115C271E6DA39B0001E9A2 /* Mimus */;
+			targetProxy = 10539B5E1E7BF218006EA51F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		10115C3A1E6DA39B0001E9A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		10115C3B1E6DA39B0001E9A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		10115C3D1E6DA39B0001E9A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				INFOPLIST_FILE = Mimus/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					XCTest,
+					"-weak-lswiftXCTest",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.Mimus;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		10115C3E1E6DA39B0001E9A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
+				INFOPLIST_FILE = Mimus/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					XCTest,
+					"-weak-lswiftXCTest",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.Mimus;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		10115C401E6DA39B0001E9A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = PDY79HZ4XW;
+				INFOPLIST_FILE = MimusTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		10115C411E6DA39B0001E9A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = PDY79HZ4XW;
+				INFOPLIST_FILE = MimusTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		10539B611E7BF218006EA51F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = PDY79HZ4XW;
+				INFOPLIST_FILE = MimusExamples/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusExamples;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		10539B621E7BF218006EA51F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = PDY79HZ4XW;
+				INFOPLIST_FILE = MimusExamples/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusExamples;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		10115C221E6DA39B0001E9A2 /* Build configuration list for PBXProject "Mimus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10115C3A1E6DA39B0001E9A2 /* Debug */,
+				10115C3B1E6DA39B0001E9A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10115C3C1E6DA39B0001E9A2 /* Build configuration list for PBXNativeTarget "Mimus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10115C3D1E6DA39B0001E9A2 /* Debug */,
+				10115C3E1E6DA39B0001E9A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10115C3F1E6DA39B0001E9A2 /* Build configuration list for PBXNativeTarget "MimusTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10115C401E6DA39B0001E9A2 /* Debug */,
+				10115C411E6DA39B0001E9A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10539B601E7BF218006EA51F /* Build configuration list for PBXNativeTarget "MimusExamples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10539B611E7BF218006EA51F /* Debug */,
+				10539B621E7BF218006EA51F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 10115C1F1E6DA39B0001E9A2 /* Project object */;
+}
