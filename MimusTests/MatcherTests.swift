@@ -28,7 +28,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testStringFailingInvocation() {
         let result = matcher.match(expected: ["Fixture String"], actual: ["Fixture Another String"])
-        XCTAssertFalse(result, "Expected strings to not match")
+        XCTAssertFalse(result, "Expected strings not to match")
     }
 
     func testStaticStringPassingInvocation() {
@@ -44,7 +44,7 @@ class FoundationMatcherTests: XCTestCase {
         let actual: StaticString = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings to not match")
+        XCTAssertFalse(result, "Expected strings not to match")
     }
 
     func testStaticStringWithStringPassingInvocation() {
@@ -60,7 +60,7 @@ class FoundationMatcherTests: XCTestCase {
         let actual = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings to not match")
+        XCTAssertFalse(result, "Expected strings not to match")
     }
 
     // MARK: Basic Types
@@ -72,7 +72,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testIntFailingInvocation() {
         let result = matcher.match(expected: [42], actual: [43])
-        XCTAssertFalse(result, "Expected ints to not match")
+        XCTAssertFalse(result, "Expected ints not to match")
     }
 
     func testDoublePassingInvocation() {
@@ -82,7 +82,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testDoubleFailingInvocation() {
         let result = matcher.match(expected: [42.0], actual: [43.0])
-        XCTAssertFalse(result, "Expected doubles to not match")
+        XCTAssertFalse(result, "Expected doubles not to match")
     }
 
     func testBoolPassingInvocation() {
@@ -92,7 +92,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testBoolFailingInvocation() {
         let result = matcher.match(expected: [true], actual: [false])
-        XCTAssertFalse(result, "Expected booleans to not match")
+        XCTAssertFalse(result, "Expected booleans not to match")
     }
 
     // MARK: Index Paths
@@ -110,14 +110,14 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [IndexPath(row: 42, section: 43)],
                 actual: [IndexPath(row: 44, section: 43)]
         )
-        XCTAssertFalse(result, "Expected index paths to not match")
+        XCTAssertFalse(result, "Expected index paths not to match")
     }
 
     // MARK: Different Types
 
     func testIncorrectTypes() {
         let result = matcher.match(expected: [42.0], actual: ["Fixture String"])
-        XCTAssertFalse(result, "Expected incorrect to not match")
+        XCTAssertFalse(result, "Expected incorrect not to match")
     }
 
     // MARK: Working with optionals and nil
@@ -129,7 +129,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testNilFailingInvocation() {
         let result = matcher.match(expected: [nil], actual: [42])
-        XCTAssertFalse(result, "Expected elements to not match")
+        XCTAssertFalse(result, "Expected elements not to match")
     }
 
     // MARK: Arrays
@@ -147,7 +147,31 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Value 1", "Fixture Value 2"]],
                 actual: [["Fixture Value 1", "Another Fixture Value 2"]]
         )
-        XCTAssertFalse(result, "Expected arrays to not match")
+        XCTAssertFalse(result, "Expected arrays not to match")
+    }
+
+    func testIncompatibleSizesArrayFailingInvocation() {
+        let result = matcher.match(
+                expected: [["Fixture Value 1", "Fixture Value 2", "Fixture Value 3"]],
+                actual: [["Fixture Value 1", "Fixture Value 2"]]
+        )
+        XCTAssertFalse(result, "Expected arrays not to match")
+    }
+
+    func testNestedArraysPassingInvocation() {
+        let result = matcher.match(
+                expected: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]],
+                actual: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]]
+        )
+        XCTAssertTrue(result, "Expected arrays to match")
+    }
+
+    func testNestedArraysFailingInvocation() {
+        let result = matcher.match(
+                expected: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]],
+                actual: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 4"]]]
+        )
+        XCTAssertFalse(result, "Expected arrays not to match")
     }
 
     // MARK: Dictionaries
@@ -165,7 +189,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Key": "Fixture Value"]],
                 actual: [["Another Fixture Key": "Fixture Value"]]
         )
-        XCTAssertFalse(result, "Expected dictionary to not match")
+        XCTAssertFalse(result, "Expected dictionary not to match")
     }
 
     func testDictionaryFailingInvocationDifferentValues() {
@@ -173,14 +197,14 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Key": "Fixture Value"]],
                 actual: [["Fixture Key": "Another Fixture Value"]]
         )
-        XCTAssertFalse(result, "Expected dictionary to not match")
+        XCTAssertFalse(result, "Expected dictionary not to match")
     }
 
     // MARK: More Complicated Scenarios
 
     func testPassingInvocation() {
         let result = matcher.match(
-                expected:["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]],
+                expected: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]],
                 actual: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]]
         )
 
@@ -189,7 +213,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testFailingInvocation() {
         let result = matcher.match(
-                expected:["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]],
+                expected: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]],
                 actual: ["Fixture String", nil, 42, 1.0, ["Another Key": "Value"], ["Fixture Another Element"]]
         )
 
