@@ -72,10 +72,9 @@ extension Array: MockEquatable {
 
     public func equalTo(other: MockEquatable?) -> Bool {
         // Small hack to go around type system
-        let anyArray = self as Any
-        guard let selfArray = anyArray as? [MockEquatable?],
-              let otherArray = other as? [MockEquatable?],
-              selfArray.count == otherArray.count else {
+        let selfAny = self as Any?
+        guard let selfArray = selfAny as? [MockEquatable?],
+              let otherArray = other as? [MockEquatable?] else {
             let expectedMirror = Mirror(reflecting: self as Any)
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported array types. Expected type \(expectedMirror.subjectType)",
@@ -84,10 +83,19 @@ extension Array: MockEquatable {
             return false
         }
 
+        if selfArray.count != otherArray.count {
+            return false
+        }
+
         var equal = true
 
         for (index, item) in selfArray.enumerated() {
             let otherItem = otherArray[index]
+
+            if areNullEquivalents(item: item, other: otherItem) {
+                continue
+            }
+
             guard let expected = item, let actual = otherItem else {
                 return false
             }
@@ -96,6 +104,13 @@ extension Array: MockEquatable {
         }
         return equal
     }
+
+    private func areNullEquivalents(item: MockEquatable?, other: MockEquatable?) -> Bool {
+        if item == nil || item is NSNull {
+            return other == nil || other is NSNull
+        }
+        return false
+    }
 }
 
 extension Dictionary: MockEquatable {
@@ -103,9 +118,10 @@ extension Dictionary: MockEquatable {
     public func equalTo(other: MockEquatable?) -> Bool {
         // Small hack to go around type system
         let anySelf: [AnyHashable: Any] = self
+        let anyOther = other as? [AnyHashable: Any]
 
         guard let expected = anySelf as? [AnyHashable: MockEquatable],
-              let actual = other as? [AnyHashable: MockEquatable] else {
+              let actual = anyOther as? [AnyHashable: MockEquatable] else {
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported dictionary types. Values should conform to \(MockEquatable.self)",
                     file: location.file,

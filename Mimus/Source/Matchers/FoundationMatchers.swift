@@ -27,3 +27,32 @@ extension NSNumber: MockEquatable {
         return false
     }
 }
+
+extension NSArray: MockEquatable {
+
+    public func equalTo(other: MockEquatable?) -> Bool {
+        if let array = self as? Array<Any> {
+            return array.equalTo(other: other)
+        } else {
+            return false
+        }
+    }
+}
+
+extension NSDictionary: MockEquatable {
+
+    public func equalTo(other: MockEquatable?) -> Bool {
+        if let dictionary = self as? Dictionary<AnyHashable, Any> {
+            return dictionary.equalTo(other: other)
+        } else {
+            return false
+        }
+    }
+}
+
+extension NSNull: MockEquatable {
+
+    public func equalTo(other: MockEquatable?) -> Bool {
+        return other == nil || other is NSNull
+    }
+}
