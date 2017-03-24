@@ -48,6 +48,16 @@ extension Int: MockEquatable {
     }
 }
 
+extension Float: MockEquatable {
+
+    public func equalTo(other: MockEquatable?) -> Bool {
+        if let otherFloat = other as? Float {
+            return self == otherFloat
+        }
+        return false
+    }
+}
+
 extension Double: MockEquatable {
 
     public func equalTo(other: MockEquatable?) -> Bool {
