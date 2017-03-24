@@ -10,6 +10,7 @@
 [![CocoaPods compatible](https://img.shields.io/badge/CocoaPods-compatible-4BC51D.svg?style=flat)](https://github.com/CocoaPods/CocoaPods)
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)]()
 [![Public Yes](https://img.shields.io/badge/Public-yes-green.svg?style=flat)]()
+[![Build Status](https://travis-ci.org/AirHelp/Mimus.svg?branch=master)](https://travis-ci.org/AirHelp/Mimus)
 
 > Mimus is a bird genus in the family Mimidae. It contains the typical mockingbirds.
 
