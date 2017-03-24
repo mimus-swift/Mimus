@@ -85,6 +85,16 @@ class FoundationMatcherTests: XCTestCase {
         XCTAssertFalse(result, "Expected doubles not to match")
     }
 
+    func testFloatPassingInvocation() {
+        let result = matcher.match(expected: [Float(42.0)], actual: [Float(42.0)])
+        XCTAssertTrue(result, "Expected doubles to match")
+    }
+
+    func testFloatFailingInvocation() {
+        let result = matcher.match(expected: [Float(42.0)], actual: [Float(43.0)])
+        XCTAssertFalse(result, "Expected doubles not to match")
+    }
+
     func testBoolPassingInvocation() {
         let result = matcher.match(expected: [true], actual: [true])
         XCTAssertTrue(result, "Expected booleans to match")
