@@ -68,6 +68,16 @@ extension Bool: MockEquatable {
     }
 }
 
+extension URL: MockEquatable {
+
+    public func equalTo(other: MockEquatable?) -> Bool {
+        if let otherUrl = other as? URL {
+            return self == otherUrl
+        }
+        return false
+    }
+}
+
 extension Array: MockEquatable {
 
     public func equalTo(other: MockEquatable?) -> Bool {

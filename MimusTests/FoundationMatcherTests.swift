@@ -105,6 +105,24 @@ class MatcherTests: XCTestCase {
         XCTAssertFalse(result, "Expected NSErrors not to match")
     }
 
+    // MARK: NSURL
+
+    func testNSURLPassingInvocation() {
+        let expected = NSURL(string: "https://fixture.url.com/fixture/suffix")!
+        let actual = NSURL(string: "https://fixture.url.com/fixture/suffix")!
+
+        let result = matcher.match(expected: [expected], actual: [actual])
+        XCTAssertTrue(result, "Expected NSErrors to match")
+    }
+
+    func testNSURLFailingInvocation() {
+        let expected = NSURL(string: "https://fixture.url.com/fixture/suffix")!
+        let actual = NSURL(string: "https://fixture.url.eu/fixture/suffix")!
+
+        let result = matcher.match(expected: [expected], actual: [actual])
+        XCTAssertFalse(result, "Expected NSErrors not to match")
+    }
+
     // MARK: NSArray
 
     func testNSArrayPassingInvocation() {
@@ -201,7 +219,7 @@ class MatcherTests: XCTestCase {
 
     func testPassingInvocation() {
         let nestedDictionary = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 2"), NSNull()))
-        let nestedArray = NSArray(object: NSNumber(floatLiteral: 0.5))
+        let nestedArray = NSArray(objects: NSNumber(floatLiteral: 0.5), NSURL(string: "https://fixture.url.com/fixture/suffix")!)
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let result = matcher.match(
@@ -214,7 +232,7 @@ class MatcherTests: XCTestCase {
 
     func testFailingInvocation() {
         let nestedDictionary = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 2"), NSNumber(floatLiteral: 0.5)))
-        let nestedArray = NSArray(object: NSNumber(floatLiteral: 0.5))
+        let nestedArray = NSArray(objects: NSNumber(floatLiteral: 0.5), NSURL(string: "https://fixture.url.eu/fixture/suffix")!)
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNull(), nestedArray, nestedDictionary)
         let result = matcher.match(

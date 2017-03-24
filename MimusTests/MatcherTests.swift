@@ -120,6 +120,32 @@ class FoundationMatcherTests: XCTestCase {
         XCTAssertFalse(result, "Expected incorrect not to match")
     }
 
+    // MARK: Url
+
+    func testUrlPassingInvocation() {
+        let result = matcher.match(
+                expected: [URL(string: "https://fixture.url.com/fixture/suffix")!],
+                actual: [URL(string: "https://fixture.url.com/fixture/suffix")!]
+        )
+        XCTAssertTrue(result, "Expected urls to match")
+    }
+
+    func testUrlFailingInvocation() {
+        let result = matcher.match(
+                expected: [URL(string: "https://fixture.url.com/fixture/suffix")!],
+                actual: [URL(string: "https://fixture.url.eu/fixture/suffix")!]
+        )
+        XCTAssertFalse(result, "Expected urls not to match")
+    }
+    
+    func testUrlCrossTypePassingInvocation() {
+        let result = matcher.match(
+            expected: [URL(string: "https://fixture.url.com/fixture/suffix")!, NSURL(string: "https://fixture.url.pl/fixture/suffix")!],
+            actual: [NSURL(string: "https://fixture.url.com/fixture/suffix")!, URL(string: "https://fixture.url.pl/fixture/suffix")!]
+        )
+        XCTAssertTrue(result, "Expected urls to match")
+    }
+
     // MARK: Working with optionals and nil
 
     func testNilPassingInvocation() {
@@ -204,8 +230,8 @@ class FoundationMatcherTests: XCTestCase {
 
     func testPassingInvocation() {
         let result = matcher.match(
-                expected: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]],
-                actual: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]]
+                expected: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element", URL(string: "htp://fixture/url")!]],
+                actual: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element", URL(string: "htp://fixture/url")!]]
         )
 
         XCTAssertTrue(result, "Expected elements to match")
@@ -213,7 +239,7 @@ class FoundationMatcherTests: XCTestCase {
 
     func testFailingInvocation() {
         let result = matcher.match(
-                expected: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element"]],
+                expected: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element", URL(string: "htp://fixture/url")!]],
                 actual: ["Fixture String", nil, 42, 1.0, ["Another Key": "Value"], ["Fixture Another Element"]]
         )
 
