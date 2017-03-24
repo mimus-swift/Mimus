@@ -56,3 +56,11 @@ extension NSNull: MockEquatable {
         return other == nil || other is NSNull
     }
 }
+
+extension NSURL: MockEquatable {
+
+    public func equalTo(other: MockEquatable?) -> Bool {
+        let selfSwiftUrl = self as URL
+        return selfSwiftUrl.equalTo(other: other)
+    }
+}
