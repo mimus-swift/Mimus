@@ -3,6 +3,7 @@
 //
 
 import XCTest
+
 @testable import Mimus
 
 class FoundationMatcherTests: XCTestCase {
@@ -87,12 +88,12 @@ class FoundationMatcherTests: XCTestCase {
 
     func testFloatPassingInvocation() {
         let result = matcher.match(expected: [Float(42.0)], actual: [Float(42.0)])
-        XCTAssertTrue(result, "Expected doubles to match")
+        XCTAssertTrue(result, "Expected floats to match")
     }
 
     func testFloatFailingInvocation() {
         let result = matcher.match(expected: [Float(42.0)], actual: [Float(43.0)])
-        XCTAssertFalse(result, "Expected doubles not to match")
+        XCTAssertFalse(result, "Expected floats not to match")
     }
 
     func testBoolPassingInvocation() {
