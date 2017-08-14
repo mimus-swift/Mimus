@@ -35,3 +35,25 @@ extension User: MockEquatable {
 And that's it! Mimus will handle all the logic for doing actual comparison. This
 will also make your objects work with containers like `Array` and `Dictionary`.
 You can read more about support for this in [Basics](https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md).
+
+You can also use convenience comparison function defined in `MockEquatable`
+extension for `Equatable` type:
+
+```swift
+func compare<T: Equatable>(other: T?) -> Bool {
+    guard let equatableSelf = self as? T, let other = other else {
+        return false
+    }
+    return equatableSelf == other
+}
+```
+
+For instance, if `User` would also conform to `Equatable` you could just write:
+
+```swift
+extension User: MockEquatable {
+
+  func equalTo(other: MockEquatable?) -> Bool {
+    return compare(other: other as? User)
+}
+```
