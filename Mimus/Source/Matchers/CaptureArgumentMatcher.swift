@@ -1,4 +1,3 @@
-
 /// Records are compared values.
 /// See https://github.com/AirHelp/Mimus/blob/master/Documentation/Capturing%20Arguments.md for more details. 
 public class CaptureArgumentMatcher: MockEquatable {

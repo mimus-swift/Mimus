@@ -26,6 +26,8 @@
 		40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02877AF79612BC1F09CDD /* Matcher.swift */; };
 		40E02C7766A981C1DB7E990C /* CaptureArgumentMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */; };
 		40E02F5C3603EB017407264E /* Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E021D799D22B9FF27D61DC /* Examples.swift */; };
+		43190C9B1F41A1F2000F6813 /* MatcherExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */; };
+		B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +72,8 @@
 		40E02F215A9DF8B857C63421 /* TestLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestLocation.swift; sourceTree = "<group>"; };
 		40E02F2190DBA2AAA3AD3A12 /* Mock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
 		40E02F8414344A935EE3A304 /* AnyMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyMatcher.swift; sourceTree = "<group>"; };
+		43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherExtensionsTests.swift; sourceTree = "<group>"; };
+		B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherHelpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +142,7 @@
 				40E022E305486CA788515B57 /* FoundationMatcherTests.swift */,
 				40E02E3B63740D357AB49610 /* MockTests.swift */,
 				40E02F19CAE87139D2C32A88 /* Helpers */,
+				43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */,
 			);
 			path = MimusTests;
 			sourceTree = "<group>";
@@ -167,6 +172,7 @@
 				40E024EB9A53254A5D8F4FCD /* FoundationMatchers.swift */,
 				40E02F8414344A935EE3A304 /* AnyMatcher.swift */,
 				40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */,
+				B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */,
 			);
 			path = Matchers;
 			sourceTree = "<group>";
@@ -367,6 +373,7 @@
 				40E02008909FD2CA1A151AFC /* VerificationHandler.swift in Sources */,
 				40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */,
 				40E0227031E79D0304201F64 /* Mock.swift in Sources */,
+				B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,6 +385,7 @@
 				40E020D8834DFFDA2780CF58 /* FoundationMatcherTests.swift in Sources */,
 				40E02A11CF409F881CB7414B /* MockTests.swift in Sources */,
 				40E02770F499510C4A2A5137 /* TestExtensions.swift in Sources */,
+				43190C9B1F41A1F2000F6813 /* MatcherExtensionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

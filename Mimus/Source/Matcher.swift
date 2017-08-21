@@ -1,11 +1,10 @@
-
 internal class Matcher {
 
     func match(expected: [MockEquatable?]?, actual: [MockEquatable?]?) -> Bool {
         if expected == nil && actual == nil {
             return true
         }
-        
+
         guard let expectedArguments = expected, let actualArguments = actual else {
             return false
         }
