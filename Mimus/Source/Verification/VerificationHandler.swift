@@ -8,24 +8,24 @@ internal class VerificationHandler {
 
     static var shared: VerificationHandler = VerificationHandler()
 
-    func verifyCall(callIdentifier: String, matchCount: Int, differentArgumentsMatchCount: Int, mode: VerificationMode, testLocation: TestLocation) {
+    func verifyCall(callIdentifier: String, matchedResults: [MatchResult], mismatchedArgumentsResults: [MatchResult], mode: VerificationMode, testLocation: TestLocation) {
         switch mode {
         case .never:
             assertNever(callIdentifier: callIdentifier,
-                    matchCount: matchCount,
-                    differentArgumentsMatchCount: differentArgumentsMatchCount,
+                    matchCount: matchedResults.count,
+                    differentArgumentsMatchCount: mismatchedArgumentsResults.count,
                     testLocation: testLocation)
         case .atLeast(let count):
             assertAtLeast(callIdentifier: callIdentifier,
                     times: count,
-                    matchCount: matchCount,
-                    differentArgumentsMatchCount: differentArgumentsMatchCount,
+                    matchCount: matchedResults.count,
+                    differentArgumentsMatchCount: mismatchedArgumentsResults.count,
                     testLocation: testLocation)
         case .times(let count):
             assert(callIdentifier: callIdentifier,
                     times: count,
-                    matchCount: matchCount,
-                    differentArgumentsMatchCount: differentArgumentsMatchCount,
+                    matchCount: matchedResults.count,
+                    differentArgumentsMatchCount: mismatchedArgumentsResults.count,
                     testLocation: testLocation)
         }
     }
