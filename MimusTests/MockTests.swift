@@ -5,19 +5,18 @@
 import XCTest
 @testable import Mimus
 
-
 class FakeVerificationHandler: VerificationHandler {
 
     var lastCallIdentifier: String?
-    var lastMatchCount: Int?
-    var lastDifferentArgumentsCount: Int?
+    var lastMatchedResults: [MatchResult]?
+    var lastMismatchedArgumentsResults: [MatchResult]?
     var lastMode: VerificationMode?
     var lastTestLocation: TestLocation?
 
-    override func verifyCall(callIdentifier: String, matchCount: Int, differentArgumentsMatchCount: Int, mode: VerificationMode, testLocation: TestLocation) {
+    override func verifyCall(callIdentifier: String, matchedResults: [MatchResult], mismatchedArgumentsResults: [MatchResult], mode: VerificationMode, testLocation: TestLocation) {
         lastCallIdentifier = callIdentifier
-        lastMatchCount = matchCount
-        lastDifferentArgumentsCount = differentArgumentsMatchCount
+        lastMatchedResults = matchedResults
+        lastMismatchedArgumentsResults = mismatchedArgumentsResults
         lastTestLocation = testLocation
         lastMode = mode
     }
@@ -87,7 +86,7 @@ class MockTests: XCTestCase {
 
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier")
 
-        XCTAssertEqual(fakeVerificationHandler.lastMatchCount, 2, "Expected verification handler to receive correct number of matches")
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 2, "Expected verification handler to receive correct number of matches")
     }
 
     func testCorrectNumberOfMatchesWithArguments() {
@@ -98,7 +97,7 @@ class MockTests: XCTestCase {
 
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [42, 43])
 
-        XCTAssertEqual(fakeVerificationHandler.lastMatchCount, 2, "Expected verification handler to receive correct number of matches")
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 2, "Expected verification handler to receive correct number of matches")
     }
 
     func testCorrectNumberOfMismatchedArguments() {
@@ -108,8 +107,8 @@ class MockTests: XCTestCase {
 
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [42])
 
-        XCTAssertEqual(fakeVerificationHandler.lastMatchCount, 1, "Expected verification handler to receive correct number of matches")
-        XCTAssertEqual(fakeVerificationHandler.lastDifferentArgumentsCount, 2, "Expected verification handler to receive correct number of unmatched arguments")
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+        XCTAssertEqual(fakeVerificationHandler.lastMismatchedArgumentsResults?.count, 2, "Expected verification handler to receive correct number of unmatched arguments")
     }
 
     func testCaptureArgument() {

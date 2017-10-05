@@ -69,20 +69,15 @@ public extension Mock {
         let callCandidates = storage.filter {
             $0.identifier == callIdentifier
         }
-        var matchCount = 0
-        var differentArgumentsMatchCount = 0
 
-        for candidate in callCandidates {
-            if mockMatcher.match(expected: arguments, actual: candidate.arguments) {
-                matchCount += 1
-            } else {
-                differentArgumentsMatchCount += 1
-            }
-        }
+        let matchResults = callCandidates.map({ mockMatcher.match(expected: arguments, actual: $0.arguments) })
+
+        let matchedResults = matchResults.filter({ $0.matching })
+        let mismatchedResults = matchResults.filter({ !$0.matching })
 
         VerificationHandler.shared.verifyCall(callIdentifier: callIdentifier,
-            matchCount: matchCount,
-            differentArgumentsMatchCount: differentArgumentsMatchCount,
+            matchedResults: matchedResults,
+            mismatchedArgumentsResults: mismatchedResults,
             mode: mode,
             testLocation: testLocation)
 

@@ -26,7 +26,8 @@ class MatcherTests: XCTestCase {
         let actual: NSString = "Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testStaticStringFailingInvocation() {
@@ -34,7 +35,11 @@ class MatcherTests: XCTestCase {
         let actual: NSString = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings not to match")
+        XCTAssertFalse(result.matching, "Expected strings not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+
+        let mismatchedResult = result.mismatchedComparisons[0]
+        mismatchedResult.assert(expected: expected, actual: actual)
     }
 
     func testStaticStringWithNSStringPassingInvocation() {
@@ -42,7 +47,8 @@ class MatcherTests: XCTestCase {
         let actual: NSString = "Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testStaticStringWithNSStringFailingInvocation() {
@@ -50,7 +56,8 @@ class MatcherTests: XCTestCase {
         let actual: NSString = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings not to match")
+        XCTAssertFalse(result.matching, "Expected strings not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     func testStringWithNSStringPassingInvocation() {
@@ -58,7 +65,8 @@ class MatcherTests: XCTestCase {
         let actual: NSString = "Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testStringWithNSStringFailingInvocation() {
@@ -66,7 +74,11 @@ class MatcherTests: XCTestCase {
         let actual: NSString = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings not to match")
+        XCTAssertFalse(result.matching, "Expected strings not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+
+        let mismatchedResult = result.mismatchedComparisons[0]
+        mismatchedResult.assert(expected: expected, actual: actual)
     }
 
     // MARK: NSNumber
@@ -76,7 +88,8 @@ class MatcherTests: XCTestCase {
         let actual: NSNumber = 42
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected NSNumbers to match")
+        XCTAssertTrue(result.matching, "Expected NSNumbers to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNSNumberFailingInvocation() {
@@ -84,7 +97,11 @@ class MatcherTests: XCTestCase {
         let actual: NSNumber = 43
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected NSNumbers not to match")
+        XCTAssertFalse(result.matching, "Expected NSNumbers not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+
+        let mismatchedResult = result.mismatchedComparisons[0]
+        mismatchedResult.assert(expected: expected, actual: actual)
     }
 
     // MARK: NSError
@@ -94,7 +111,8 @@ class MatcherTests: XCTestCase {
         let actual = NSError(domain: "Fixture Domain", code: 42)
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected NSErrors to match")
+        XCTAssertTrue(result.matching, "Expected NSErrors to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNSErrorFailingInvocation() {
@@ -102,7 +120,11 @@ class MatcherTests: XCTestCase {
         let actual = NSError(domain: "Fixture Domain", code: 43)
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected NSErrors not to match")
+        XCTAssertFalse(result.matching, "Expected NSErrors not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+
+        let mismatchedResult = result.mismatchedComparisons[0]
+        mismatchedResult.assert(expected: expected, actual: actual)
     }
 
     // MARK: NSURL
@@ -112,7 +134,8 @@ class MatcherTests: XCTestCase {
         let actual = NSURL(string: "https://fixture.url.com/fixture/suffix")!
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected NSErrors to match")
+        XCTAssertTrue(result.matching, "Expected NSErrors to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNSURLFailingInvocation() {
@@ -120,7 +143,11 @@ class MatcherTests: XCTestCase {
         let actual = NSURL(string: "https://fixture.url.eu/fixture/suffix")!
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected NSErrors not to match")
+        XCTAssertFalse(result.matching, "Expected NSErrors not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+
+        let mismatchedResult = result.mismatchedComparisons[0]
+        mismatchedResult.assert(expected: expected, actual: actual)
     }
 
     // MARK: NSArray
@@ -130,7 +157,8 @@ class MatcherTests: XCTestCase {
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected arrays to match")
+        XCTAssertTrue(result.matching, "Expected arrays to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNSArrayFailingInvocation() {
@@ -138,7 +166,8 @@ class MatcherTests: XCTestCase {
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected arrays not to match")
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     func testIncompatibleSizesNSArrayFailingInvocation() {
@@ -146,7 +175,8 @@ class MatcherTests: XCTestCase {
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected arrays not to match")
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     func testNestedNSArrayPassingInvocation() {
@@ -156,7 +186,8 @@ class MatcherTests: XCTestCase {
         let actual = NSArray(objects: NSNumber(floatLiteral: 0.5), nestedActualArray)
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected arrays to match")
+        XCTAssertTrue(result.matching, "Expected arrays to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNestedNSArrayFailingInvocation() {
@@ -166,7 +197,8 @@ class MatcherTests: XCTestCase {
         let actual = NSArray(objects: NSNumber(floatLiteral: 0.5), nestedActualArray)
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected arrays not to match")
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     // MARK: NSDictionary
@@ -176,7 +208,8 @@ class MatcherTests: XCTestCase {
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 2"), NSNumber(floatLiteral: 0.5)))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected dictionaries to match")
+        XCTAssertTrue(result.matching, "Expected dictionaries to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNSDictionaryFailingInvocation() {
@@ -184,7 +217,8 @@ class MatcherTests: XCTestCase {
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 2"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 1"), NSNumber(floatLiteral: 0.5)))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected dictionaries not to match")
+        XCTAssertFalse(result.matching, "Expected dictionaries not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     func testIncompatibleSizesNSDictionaryFailingInvocation() {
@@ -192,7 +226,8 @@ class MatcherTests: XCTestCase {
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 2"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 1"), NSNumber(floatLiteral: 0.5)))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected dictionaries not to match")
+        XCTAssertFalse(result.matching, "Expected dictionaries not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     func testNestedNSDictionaryPassingInvocation() {
@@ -202,7 +237,8 @@ class MatcherTests: XCTestCase {
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedActualDictionary))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected dictionaries to match")
+        XCTAssertTrue(result.matching, "Expected dictionaries to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNestedNSDictionaryFailingInvocation() {
@@ -212,7 +248,8 @@ class MatcherTests: XCTestCase {
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedActualDictionary), (NSString(string: "Fixture Key 2"), nestedExpectedDictionary))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected dictionaries not to match")
+        XCTAssertTrue(result.matching, "Expected dictionaries to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     // MARK: More Complicated Scenarios
@@ -223,11 +260,12 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let result = matcher.match(
-                expected: [expected],
-                actual: [actual]
+            expected: [expected],
+            actual: [actual]
         )
 
-        XCTAssertTrue(result, "Expected elements to match")
+        XCTAssertTrue(result.matching, "Expected elements to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testFailingInvocation() {
@@ -236,10 +274,11 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNull(), nestedArray, nestedDictionary)
         let result = matcher.match(
-                expected: [expected],
-                actual: [actual]
+            expected: [expected],
+            actual: [actual]
         )
 
-        XCTAssertFalse(result, "Expected elements to match")
+        XCTAssertFalse(result.matching, "Expected elements to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 }

@@ -24,12 +24,13 @@ class FoundationMatcherTests: XCTestCase {
 
     func testStringPassingInvocation() {
         let result = matcher.match(expected: ["Fixture String"], actual: ["Fixture String"])
-        XCTAssertTrue(result, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testStringFailingInvocation() {
         let result = matcher.match(expected: ["Fixture String"], actual: ["Fixture Another String"])
-        XCTAssertFalse(result, "Expected strings not to match")
+        XCTAssertFalse(result.matching, "Expected strings not to match")
     }
 
     func testStaticStringPassingInvocation() {
@@ -37,7 +38,8 @@ class FoundationMatcherTests: XCTestCase {
         let actual: StaticString = "Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testStaticStringFailingInvocation() {
@@ -45,7 +47,7 @@ class FoundationMatcherTests: XCTestCase {
         let actual: StaticString = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings not to match")
+        XCTAssertFalse(result.matching, "Expected strings not to match")
     }
 
     func testStaticStringWithStringPassingInvocation() {
@@ -53,7 +55,8 @@ class FoundationMatcherTests: XCTestCase {
         let actual = "Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testStaticStringWithStringFailingInvocation() {
@@ -61,49 +64,53 @@ class FoundationMatcherTests: XCTestCase {
         let actual = "Another Fixture String"
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertFalse(result, "Expected strings not to match")
+        XCTAssertFalse(result.matching, "Expected strings not to match")
     }
 
     // MARK: Basic Types
 
     func testIntPassingInvocation() {
         let result = matcher.match(expected: [42], actual: [42])
-        XCTAssertTrue(result, "Expected ints to match")
+        XCTAssertTrue(result.matching, "Expected ints to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testIntFailingInvocation() {
         let result = matcher.match(expected: [42], actual: [43])
-        XCTAssertFalse(result, "Expected ints not to match")
+        XCTAssertFalse(result.matching, "Expected ints not to match")
     }
 
     func testDoublePassingInvocation() {
         let result = matcher.match(expected: [42.0], actual: [42.0])
-        XCTAssertTrue(result, "Expected doubles to match")
+        XCTAssertTrue(result.matching, "Expected doubles to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testDoubleFailingInvocation() {
         let result = matcher.match(expected: [42.0], actual: [43.0])
-        XCTAssertFalse(result, "Expected doubles not to match")
+        XCTAssertFalse(result.matching, "Expected doubles not to match")
     }
 
     func testFloatPassingInvocation() {
         let result = matcher.match(expected: [Float(42.0)], actual: [Float(42.0)])
-        XCTAssertTrue(result, "Expected floats to match")
+        XCTAssertTrue(result.matching, "Expected floats to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testFloatFailingInvocation() {
         let result = matcher.match(expected: [Float(42.0)], actual: [Float(43.0)])
-        XCTAssertFalse(result, "Expected floats not to match")
+        XCTAssertFalse(result.matching, "Expected floats not to match")
     }
 
     func testBoolPassingInvocation() {
         let result = matcher.match(expected: [true], actual: [true])
-        XCTAssertTrue(result, "Expected booleans to match")
+        XCTAssertTrue(result.matching, "Expected booleans to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testBoolFailingInvocation() {
         let result = matcher.match(expected: [true], actual: [false])
-        XCTAssertFalse(result, "Expected booleans not to match")
+        XCTAssertFalse(result.matching, "Expected booleans not to match")
     }
 
     // MARK: Index Paths
@@ -113,7 +120,8 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [IndexPath(row: 42, section: 43)],
                 actual: [IndexPath(row: 42, section: 43)]
         )
-        XCTAssertTrue(result, "Expected index paths to match")
+        XCTAssertTrue(result.matching, "Expected index paths to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testIndexPathFailingInvocation() {
@@ -121,14 +129,14 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [IndexPath(row: 42, section: 43)],
                 actual: [IndexPath(row: 44, section: 43)]
         )
-        XCTAssertFalse(result, "Expected index paths not to match")
+        XCTAssertFalse(result.matching, "Expected index paths not to match")
     }
 
     // MARK: Different Types
 
     func testIncorrectTypes() {
         let result = matcher.match(expected: [42.0], actual: ["Fixture String"])
-        XCTAssertFalse(result, "Expected incorrect not to match")
+        XCTAssertFalse(result.matching, "Expected incorrect not to match")
     }
 
     // MARK: Url
@@ -138,7 +146,8 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [URL(string: "https://fixture.url.com/fixture/suffix")!],
                 actual: [URL(string: "https://fixture.url.com/fixture/suffix")!]
         )
-        XCTAssertTrue(result, "Expected urls to match")
+        XCTAssertTrue(result.matching, "Expected urls to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testUrlFailingInvocation() {
@@ -146,7 +155,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [URL(string: "https://fixture.url.com/fixture/suffix")!],
                 actual: [URL(string: "https://fixture.url.eu/fixture/suffix")!]
         )
-        XCTAssertFalse(result, "Expected urls not to match")
+        XCTAssertFalse(result.matching, "Expected urls not to match")
     }
     
     func testUrlCrossTypePassingInvocation() {
@@ -154,19 +163,21 @@ class FoundationMatcherTests: XCTestCase {
             expected: [URL(string: "https://fixture.url.com/fixture/suffix")!, NSURL(string: "https://fixture.url.pl/fixture/suffix")!],
             actual: [NSURL(string: "https://fixture.url.com/fixture/suffix")!, URL(string: "https://fixture.url.pl/fixture/suffix")!]
         )
-        XCTAssertTrue(result, "Expected urls to match")
+        XCTAssertTrue(result.matching, "Expected urls to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     // MARK: Working with optionals and nil
 
     func testNilPassingInvocation() {
         let result = matcher.match(expected: [nil], actual: [nil])
-        XCTAssertTrue(result, "Expected nils to match")
+        XCTAssertTrue(result.matching, "Expected nils to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNilFailingInvocation() {
         let result = matcher.match(expected: [nil], actual: [42])
-        XCTAssertFalse(result, "Expected elements not to match")
+        XCTAssertFalse(result.matching, "Expected elements not to match")
     }
 
     // MARK: Arrays
@@ -176,7 +187,8 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Value 1", "Fixture Value 2"]],
                 actual: [["Fixture Value 1", "Fixture Value 2"]]
         )
-        XCTAssertTrue(result, "Expected arrays to match")
+        XCTAssertTrue(result.matching, "Expected arrays to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testArrayFailingInvocation() {
@@ -184,7 +196,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Value 1", "Fixture Value 2"]],
                 actual: [["Fixture Value 1", "Another Fixture Value 2"]]
         )
-        XCTAssertFalse(result, "Expected arrays not to match")
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
     }
 
     func testIncompatibleSizesArrayFailingInvocation() {
@@ -192,7 +204,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Value 1", "Fixture Value 2", "Fixture Value 3"]],
                 actual: [["Fixture Value 1", "Fixture Value 2"]]
         )
-        XCTAssertFalse(result, "Expected arrays not to match")
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
     }
 
     func testNestedArraysPassingInvocation() {
@@ -200,7 +212,8 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]],
                 actual: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]]
         )
-        XCTAssertTrue(result, "Expected arrays to match")
+        XCTAssertTrue(result.matching, "Expected arrays to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testNestedArraysFailingInvocation() {
@@ -208,7 +221,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]],
                 actual: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 4"]]]
         )
-        XCTAssertFalse(result, "Expected arrays not to match")
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
     }
 
     // MARK: Dictionaries
@@ -218,7 +231,8 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Key": "Fixture Value"]],
                 actual: [["Fixture Key": "Fixture Value"]]
         )
-        XCTAssertTrue(result, "Expected dictionary to match")
+        XCTAssertTrue(result.matching, "Expected dictionary to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testDictionaryFailingInvocationDifferentKeys() {
@@ -226,7 +240,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Key": "Fixture Value"]],
                 actual: [["Another Fixture Key": "Fixture Value"]]
         )
-        XCTAssertFalse(result, "Expected dictionary not to match")
+        XCTAssertFalse(result.matching, "Expected dictionary not to match")
     }
 
     func testDictionaryFailingInvocationDifferentValues() {
@@ -234,7 +248,7 @@ class FoundationMatcherTests: XCTestCase {
                 expected: [["Fixture Key": "Fixture Value"]],
                 actual: [["Fixture Key": "Another Fixture Value"]]
         )
-        XCTAssertFalse(result, "Expected dictionary not to match")
+        XCTAssertFalse(result.matching, "Expected dictionary not to match")
     }
 
     // MARK: More Complicated Scenarios
@@ -245,7 +259,8 @@ class FoundationMatcherTests: XCTestCase {
                 actual: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element", URL(string: "htp://fixture/url")!]]
         )
 
-        XCTAssertTrue(result, "Expected elements to match")
+        XCTAssertTrue(result.matching, "Expected elements to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
 
     func testFailingInvocation() {
@@ -254,6 +269,14 @@ class FoundationMatcherTests: XCTestCase {
                 actual: ["Fixture String", nil, 42, 1.0, ["Another Key": "Value"], ["Fixture Another Element"]]
         )
 
-        XCTAssertFalse(result, "Expected elements to match")
+        XCTAssertFalse(result.matching, "Expected elements to not match")
+    }
+
+    // MARK: Bugs
+
+    func testNilValues() {
+        let result = matcher.match(expected: ["Fixture Value", nil], actual: ["Fixture Another value", nil])
+
+        XCTAssertFalse(result.matching, "Expected elements to not match")
     }
 }
