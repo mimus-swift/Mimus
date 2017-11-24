@@ -7,8 +7,8 @@ public class CaptureArgumentMatcher: MockEquatable {
     public init() {
     }
 
-    public func equalTo(other: MockEquatable?) -> Bool {
-        capturedValues.append(other as Any)
+    public func equalTo(other: Any?) -> Bool {
+        capturedValues.append(other)
         return true
     }
 }

@@ -2,7 +2,7 @@ import Foundation
 
 extension NSError: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherError = other as? NSError {
             return self == otherError
         }
@@ -12,7 +12,7 @@ extension NSError: MockEquatable {
 
 extension NSString: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         let selfSwiftString = self as String
         return selfSwiftString.equalTo(other: other)
     }
@@ -20,7 +20,7 @@ extension NSString: MockEquatable {
 
 extension NSNumber: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherNumber = other as? NSNumber {
             return self == otherNumber
         }
@@ -30,7 +30,7 @@ extension NSNumber: MockEquatable {
 
 extension NSArray: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let array = self as? Array<Any> {
             return array.equalTo(other: other)
         } else {
@@ -41,7 +41,7 @@ extension NSArray: MockEquatable {
 
 extension NSDictionary: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let dictionary = self as? Dictionary<AnyHashable, Any> {
             return dictionary.equalTo(other: other)
         } else {
@@ -52,14 +52,14 @@ extension NSDictionary: MockEquatable {
 
 extension NSNull: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         return other == nil || other is NSNull
     }
 }
 
 extension NSURL: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         let selfSwiftUrl = self as URL
         return selfSwiftUrl.equalTo(other: other)
     }
