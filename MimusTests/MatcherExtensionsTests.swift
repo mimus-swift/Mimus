@@ -37,7 +37,7 @@ class MatcherExtensionsTests: XCTestCase {
 
 extension User: MockEquatable {
 
-    func equalTo(other: MockEquatable?) -> Bool {
+    func equalTo(other: Any?) -> Bool {
         return compare(other: other as? User)
     }
 }

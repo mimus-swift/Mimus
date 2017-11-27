@@ -4,7 +4,7 @@ internal struct MatchResult {
 
         let expected: MockEquatable?
 
-        let actual: MockEquatable?
+        let actual: Any?
     }
 
     let matching: Bool
@@ -24,7 +24,7 @@ internal struct MatchResult {
 
 internal class Matcher {
 
-    func match(expected: [MockEquatable?]?, actual: [MockEquatable?]?) -> MatchResult {
+    func match(expected: [MockEquatable?]?, actual: [Any?]?) -> MatchResult {
         if expected == nil && actual == nil {
             return MatchResult(matching: true)
         }
@@ -40,7 +40,7 @@ internal class Matcher {
         return match(expectedArguments: expectedArguments, actualArguments: actualArguments)
     }
 
-    func match(expectedArguments: [MockEquatable?], actualArguments: [MockEquatable?]) -> MatchResult {
+    func match(expectedArguments: [MockEquatable?], actualArguments: [Any?]) -> MatchResult {
         // At this point we're sure both arrays have the same count
 
         var equal = true

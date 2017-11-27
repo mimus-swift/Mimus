@@ -6,7 +6,7 @@ public class AnyMatcher: MockEquatable {
     public init() {
     }
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         return true
     }
 }

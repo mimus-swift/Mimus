@@ -20,7 +20,7 @@ public protocol MockEquatable {
     ///
     /// - Parameter other: other value for verifying equality
     /// - Returns: true if values are equal, false if not
-    func equalTo(other: MockEquatable?) -> Bool
+    func equalTo(other: Any?) -> Bool
 }
 
 /// Structure used to hold recorded invocations
@@ -28,7 +28,7 @@ public struct RecordedCall {
 
     let identifier: String
 
-    let arguments: [MockEquatable?]?
+    let arguments: [Any?]?
 
 }
 
@@ -47,7 +47,7 @@ public extension Mock {
     /// - Parameters:
     ///   - callIdentifier: call identifier for recorded invocation. You should use the same identifier when verifying call.
     ///   - arguments: Recorded arguments. You can pass nil if no arguments are needed. Supports nils in the array as well.
-    func recordCall(withIdentifier callIdentifier: String, arguments: [MockEquatable?]? = nil) {
+    func recordCall(withIdentifier callIdentifier: String, arguments: [Any?]? = nil) {
         let record = RecordedCall(identifier: callIdentifier, arguments: arguments)
         storage.append(record)
     }

@@ -6,7 +6,7 @@ import XCTest
 
 extension String: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherString = other as? String {
             return self == otherString
         }
@@ -19,7 +19,7 @@ extension String: MockEquatable {
 
 extension StaticString: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         let selfString = self.toString()
         if let otherString = other as? String {
             return selfString == otherString
@@ -40,7 +40,7 @@ extension StaticString: MockEquatable {
 
 extension Int: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherInt = other as? Int {
             return self == otherInt
         }
@@ -50,7 +50,7 @@ extension Int: MockEquatable {
 
 extension Float: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherFloat = other as? Float {
             return self == otherFloat
         }
@@ -60,7 +60,7 @@ extension Float: MockEquatable {
 
 extension Double: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherDouble = other as? Double {
             return self == otherDouble
         }
@@ -70,7 +70,7 @@ extension Double: MockEquatable {
 
 extension Bool: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherBool = other as? Bool {
             return self == otherBool
         }
@@ -80,7 +80,7 @@ extension Bool: MockEquatable {
 
 extension URL: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherUrl = other as? URL {
             return self == otherUrl
         }
@@ -90,7 +90,7 @@ extension URL: MockEquatable {
 
 extension Array: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         // Small hack to go around type system
         let selfAny = self as Any?
         guard let selfArray = selfAny as? [MockEquatable?],
@@ -135,7 +135,7 @@ extension Array: MockEquatable {
 
 extension Dictionary: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         // Small hack to go around type system
         let anySelf: [AnyHashable: Any] = self
         let anyOther = other as? [AnyHashable: Any]
@@ -165,7 +165,7 @@ extension Dictionary: MockEquatable {
 
 extension IndexPath: MockEquatable {
 
-    public func equalTo(other: MockEquatable?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         if let otherIndexPath = other as? IndexPath {
             return self == otherIndexPath
         }
