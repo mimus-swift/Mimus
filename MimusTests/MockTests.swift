@@ -122,4 +122,34 @@ class MockTests: XCTestCase {
 
         XCTAssertEqual(lastValue, 42, "Expected to receive captured value")
     }
+
+    func testInstanceOf() {
+        let user = User(identifier: "Fixture Identifier")
+
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [user])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [InstanceOf<User>()])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+
+    func testInstanceOfFailure() {
+        let user = User(identifier: "Fixture Identifier")
+
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [user])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [InstanceOf<Client>()])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
+    // MARK: Helpers
+
+    struct User {
+        let identifier: String
+    }
+
+    struct Client {
+        let identifier: String
+    }
 }

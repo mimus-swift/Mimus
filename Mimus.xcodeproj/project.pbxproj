@@ -27,6 +27,8 @@
 		40E02C7766A981C1DB7E990C /* CaptureArgumentMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */; };
 		40E02F5C3603EB017407264E /* Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E021D799D22B9FF27D61DC /* Examples.swift */; };
 		43190C9B1F41A1F2000F6813 /* MatcherExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */; };
+		437E55B91FCC7DC9007D5A3C /* ApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */; };
+		B27A9968CAC21E5D7E37A8C5 /* InstanceOfMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */; };
 		B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */; };
 /* End PBXBuildFile section */
 
@@ -73,7 +75,9 @@
 		40E02F2190DBA2AAA3AD3A12 /* Mock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
 		40E02F8414344A935EE3A304 /* AnyMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyMatcher.swift; sourceTree = "<group>"; };
 		43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherExtensionsTests.swift; sourceTree = "<group>"; };
+		437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationService.swift; sourceTree = "<group>"; };
 		B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherHelpers.swift; sourceTree = "<group>"; };
+		B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstanceOfMatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +177,7 @@
 				40E02F8414344A935EE3A304 /* AnyMatcher.swift */,
 				40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */,
 				B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */,
+				B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */,
 			);
 			path = Matchers;
 			sourceTree = "<group>";
@@ -183,6 +188,7 @@
 				40E0209036FA4582F38027DB /* AuthenticationManager.swift */,
 				40E0239656117918B2B508D2 /* FakeAuthenticationManager.swift */,
 				40E025D4F7B199795EEBE417 /* AuthenticationCoordinator.swift */,
+				437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */,
 			);
 			path = "Test Helpers";
 			sourceTree = "<group>";
@@ -377,6 +383,7 @@
 				40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */,
 				40E0227031E79D0304201F64 /* Mock.swift in Sources */,
 				B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */,
+				B27A9968CAC21E5D7E37A8C5 /* InstanceOfMatcher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +404,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				40E02468F3763AACE6F79040 /* AuthenticationManager.swift in Sources */,
+				437E55B91FCC7DC9007D5A3C /* ApplicationService.swift in Sources */,
 				40E02F5C3603EB017407264E /* Examples.swift in Sources */,
 				40E0204F99A9FCC36C0ED04A /* FakeAuthenticationManager.swift in Sources */,
 				40E0217043DED2C29D5CE013 /* AuthenticationCoordinator.swift in Sources */,
@@ -555,7 +563,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.Mimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -585,7 +592,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.Mimus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -598,7 +604,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -611,7 +616,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -624,7 +628,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusExamples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -637,7 +640,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusExamples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
