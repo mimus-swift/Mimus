@@ -66,4 +66,14 @@ class AuthenticationCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(capturedOptions?["type"], "login")
     }
+    
+    // MARK: InstanceOf
+    
+    func testInstanceOf() {
+        let fakeServiceRegistrator = FakeApplicationServiceRegistrator()
+        
+        fakeServiceRegistrator.register(service: FakeApplicationService())
+        
+        fakeServiceRegistrator.verifyCall(withIdentifier: "register", arguments: [InstanceOf<FakeApplicationService>()])
+    }
 }
