@@ -26,8 +26,10 @@
 		40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E02877AF79612BC1F09CDD /* Matcher.swift */; };
 		40E02C7766A981C1DB7E990C /* CaptureArgumentMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */; };
 		40E02F5C3603EB017407264E /* Examples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E021D799D22B9FF27D61DC /* Examples.swift */; };
+		4316CED51FFBDBEF004C82E7 /* IdenticalMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4316CED41FFBDBEF004C82E7 /* IdenticalMatcher.swift */; };
 		43190C9B1F41A1F2000F6813 /* MatcherExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */; };
 		437E55B91FCC7DC9007D5A3C /* ApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */; };
+		B27A920B9C2CA66BCBADDB19 /* EqualMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9B7F44828628232184BF /* EqualMatcher.swift */; };
 		B27A9968CAC21E5D7E37A8C5 /* InstanceOfMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */; };
 		B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */; };
 /* End PBXBuildFile section */
@@ -74,9 +76,11 @@
 		40E02F215A9DF8B857C63421 /* TestLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestLocation.swift; sourceTree = "<group>"; };
 		40E02F2190DBA2AAA3AD3A12 /* Mock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
 		40E02F8414344A935EE3A304 /* AnyMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyMatcher.swift; sourceTree = "<group>"; };
+		4316CED41FFBDBEF004C82E7 /* IdenticalMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdenticalMatcher.swift; sourceTree = "<group>"; };
 		43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherExtensionsTests.swift; sourceTree = "<group>"; };
 		437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationService.swift; sourceTree = "<group>"; };
 		B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherHelpers.swift; sourceTree = "<group>"; };
+		B27A9B7F44828628232184BF /* EqualMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EqualMatcher.swift; sourceTree = "<group>"; };
 		B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstanceOfMatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -178,6 +182,8 @@
 				40E028F08E6809067D26CF3B /* CaptureArgumentMatcher.swift */,
 				B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */,
 				B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */,
+				B27A9B7F44828628232184BF /* EqualMatcher.swift */,
+				4316CED41FFBDBEF004C82E7 /* IdenticalMatcher.swift */,
 			);
 			path = Matchers;
 			sourceTree = "<group>";
@@ -377,8 +383,10 @@
 				40E02A9090F3F6AE9F3D4E38 /* TestLocation.swift in Sources */,
 				40E02B8EE6D8674EB13C9E5A /* SwiftMatchers.swift in Sources */,
 				40E02284F87CD8F68F75F631 /* FoundationMatchers.swift in Sources */,
+				B27A920B9C2CA66BCBADDB19 /* EqualMatcher.swift in Sources */,
 				40E020F0008AFC5EA96FB250 /* AnyMatcher.swift in Sources */,
 				40E02C7766A981C1DB7E990C /* CaptureArgumentMatcher.swift in Sources */,
+				4316CED51FFBDBEF004C82E7 /* IdenticalMatcher.swift in Sources */,
 				40E02008909FD2CA1A151AFC /* VerificationHandler.swift in Sources */,
 				40E02C2551FC0954F94EBDD0 /* Matcher.swift in Sources */,
 				40E0227031E79D0304201F64 /* Mock.swift in Sources */,
