@@ -143,6 +143,60 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    func testIdentical() {
+        let object = TestClass()
+        
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+        
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(object)])
+        
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+    
+    func testIdenticalFailure() {
+        let object = TestClass()
+        let otherObject = TestClass()
+        
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+        
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(otherObject)])
+        
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+    
+    func testEqual() {
+        let object = TestStruct(value: "Fixture Value 1")
+        let anotherObject = TestStruct(value: "Fixture Value 1")
+        
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+        
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(anotherObject)])
+        
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+    
+    func testArrayEqual() {
+        let object = TestStruct(value: "Fixture Value 1")
+        let anotherObject = TestStruct(value: "Fixture Value 1")
+        
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [[object]])
+        
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [[mEqual(anotherObject)]])
+        
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+    
+    func testEqualFailure() {
+        let object = TestStruct(value: "Fixture Value 1")
+        let anotherObject = TestStruct(value: "Fixture Value 2")
+        
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+        
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(anotherObject)])
+        
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
     // MARK: Helpers
 
     struct User {
@@ -151,5 +205,17 @@ class MockTests: XCTestCase {
 
     struct Client {
         let identifier: String
+    }
+    
+    class TestClass {
+        
+    }
+    
+    struct TestStruct: Equatable {
+        static func ==(lhs: TestStruct, rhs: TestStruct) -> Bool {
+            return lhs.value == rhs.value
+        }
+
+        let value: String
     }
 }

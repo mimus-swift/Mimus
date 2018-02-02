@@ -4,7 +4,7 @@
 
 import Foundation
 
-public class InstanceOf<T>: MockEquatable {
+public final class InstanceOf<T>: MockEquatable {
     
     public init() { }
     
