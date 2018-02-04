@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./Design/mimus@3x.png" width="250" height="250"/>
+  <img src="https://github.com/AirHelp/Mimus/raw/master/Design/mimus%403x.png" width="250" height="250"/>
 </p>
 
 # Mimus
