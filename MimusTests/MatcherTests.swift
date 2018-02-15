@@ -251,6 +251,14 @@ class FoundationMatcherTests: XCTestCase {
         XCTAssertFalse(result.matching, "Expected dictionary not to match")
     }
 
+    func testDictionaryWithDifferentAmountOfValues() {
+        let result = matcher.match(
+            expected: [["Fixture Key": "Fixture Value"]],
+            actual: [["Fixture Key": "Fixture Value", "Second Fixture Key": "Fixture Value"]]
+        )
+        XCTAssertFalse(result.matching, "Expected dictionary not to match")
+    }
+
     // MARK: More Complicated Scenarios
 
     func testPassingInvocation() {

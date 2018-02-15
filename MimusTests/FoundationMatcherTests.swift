@@ -248,8 +248,8 @@ class MatcherTests: XCTestCase {
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedActualDictionary), (NSString(string: "Fixture Key 2"), nestedExpectedDictionary))
 
         let result = matcher.match(expected: [expected], actual: [actual])
-        XCTAssertTrue(result.matching, "Expected dictionaries to match")
-        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+        XCTAssertFalse(result.matching, "Expected dictionaries not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
     // MARK: More Complicated Scenarios
