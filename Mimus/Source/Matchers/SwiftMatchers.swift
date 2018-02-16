@@ -148,6 +148,10 @@ extension Dictionary: MockEquatable {
             return false
         }
 
+        guard keys.count == actual.keys.count else {
+            return false
+        }
+
         var equal = true
 
         for (key, expectedValue) in expected {
