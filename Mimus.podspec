@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Mimus"
-  s.version      = "1.0.2"
+  s.version      = "1.1.0"
   s.summary      = "Swift Mocking Library"
 
   s.description  = <<-DESC
@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
                    It's been battle tested at AirHelp where we've used it extensively across our test suites.
                    DESC
 
-  s.homepage     = "http://airhelp.com"
+  s.homepage     = "https://www.airhelp.com"
   s.license      = { :type => "MIT", :file => "LICENSE" }
 
   s.authors = { "Pawel Dudek" => "pawel.dudek@airhelp.com", "Paweł Kozielecki" => "pawel.kozielecki@airhelp.com" }
