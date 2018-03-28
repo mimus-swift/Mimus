@@ -64,3 +64,21 @@ extension NSURL: MockEquatable {
         return selfSwiftUrl.equalTo(other: other)
     }
 }
+
+extension Data: MockEquatable {
+    public func equalTo(other: Any?) -> Bool {
+        if let other = other as? Data {
+            return other == self
+        }
+        return false
+    }
+}
+
+extension URLRequest: MockEquatable {
+    public func equalTo(other: Any?) -> Bool {
+        if let other = other as? URLRequest {
+            return other == self
+        }
+        return false
+    }
+}
