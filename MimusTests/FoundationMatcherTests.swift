@@ -252,6 +252,50 @@ class MatcherTests: XCTestCase {
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
 
+    // MARK: Data
+
+    func testDataTypePassingInvocation() {
+        let expected = "data".data(using: .utf8)!
+        let actual = "data".data(using: .utf8)!
+
+        let result = matcher.match(expected: [expected], actual: [actual])
+
+        XCTAssertTrue(result.matching, "Expected data to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+    func testDataTypeFailingInvocation() {
+        let expected = "data1".data(using: .utf8)!
+        let actual = "data2".data(using: .utf8)!
+
+        let result = matcher.match(expected: [expected], actual: [actual])
+
+        XCTAssertFalse(result.matching, "Expected data not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+    }
+
+    // MARK: URLRequest
+
+    func testURLRequestPassingInvocation() {
+        let expected = URLRequest(url: URL(string: "http://www.toptal.com")!)
+        let actual = URLRequest(url: URL(string: "http://www.toptal.com")!)
+
+        let result = matcher.match(expected: [expected], actual: [actual])
+
+        XCTAssertTrue(result.matching, "Expected URLRequest to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+    func testURLRequestFailingInvocation() {
+        let expected = URLRequest(url: URL(string: "http://www.toptal1.com")!)
+        let actual = URLRequest(url: URL(string: "http://www.toptal2.com")!)
+
+        let result = matcher.match(expected: [expected], actual: [actual])
+
+        XCTAssertFalse(result.matching, "Expected URLRequest not to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
+    }
+
     // MARK: More Complicated Scenarios
 
     func testPassingInvocation() {
