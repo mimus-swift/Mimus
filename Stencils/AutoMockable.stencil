@@ -1,0 +1,101 @@
+import Mimus
+{% for argument in argument.imports %}
+import {{ argument }}
+{% endfor %}
+@testable import {{ argument.module }}
+
+// Template below is based on on https://github.com/krzysztofzablocki/Sourcery/blob/master/Templates/Templates/AutoMockable.stencil
+
+// swiftlint:disable file_length
+
+{% macro normalizeMethodName name %}{{ name | replace:"(","_" | replace:")","" | replace:":","_" | replace:"`","" | snakeToCamelCase | lowerFirstWord }}{% endmacro %}
+{% macro normalizeUpperMethodName name %}{{ name | replace:"(","_" | replace:")","" | replace:":","_" | replace:"`","" | snakeToCamelCase | upperFirstLetter }}{% endmacro %}
+
+{% macro mockOptionalVariable variable %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }}
+{% endmacro %}
+
+{% macro mockNonOptionalArrayOrDictionaryVariable variable %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }} = {% if variable.isArray %}[]{% elif variable.isDictionary %}[:]{% endif %}
+{% endmacro %}
+
+{% macro mockNonOptionalVariable variable %}
+    {% if variable.type.kind == 'protocol' and variable.type.annotations.automockable  %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }} = Mock{{ variable.typeName }}()
+    {% else %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }}!
+    {% endif %}
+{% endmacro %}
+
+{% macro mockedVariableName variable %}{%if variable.definedInType.isExtension %}extension{% endif %}{{ variable.name }}{% endmacro %}
+
+// MARK: - AutoMockable Generated
+{% for type in types.protocols|annotated:'automockable' %}
+// MARK: - {{ type.name }} AutoMockable
+final class Mock{{ type.name }}: {{ type.name }}, Mock {
+
+    var storage: [RecordedCall] = []
+
+    {% if type.allMethods.count > 0 %}
+    enum CallIdentifier: String {
+      {% for method in type.allMethods|!definedInExtension %}
+      case {% call normalizeMethodName method.selectorName %}
+      {% endfor %}
+    }
+
+    func verifyCall(_ call: CallIdentifier, arguments: [MockEquatable?]? = nil, mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) {
+        verifyCall(withIdentifier: call.rawValue, arguments: arguments, mode: mode, file: file, line: line)
+    }
+
+    //MARK: - Mocked Functions
+    {% for method in type.allMethods|!definedInExtension %}
+
+    {% if not method.returnTypeName.isVoid %}
+    {% if method.isOptionalReturnType %}
+    var simulated{% call normalizeUpperMethodName method.selectorName %}: {{ method.returnTypeName }} = nil
+    {% elif method.returnType.kind == 'protocol' and method.returnType.annotations.automockable %}
+    var simulated{% call normalizeUpperMethodName method.selectorName %}: {{ method.returnTypeName }} = Mock{{ method.returnTypeName }}()
+    {% else %}
+    var simulated{% call normalizeUpperMethodName method.selectorName %}: {{ method.returnTypeName }}!
+    {% endif %}
+    {% endif %}
+    {% if method.throws %}
+    var simulated{% call normalizeUpperMethodName method.selectorName %}Error: Error? = nil
+    {% endif %}
+
+    func {{ method.name }}{% if method.throws %} throws{% endif %}{% if not method.returnTypeName.isVoid %} -> {{ method.returnTypeName }}{% endif %} {
+        {% if method.parameters.count == 0 %}
+        recordCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}")
+        {% else %}
+        recordCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}])
+        {% endif %}
+        {% if method.throws %}if let error = simulated{% call normalizeUpperMethodName method.selectorName %}Error {
+            throw error
+        }
+        {% endif %}
+        {% if not method.returnTypeName.isVoid %}
+        return simulated{% call normalizeUpperMethodName method.selectorName %}
+        {% endif %}
+    }
+    {% endfor %}
+    {% endif %}
+
+    {% if type.allVariables.count > 0 %}
+    //MARK: - Mocked Variables
+
+    {% for variable in type.allVariables %}
+        {% if variable.isOptional %}{% call mockOptionalVariable variable %}{% elif variable.isArray or variable.isDictionary %}{% call mockNonOptionalArrayOrDictionaryVariable variable %}{% else %}{% call mockNonOptionalVariable variable %}{% endif %}
+    {% endfor %}
+    {% endif %}
+}
+{% endfor %}
+
+// MARK: - Mimus MockEquatable Generated
+
+{% for type in types.implementing.AutoEquatable %}
+extension {{ argument.module }}.{{ type.name }}: MockEquatable {
+    public func equalTo(other: Any?) -> Bool {
+        return compare(other: other as? {{ argument.module }}.{{ type.name }})
+    }
+}
+{% endfor %}
