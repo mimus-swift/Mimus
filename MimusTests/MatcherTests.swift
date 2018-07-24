@@ -280,6 +280,49 @@ class FoundationMatcherTests: XCTestCase {
         XCTAssertFalse(result.matching, "Expected elements to not match")
     }
 
+    // Mark: None Tests
+
+    func testAnyInvocation() {
+        let result = matcher.match(
+            expected: .any,
+            actual: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element", URL(string: "htp://fixture/url")!]]
+        )
+
+        XCTAssertTrue(result.matching, "Expected elements to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+    func testAnyNoArgumentsInvocation() {
+        let result = matcher.match(
+            expected: .any,
+            actual: nil
+        )
+
+        XCTAssertTrue(result.matching, "Expected elements to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+    func testNoneNoArgumentsInvocation() {
+        let result = matcher.match(
+            expected: .none,
+            actual: nil
+        )
+
+        XCTAssertTrue(result.matching, "Expected elements to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+    func testNoneInvocation() {
+        let result = matcher.match(
+            expected: .none,
+            actual: ["Fixture String", nil, 42, 1.0, ["Key": "Value"], ["Fixture Element", URL(string: "htp://fixture/url")!]]
+        )
+        
+        XCTAssertFalse(result.matching, "Expected elements to not match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+
     // MARK: Bugs
 
     func testNilValues() {

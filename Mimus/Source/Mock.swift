@@ -12,6 +12,18 @@ public enum VerificationMode {
     case times(Int)
 }
 
+public enum Arguments: ExpressibleByArrayLiteral {
+    case any
+    case actual([MockEquatable?])
+    case none
+    
+    public init(arrayLiteral elements: MockEquatable?...) {
+        self = .actual(elements)
+    }
+    
+    public typealias ArrayLiteralElement = MockEquatable?
+}
+
 /// Protocol used for verifying equality between objects. Mimus delivers support for base Swift types, check out
 /// https://github.com/AirHelp/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md if you want to use your own types
 public protocol MockEquatable {
@@ -25,23 +37,17 @@ public protocol MockEquatable {
 
 /// Structure used to hold recorded invocations
 public struct RecordedCall {
-
     let identifier: String
-
     let arguments: [Any?]?
-
 }
 
 /// Use this protocol to add mocking functionality for your mock objects. You will have to provide storage for recorded 
 /// calls in your implementation.
 public protocol Mock: class {
-
     var storage: [RecordedCall] { get set }
-
 }
 
 public extension Mock {
-
     /// Records given invocation.
     ///
     /// - Parameters:
@@ -61,7 +67,7 @@ public extension Mock {
     ///   - mode: Verification mode. Defaults to .times(1)
     ///   - file: The file where your verification happens. Defaults to file where given call was made.
     ///   - line: The line where your verification happens. Defaults to line where given call was made.
-    func verifyCall(withIdentifier callIdentifier: String, arguments: [MockEquatable?]? = nil, mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) {
+    func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) {
         let testLocation = TestLocation(file: file, line: line)
         TestLocation.internalTestLocation = testLocation
         let mockMatcher = Matcher()

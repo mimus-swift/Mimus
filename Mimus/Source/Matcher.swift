@@ -24,23 +24,30 @@ internal struct MatchResult {
 
 internal class Matcher {
 
-    func match(expected: [MockEquatable?]?, actual: [Any?]?) -> MatchResult {
-        if expected == nil && actual == nil {
+    func match(expected: Arguments, actual: [Any?]?) -> MatchResult {
+        switch expected {
+        case .any:
             return MatchResult(matching: true)
+        case .none:
+            return MatchResult(matching: actual == nil)
+        case let .actual(arguments):
+            return match(expected: arguments, actual: actual)
         }
-
-        guard let expectedArguments = expected, let actualArguments = actual else {
-            return MatchResult(matching: false)
-        }
-
-        if expectedArguments.count != actualArguments.count {
-            return MatchResult(matching: false)
-        }
-
-        return match(expectedArguments: expectedArguments, actualArguments: actualArguments)
     }
 
-    func match(expectedArguments: [MockEquatable?], actualArguments: [Any?]) -> MatchResult {
+    private func match(expected: [MockEquatable?], actual: [Any?]?) -> MatchResult {
+        guard let actualArguments = actual else {
+            return MatchResult(matching: false)
+        }
+
+        if expected.count != actualArguments.count {
+            return MatchResult(matching: false)
+        }
+
+        return match(expectedArguments: expected, actualArguments: actualArguments)
+    }
+
+    private func match(expectedArguments: [MockEquatable?], actualArguments: [Any?]) -> MatchResult {
         // At this point we're sure both arrays have the same count
 
         var equal = true
