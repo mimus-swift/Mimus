@@ -144,6 +144,27 @@ public enum VerificationMode {
 
 `times` will fail the test if the number of invocations does not equal to the enum value.
 
+# Argument Modes
+
+Mimus supports different argument modes:
+
+
+```swift
+public enum Arguments: ExpressibleByArrayLiteral {
+    case any
+    case actual([MockEquatable?])
+    case none
+}
+```
+
+`any` will never fail the test if there are any arguments mismatch (basically it's 'I don't mind what the arguments are).
+
+`actual` will match the arguments one to one.
+
+`none` will fail if there are any recorded arguments.
+
+The default value for this parameter is `none`.
+
 ## Array and Dictionary matching
 
 Even though Mimus will fail to compile if you pass it a type that doesn't conform to `MockEquatable` this is not the case for Array and Dictionaries.

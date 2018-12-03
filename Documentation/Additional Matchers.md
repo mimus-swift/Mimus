@@ -109,4 +109,31 @@ fakeServiceRegistrator.register(service: FakeApplicationService())
 fakeServiceRegistrator.verifyCall(withIdentifier: "register", arguments: [InstanceOf<FakeApplicationService>()])
 ```
 
+# Not
+
+You can also negate other existing matchers by using `NotMatcher`. Using our `EqualTo` example:
+
+```swift
+let object = TestStruct(value: "Fixture Value 1")
+let anotherObject = TestStruct(value: "Fixture Value 1")
+
+(...)
+
+delegate.verifyCall(withIdentifier: "Fixture Identifier", arguments: [[NotMatcher(EqualTo(anotherObject))]])
+```
+
+The above test will pass as we negated the `EqualTo` matcher. Semantically this means we expect any object that's not equal to `anotherObject`.
+
+# Closure Matcher
+
+You can quickly write your own custom matchers using `ClosureMatcher`:
+
+```swift
+let matcher = ClosureMatcher<User>({ user in
+     return user?.name == "Fixture Name"
+})
+```
+
+This matcher will automatically attempt to cast matched value to `T?` and will fail the test is that fails. Afterwards it'll use the passed-in block to perform evaluation.
+
 And that's it!

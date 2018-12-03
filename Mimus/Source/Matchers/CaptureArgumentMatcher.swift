@@ -12,3 +12,9 @@ public class CaptureArgumentMatcher: MockEquatable {
         return true
     }
 }
+
+public extension CaptureArgumentMatcher {
+    public func lastValue<T>() -> T? {
+        return capturedValues.last as? T
+    }
+}
