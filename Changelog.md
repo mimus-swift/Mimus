@@ -1,5 +1,7 @@
 # Next (1.1.1)
-
+- Added out of the box system classes that support `MockEquatable` (thanks @karolus)
+- Allow specifying none or any arguments when verifying calls (see [here for details](https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md#argument-modes))
+- Added additional `ClosureMatcher` and `NotMatcher` (see [here for details](https://github.com/AirHelp/Mimus/blob/master/Documentation/Additional%20Matchers.md#not))
 
 # 1.1.0
 - *BREAKING* Changed `MockEquatable` equation function to `equalTo(other: Any)`. This allows to record any type of value, not just types that conform to `MockEquatable`, greatly increasing how versatile this framework is

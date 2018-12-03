@@ -18,7 +18,7 @@ Mimus is a Swift mocking library, aiming to reduce boilerplate code required for
 
 # Main features:
 
-* Pure Swift 3.0
+* Pure Swift (4.2 - 3.0 support)
 * Protocol-oriented implementation
 * Integrated with XCTest
 * Support for basic types
