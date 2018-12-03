@@ -2,7 +2,7 @@ import Foundation
 
 public final class EqualTo<T: Equatable>: MockEquatable {
 
-    let object: T
+    private let object: T
 
     public init(_ object: T) {
         self.object = object
@@ -14,9 +14,4 @@ public final class EqualTo<T: Equatable>: MockEquatable {
         }
         return false
     }
-}
-
-// We prefix with m to avoid having a global function named `equal` -> might not be a good idea.
-public func mEqual<T: Equatable>(_ object: T) -> MockEquatable {
-    return EqualTo(object)
 }

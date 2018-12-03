@@ -30,8 +30,11 @@
 		43190C9B1F41A1F2000F6813 /* MatcherExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */; };
 		437E55B91FCC7DC9007D5A3C /* ApplicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */; };
 		B27A920B9C2CA66BCBADDB19 /* EqualMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9B7F44828628232184BF /* EqualMatcher.swift */; };
+		B27A93145E8B802D1E9FD894 /* MatcherShorthands.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A994E11A3C51C19C9E3E5 /* MatcherShorthands.swift */; };
 		B27A9968CAC21E5D7E37A8C5 /* InstanceOfMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */; };
+		B27A9AC9D7C76B52740F86F6 /* NotMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9A21A02DFFE58DF8F120 /* NotMatcher.swift */; };
 		B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */; };
+		B27A9FD07F0DBB1F59345E79 /* ClosureMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A9C05F0C24BC211A5ADA7 /* ClosureMatcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,7 +83,10 @@
 		43190C9A1F41A1F2000F6813 /* MatcherExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherExtensionsTests.swift; sourceTree = "<group>"; };
 		437E55B81FCC7DC9007D5A3C /* ApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationService.swift; sourceTree = "<group>"; };
 		B27A915D909A304A0CB50B1C /* MatcherHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherHelpers.swift; sourceTree = "<group>"; };
+		B27A994E11A3C51C19C9E3E5 /* MatcherShorthands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatcherShorthands.swift; sourceTree = "<group>"; };
+		B27A9A21A02DFFE58DF8F120 /* NotMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotMatcher.swift; sourceTree = "<group>"; };
 		B27A9B7F44828628232184BF /* EqualMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EqualMatcher.swift; sourceTree = "<group>"; };
+		B27A9C05F0C24BC211A5ADA7 /* ClosureMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClosureMatcher.swift; sourceTree = "<group>"; };
 		B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstanceOfMatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -184,6 +190,9 @@
 				B27A9F47A538073105189D9B /* InstanceOfMatcher.swift */,
 				B27A9B7F44828628232184BF /* EqualMatcher.swift */,
 				4316CED41FFBDBEF004C82E7 /* IdenticalMatcher.swift */,
+				B27A9C05F0C24BC211A5ADA7 /* ClosureMatcher.swift */,
+				B27A9A21A02DFFE58DF8F120 /* NotMatcher.swift */,
+				B27A994E11A3C51C19C9E3E5 /* MatcherShorthands.swift */,
 			);
 			path = Matchers;
 			sourceTree = "<group>";
@@ -310,7 +319,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0820;
-				LastUpgradeCheck = 0910;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = AirHelp;
 				TargetAttributes = {
 					10115C271E6DA39B0001E9A2 = {
@@ -392,6 +401,9 @@
 				40E0227031E79D0304201F64 /* Mock.swift in Sources */,
 				B27A9BACD1A73B2F79D6FD2B /* MatcherHelpers.swift in Sources */,
 				B27A9968CAC21E5D7E37A8C5 /* InstanceOfMatcher.swift in Sources */,
+				B27A9FD07F0DBB1F59345E79 /* ClosureMatcher.swift in Sources */,
+				B27A9AC9D7C76B52740F86F6 /* NotMatcher.swift in Sources */,
+				B27A93145E8B802D1E9FD894 /* MatcherShorthands.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,6 +460,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -455,6 +468,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -508,6 +522,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -515,6 +530,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
