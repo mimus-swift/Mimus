@@ -80,6 +80,17 @@ class FoundationMatcherTests: XCTestCase {
         XCTAssertFalse(result.matching, "Expected ints not to match")
     }
 
+    func testUIntPassingInvocation() {
+        let result = matcher.match(expected: [UInt(42)], actual: [UInt(42)])
+        XCTAssertTrue(result.matching, "Expected ints to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+    }
+
+    func testUIntFailingInvocation() {
+        let result = matcher.match(expected: [UInt(42)], actual: [UInt(43)])
+        XCTAssertFalse(result.matching, "Expected ints not to match")
+    }
+
     func testDoublePassingInvocation() {
         let result = matcher.match(expected: [42.0], actual: [42.0])
         XCTAssertTrue(result.matching, "Expected doubles to match")

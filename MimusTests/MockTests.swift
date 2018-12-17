@@ -174,6 +174,16 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    func testIdenticalFailureDifferentObject() {
+        let otherObject = TestClass()
+
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: ["Fixture String"])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(otherObject)])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
     func testEqual() {
         let object = TestStruct(value: "Fixture Value 1")
         let anotherObject = TestStruct(value: "Fixture Value 1")
@@ -207,6 +217,16 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    func testEqualFailureDifferentObjects() {
+        let anotherObject = TestStruct(value: "Fixture Value 2")
+
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: ["Fixture String"])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(anotherObject)])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
     // MARK: Closure Matcher
 
     func testClosureSuccess() {
@@ -215,6 +235,19 @@ class MockTests: XCTestCase {
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
 
         let matcher = ClosureMatcher<TestStruct>({ v in
+             return v?.value == object.value
+        })
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+
+    func testClosureShorthandSuccess() {
+        let object = TestStruct(value: "Fixture Value 1")
+
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+
+        let matcher = mClosure({ (v: TestStruct?) in
              return v?.value == object.value
         })
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
