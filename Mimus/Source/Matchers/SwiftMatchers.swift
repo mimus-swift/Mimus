@@ -5,7 +5,6 @@
 import XCTest
 
 extension String: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         if let otherString = other as? String {
             return self == otherString
@@ -18,7 +17,6 @@ extension String: MockEquatable {
 }
 
 extension StaticString: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         let selfString = self.toString()
         if let otherString = other as? String {
@@ -39,7 +37,6 @@ extension StaticString: MockEquatable {
 }
 
 extension Int: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         if let otherInt = other as? Int {
             return self == otherInt
@@ -48,8 +45,16 @@ extension Int: MockEquatable {
     }
 }
 
-extension Float: MockEquatable {
+extension UInt: MockEquatable {
+    public func equalTo(other: Any?) -> Bool {
+        if let otherInt = other as? UInt {
+            return self == otherInt
+        }
+        return false
+    }
+}
 
+extension Float: MockEquatable {
     public func equalTo(other: Any?) -> Bool {
         if let otherFloat = other as? Float {
             return self == otherFloat
@@ -59,7 +64,6 @@ extension Float: MockEquatable {
 }
 
 extension Double: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         if let otherDouble = other as? Double {
             return self == otherDouble
@@ -69,7 +73,6 @@ extension Double: MockEquatable {
 }
 
 extension Bool: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         if let otherBool = other as? Bool {
             return self == otherBool
@@ -79,7 +82,6 @@ extension Bool: MockEquatable {
 }
 
 extension URL: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         if let otherUrl = other as? URL {
             return self == otherUrl
@@ -89,7 +91,6 @@ extension URL: MockEquatable {
 }
 
 extension Array: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         // Small hack to go around type system
         let selfAny = self as Any?
@@ -98,8 +99,8 @@ extension Array: MockEquatable {
             let expectedMirror = Mirror(reflecting: self as Any)
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported array types. Expected type \(expectedMirror.subjectType)",
-                    file: location.file,
-                    line: location.line)
+                file: location.file,
+                line: location.line)
             return false
         }
 
@@ -134,7 +135,6 @@ extension Array: MockEquatable {
 }
 
 extension Dictionary: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         // Small hack to go around type system
         let anySelf: [AnyHashable: Any] = self
@@ -143,8 +143,8 @@ extension Dictionary: MockEquatable {
               let actual = other as? [AnyHashable: Any] else {
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported dictionary types. Values should conform to \(MockEquatable.self)",
-                    file: location.file,
-                    line: location.line)
+                file: location.file,
+                line: location.line)
             return false
         }
 
@@ -167,7 +167,6 @@ extension Dictionary: MockEquatable {
 }
 
 extension IndexPath: MockEquatable {
-
     public func equalTo(other: Any?) -> Bool {
         if let otherIndexPath = other as? IndexPath {
             return self == otherIndexPath

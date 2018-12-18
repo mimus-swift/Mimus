@@ -1,4 +1,5 @@
 # Next (1.1.2)
+- Added out of the box comparison support for `UInt`
 
 
 # 1.1.1
