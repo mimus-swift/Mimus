@@ -92,10 +92,12 @@ extension URL: MockEquatable {
 
 extension Array: MockEquatable {
     public func equalTo(other: Any?) -> Bool {
+        guard let actualArray = other as? [Any?] else {
+            return false
+        }
         // Small hack to go around type system
         let selfAny = self as Any?
-        guard let expectedArray = selfAny as? [MockEquatable?],
-              let actualArray = other as? [Any?] else {
+        guard let expectedArray = selfAny as? [MockEquatable?] else {
             let expectedMirror = Mirror(reflecting: self as Any)
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported array types. Expected type \(expectedMirror.subjectType)",
@@ -136,11 +138,10 @@ extension Array: MockEquatable {
 
 extension Dictionary: MockEquatable {
     public func equalTo(other: Any?) -> Bool {
-        // Small hack to go around type system
-        let anySelf: [AnyHashable: Any] = self
-
-        guard let expected = anySelf as? [AnyHashable: MockEquatable],
-              let actual = other as? [AnyHashable: Any] else {
+        guard let actual = other as? [AnyHashable: Any] else {
+            return false
+        }
+        guard let expected = self as? [AnyHashable: MockEquatable] else {
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported dictionary types. Values should conform to \(MockEquatable.self)",
                 file: location.file,

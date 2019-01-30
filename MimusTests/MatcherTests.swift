@@ -235,6 +235,14 @@ class FoundationMatcherTests: XCTestCase {
         XCTAssertFalse(result.matching, "Expected arrays not to match")
     }
 
+    func testArrayWithComparedWithDifferentType() {
+        let result = matcher.match(
+                expected: [["Fixture Value 1", "Fixture Value 2", ["Fixture Value 3"]]],
+                actual: ["Not an array"]
+        )
+        XCTAssertFalse(result.matching, "Expected arrays not to match")
+    }
+
     // MARK: Dictionaries
 
     func testDictionaryPassingInvocation() {
@@ -266,6 +274,14 @@ class FoundationMatcherTests: XCTestCase {
         let result = matcher.match(
             expected: [["Fixture Key": "Fixture Value"]],
             actual: [["Fixture Key": "Fixture Value", "Second Fixture Key": "Fixture Value"]]
+        )
+        XCTAssertFalse(result.matching, "Expected dictionary not to match")
+    }
+
+    func testDictionaryComparedWithDifferentType() {
+        let result = matcher.match(
+            expected: [["Fixture Key": "Fixture Value"]],
+            actual: ["Not a Dictionary"]
         )
         XCTAssertFalse(result.matching, "Expected dictionary not to match")
     }
