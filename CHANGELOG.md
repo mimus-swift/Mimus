@@ -1,5 +1,6 @@
 # Next (1.1.2)
 - Added out of the box comparison support for `UInt`
+- Fixed issues with comparing dictionary or array with a different yielded an incorrect message
 
 
 # 1.1.1
