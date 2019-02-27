@@ -16,37 +16,34 @@ public enum VerificationMode {
 
 public enum Arguments: ExpressibleByArrayLiteral {
     case any
-    case actual([MockEquatable?])
+    case actual([Matcher?])
     case none
 
-    public init(arrayLiteral elements: MockEquatable?...) {
+    public init(arrayLiteral elements: Matcher?...) {
         self = .actual(elements)
     }
 
-    public typealias ArrayLiteralElement = MockEquatable?
+    public typealias ArrayLiteralElement = Matcher?
 }
 
 /// Protocol used for verifying equality between objects. Mimus delivers support for base Swift types, check out
-/// https://github.com/AirHelp/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md if you want to use your own types
-public protocol MockEquatable {
-
-    /// Function verifying whether two MockEquatable objects are actually equal.
+/// https://github.com/AirHelp/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md if you want to use your own
+/// types
+public protocol Matcher {
+    /// Function verifying whether this matcher matches passed in argument.
     ///
-    /// - Parameter other: other value for verifying equality
-    /// - Returns: true if values are equal, false if not
-    func equalTo(other: Any?) -> Bool
+    /// - Parameter other: other value for comparison
+    /// - Returns: true if values matchers this matcher, false if not
+    func matches(argument: Any?) -> Bool
 }
 
-/// Structure used to hold recorded invocations
-public struct RecordedCall {
-    let identifier: String
-    let arguments: [Any?]?
-}
+/// Syntax sugar protocol for backwards compatibility with pre-1.2 version.  
+public protocol MockEquatable: Matcher { }
 
 /// Use this protocol to add mocking functionality for your mock objects. You will have to provide storage for recorded 
 /// calls in your implementation.
 public protocol Mock: AnyObject {
-    var storage: [RecordedCall] { get set }
+    var storage: Storage { get }
 }
 
 public extension Mock {
@@ -56,8 +53,8 @@ public extension Mock {
     ///   - callIdentifier: call identifier for recorded invocation. You should use the same identifier when verifying call.
     ///   - arguments: Recorded arguments. You can pass nil if no arguments are needed. Supports nils in the array as well.
     func recordCall(withIdentifier callIdentifier: String, arguments: [Any?]? = nil) {
-        let record = RecordedCall(identifier: callIdentifier, arguments: arguments)
-        storage.append(record)
+        let recordedCall = RecordedCall(identifier: callIdentifier, arguments: arguments)
+        storage.record(call: recordedCall)
     }
 
     /// Verifies whether given call with given arguments was recorded. Will call XCTFail if no invocations matching
@@ -65,16 +62,16 @@ public extension Mock {
     ///
     /// - Parameters:
     ///   - callIdentifier: call identifier for recorded invocation. You should use the same one as when recording call.
-    ///   - arguments: Expected arguments. You can pass nil if no arguments are needed. Supports nils in the array as well.
+    ///   - arguments: Expected arguments. You can pass `.none` if no arguments are needed. Supports nils in the array as well.
     ///   - mode: Verification mode. Defaults to .times(1)
     ///   - file: The file where your verification happens. Defaults to file where given call was made.
     ///   - line: The line where your verification happens. Defaults to line where given call was made.
     func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) {
         let testLocation = TestLocation(file: file, line: line)
         TestLocation.internalTestLocation = testLocation
-        let mockMatcher = Matcher()
+        let mockMatcher = MimusComparator()
 
-        let callCandidates = storage.filter {
+        let callCandidates = storage.recordedCalls.filter {
             $0.identifier == callIdentifier
         }
 
@@ -91,6 +88,28 @@ public extension Mock {
 
         TestLocation.internalTestLocation = nil
 
-        storage = []
+        storage.reset()
+    }
+
+    func record(returnValue: Any?, forCallWithIdentifier identifier: String, arguments: [Any?]? = nil) {
+        let recordedCall = RecordedCall(identifier: identifier, arguments: arguments)
+        let givenCall = RecordedReturnEntry(returnValue: returnValue, recordedCall: recordedCall, thrownError: nil)
+        storage.record(entry: givenCall)
+    }
+
+    func record(error: Error, forCallWithIdentifier identifier: String, arguments: [Any?]? = nil) {
+        let recordedCall = RecordedCall(identifier: identifier, arguments: arguments)
+        let givenCall = RecordedReturnEntry(returnValue: nil, recordedCall: recordedCall, thrownError: error)
+        storage.record(entry: givenCall)
+    }
+
+    func recordedValue<T: Any>(forCallWithIdentifier identifier: String, arguments: Arguments = .none) -> T? {
+        let entry = storage.recordedReturnEntry(matchingIdentifier: identifier, arguments: arguments)
+        return entry?.returnValue as? T
+    }
+
+    func recordedError(forCallWithIdentifier identifier: String, arguments: Arguments = .none) -> Error? {
+        let entry = storage.recordedReturnEntry(matchingIdentifier: identifier, arguments: arguments)
+        return entry?.thrownError
     }
 }

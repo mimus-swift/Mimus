@@ -6,7 +6,7 @@ import Foundation
 
 class MismatchMessageBuilder {
 
-    func message(for mismatchedResults: [MatchResult]) -> String {
+    func message(for mismatchedResults: [MimusComparator.ComparisonResult]) -> String {
         guard !mismatchedResults.isEmpty else {
             return ""
         }
@@ -14,7 +14,7 @@ class MismatchMessageBuilder {
         return joined(messages, newlineSeparator: "\n\n")
     }
 
-    private func buildRecordedCallsMessages(for matchResults: [MatchResult]) -> [String] {
+    private func buildRecordedCallsMessages(for matchResults: [MimusComparator.ComparisonResult]) -> [String] {
         let hasMultipleMismatches = matchResults.count > 1
         if hasMultipleMismatches {
             return matchResults.enumerated().map(indexedMessageForMismatchedCall)
@@ -23,12 +23,12 @@ class MismatchMessageBuilder {
         }
     }
 
-    private func indexedMessageForMismatchedCall(index: Int, matchResult: MatchResult) -> String {
+    private func indexedMessageForMismatchedCall(index: Int, matchResult: MimusComparator.ComparisonResult) -> String {
         let callIndex = index + 1
         return "Mismatched call #\(callIndex):\n\(messageForMismatchedCall(for: matchResult))"
     }
 
-    private func messageForMismatchedCall(for matchResult: MatchResult) -> String {
+    private func messageForMismatchedCall(for matchResult: MimusComparator.ComparisonResult) -> String {
         let comparisons = matchResult.mismatchedComparisons
         guard !comparisons.isEmpty else {
             return "Unexpected behavior, no arguments comparison to present"

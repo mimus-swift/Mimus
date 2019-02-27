@@ -8,12 +8,12 @@ import XCTest
 class FakeVerificationHandler: VerificationHandler {
 
     var lastCallIdentifier: String?
-    var lastMatchedResults: [MatchResult]?
-    var lastMismatchedArgumentsResults: [MatchResult]?
+    var lastMatchedResults: [MimusComparator.ComparisonResult]?
+    var lastMismatchedArgumentsResults: [MimusComparator.ComparisonResult]?
     var lastMode: VerificationMode?
     var lastTestLocation: TestLocation?
 
-    override func verifyCall(callIdentifier: String, matchedResults: [MatchResult], mismatchedArgumentsResults: [MatchResult], mode: VerificationMode, testLocation: TestLocation) {
+    override func verifyCall(callIdentifier: String, matchedResults: [MimusComparator.ComparisonResult], mismatchedArgumentsResults: [MimusComparator.ComparisonResult], mode: VerificationMode, testLocation: TestLocation) {
         lastCallIdentifier = callIdentifier
         lastMatchedResults = matchedResults
         lastMismatchedArgumentsResults = mismatchedArgumentsResults
@@ -25,7 +25,7 @@ class FakeVerificationHandler: VerificationHandler {
 class MockTests: XCTestCase {
 
     class MockRecorder: Mock {
-        var storage = [RecordedCall]()
+        var storage = Storage()
     }
 
     var mockRecorder: MockRecorder!
@@ -72,7 +72,7 @@ class MockTests: XCTestCase {
 
         let expectedFileName: StaticString = "Fixture File"
         // Not too beautiful - we're using our matchers as XCTest cannot verify StaticStrings
-        let namesMatched = expectedFileName.equalTo(other: fakeVerificationHandler.lastTestLocation?.file)
+        let namesMatched = expectedFileName.matches(argument: fakeVerificationHandler.lastTestLocation?.file)
 
         XCTAssertTrue(namesMatched, "Expected verification handler to receive correct file")
         XCTAssertEqual(fakeVerificationHandler.lastTestLocation?.line, 42, "Expected verification handler to receive correct line")
@@ -379,6 +379,136 @@ class MockTests: XCTestCase {
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mNot(mEqual(object))])
 
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
+    // MARK: Returning Values
+
+    func testNoReturnValueRecordedForSimpleCall() {
+        let actual: String? = mockRecorder.recordedValue(forCallWithIdentifier: "Fixture Identifier")
+
+        XCTAssertNil(actual, "Expected no return value to be returned")
+    }
+
+    func testNoReturnValueRecordedForComplexCall() {
+        let object = TestStruct(value: "Fixture Value 1")
+
+        let actual: String? = mockRecorder.recordedValue(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(object)]
+        )
+
+        XCTAssertNil(actual, "Expected no return value to be returned")
+    }
+
+    func testReturnValueRecordedForSimpleCall() {
+        mockRecorder.record(returnValue: "Fixture Recorded Return Value", forCallWithIdentifier: "Fixture Identifier")
+
+        let actual: String? = mockRecorder.recordedValue(forCallWithIdentifier: "Fixture Identifier")
+        XCTAssertEqual(actual, "Fixture Recorded Return Value", "Expected correct return value to be returned")
+    }
+
+    func testReturnValueRecordedForComplexCall() {
+        let object = TestStruct(value: "Fixture Value 1")
+
+        mockRecorder.record(
+            returnValue: "Fixture Recorded Return Value",
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [object]
+        )
+
+        let actual: String? = mockRecorder.recordedValue(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(object)]
+        )
+        XCTAssertEqual(actual, "Fixture Recorded Return Value", "Expected correct return value to be returned")
+    }
+
+    func testReturnValueRecordedForMismatchedCall() {
+        mockRecorder.record(
+            returnValue: "Fixture Recorded Return Value",
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [TestStruct(value: "Fixture Value 1")]
+        )
+
+        let actual: String? = mockRecorder.recordedValue(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(TestStruct(value: "Fixture Value 2"))]
+        )
+        XCTAssertNil(actual, "Expected no return value to be returned")
+    }
+
+    func testReturnValueRecordedForMismatchedType() {
+        let object = TestStruct(value: "Fixture Value 1")
+
+        mockRecorder.record(
+            returnValue: Int(42),
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [object]
+        )
+
+        let actual: String? = mockRecorder.recordedValue(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(object)]
+        )
+        XCTAssertNil(actual, "Expected no return value to be returned")
+    }
+
+    // MARK: Returning Errors
+
+    func testNoReturnErrorRecordedForSimpleCall() {
+        let actual = mockRecorder.recordedError(forCallWithIdentifier: "Fixture Identifier")
+
+        XCTAssertNil(actual, "Expected no error value to be returned")
+    }
+
+    func testNoReturnErrorRecordedForComplexCall() {
+        let object = TestStruct(value: "Fixture Value 1")
+
+        let actual = mockRecorder.recordedError(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(object)]
+        )
+
+        XCTAssertNil(actual, "Expected no return error to be returned")
+    }
+
+    func testReturnErrorRecordedForSimpleCall() {
+        let error = NSError(domain: "Fixture Domain", code: 42, userInfo: [:])
+        mockRecorder.record(error: error, forCallWithIdentifier: "Fixture Identifier")
+
+        let actual = mockRecorder.recordedError(forCallWithIdentifier: "Fixture Identifier") as NSError?
+        XCTAssertTrue(actual === error, "Expected correct return value to be returned")
+    }
+
+    func testReturnErrorRecordedForComplexCall() {
+        let object = TestStruct(value: "Fixture Value 1")
+        let error = NSError(domain: "Fixture Domain", code: 42, userInfo: [:])
+
+        mockRecorder.record(
+            error: error,
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [object]
+        )
+
+        let actual = mockRecorder.recordedError(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(object)]
+        ) as NSError?
+        XCTAssertTrue(actual === error, "Expected correct return value to be returned")
+    }
+
+    func testReturnErrorRecordedForMismatchedCall() {
+        mockRecorder.record(
+            error: NSError(domain: "Fixture Domain", code: 42, userInfo: [:]),
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [TestStruct(value: "Fixture Value 1")]
+        )
+
+        let actual = mockRecorder.recordedError(
+            forCallWithIdentifier: "Fixture Identifier",
+            arguments: [mEqual(TestStruct(value: "Fixture Value 2"))]
+        )
+        XCTAssertNil(actual, "Expected no return value to be returned")
     }
 
     // MARK: Helpers

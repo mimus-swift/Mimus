@@ -6,14 +6,14 @@ import XCTest
 
 @testable import Mimus
 
-class FoundationMatcherTests: XCTestCase {
+class ComparatorTests: XCTestCase {
 
-    var matcher: Matcher!
+    var matcher: MimusComparator!
 
     override func setUp() {
         super.setUp()
 
-        matcher = Matcher()
+        matcher = MimusComparator()
     }
 
     override func tearDown() {

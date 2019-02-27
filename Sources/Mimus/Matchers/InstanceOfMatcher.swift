@@ -4,11 +4,11 @@
 
 import Foundation
 
-public final class InstanceOf<T>: MockEquatable {
+public final class InstanceOf<T>: Matcher {
 
     public init() { }
 
-    public func equalTo(other: Any?) -> Bool {
-        return other is T
+    public func matches(argument: Any?) -> Bool {
+        return argument is T
     }
 }

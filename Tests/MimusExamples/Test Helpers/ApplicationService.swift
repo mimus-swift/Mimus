@@ -19,7 +19,7 @@ protocol ApplicationServiceRegistrator {
 
 class FakeApplicationServiceRegistrator: ApplicationServiceRegistrator, Mock {
 
-    var storage: [RecordedCall] = []
+    var storage = Mimus.Storage()
     
     func register(service: ApplicationService) {
         recordCall(withIdentifier: "register", arguments: [service])

@@ -25,8 +25,7 @@ public func ==(lhs: VerificationMode, rhs: VerificationMode) -> Bool {
     }
 }
 
-extension MatchResult.MismatchedComparison {
-
+extension MimusComparator.ComparisonResult.MismatchedComparison {
     func assert<T: Equatable, M: Equatable>(expected: T?, actual: M?, file: StaticString = #file, line: UInt = #line) {
         XCTAssertEqual(actual, self.actual as? M, file: file, line: line)
         XCTAssertEqual(expected, self.expected as? T, file: file, line: line)

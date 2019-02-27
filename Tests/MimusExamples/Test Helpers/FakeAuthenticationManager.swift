@@ -7,7 +7,7 @@ import Mimus
 
 class FakeAuthenticationManager: AuthenticationManager, Mock {
 
-    var storage: [RecordedCall] = []
+    var storage = Mimus.Storage()
 
     func setup() {
         recordCall(withIdentifier: "Setup")

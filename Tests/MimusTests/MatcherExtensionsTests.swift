@@ -19,26 +19,24 @@ struct User: Equatable {
 }
 
 class MatcherExtensionsTests: XCTestCase {
-
     func testPassingMatcher() {
         let firstUser = User(firstName: "Fixture First Name", lastName: "Fixture Last Name", id: "42")
         let secondUser = User(firstName: "Fixture First Name", lastName: "Fixture Last Name", id: "42")
 
-        XCTAssertTrue(firstUser.equalTo(other: secondUser), "Expected users to match")
+        XCTAssertTrue(firstUser.matches(argument: secondUser), "Expected users to match")
     }
 
     func testFailingMatcher() {
         let firstUser = User(firstName: "Fixture First Name", lastName: "Fixture Last Name", id: "42")
         let secondUser = User(firstName: "Fixture First Name", lastName: "Fixture Last Name", id: "43")
 
-        XCTAssertFalse(firstUser.equalTo(other: secondUser), "Expected users to match")
+        XCTAssertFalse(firstUser.matches(argument: secondUser), "Expected users to match")
     }
 }
 
-extension User: MockEquatable {
-
-    func equalTo(other: Any?) -> Bool {
-        return compare(other: other as? User)
+extension User: Matcher {
+    func matches(argument: Any?) -> Bool {
+        return compare(other: argument as? User)
     }
 }
 

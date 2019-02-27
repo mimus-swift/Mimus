@@ -7,16 +7,16 @@ import XCTest
 
 class MatcherTests: XCTestCase {
 
-    var matcher: Matcher!
+    var comparator: MimusComparator!
 
     override func setUp() {
         super.setUp()
 
-        matcher = Matcher()
+        comparator = MimusComparator()
     }
 
     override func tearDown() {
-        matcher = nil
+        comparator = nil
     }
 
     // MARK: Strings
@@ -25,7 +25,7 @@ class MatcherTests: XCTestCase {
         let expected: NSString = "Fixture String"
         let actual: NSString = "Fixture String"
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected strings to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -34,7 +34,7 @@ class MatcherTests: XCTestCase {
         let expected: NSString = "Fixture String"
         let actual: NSString = "Another Fixture String"
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected strings not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
 
@@ -46,7 +46,7 @@ class MatcherTests: XCTestCase {
         let expected: StaticString = "Fixture String"
         let actual: NSString = "Fixture String"
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected strings to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -55,7 +55,7 @@ class MatcherTests: XCTestCase {
         let expected: StaticString = "Fixture String"
         let actual: NSString = "Another Fixture String"
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected strings not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -64,7 +64,7 @@ class MatcherTests: XCTestCase {
         let expected = "Fixture String"
         let actual: NSString = "Fixture String"
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected strings to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -73,7 +73,7 @@ class MatcherTests: XCTestCase {
         let expected = "Fixture String"
         let actual: NSString = "Another Fixture String"
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected strings not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
 
@@ -87,7 +87,7 @@ class MatcherTests: XCTestCase {
         let expected: NSNumber = 42
         let actual: NSNumber = 42
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected NSNumbers to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -96,7 +96,7 @@ class MatcherTests: XCTestCase {
         let expected: NSNumber = 42
         let actual: NSNumber = 43
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected NSNumbers not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
 
@@ -110,7 +110,7 @@ class MatcherTests: XCTestCase {
         let expected = NSError(domain: "Fixture Domain", code: 42)
         let actual = NSError(domain: "Fixture Domain", code: 42)
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected NSErrors to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -119,7 +119,7 @@ class MatcherTests: XCTestCase {
         let expected = NSError(domain: "Fixture Domain", code: 42)
         let actual = NSError(domain: "Fixture Domain", code: 43)
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected NSErrors not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
 
@@ -133,7 +133,7 @@ class MatcherTests: XCTestCase {
         let expected = NSURL(string: "https://fixture.url.com/fixture/suffix")!
         let actual = NSURL(string: "https://fixture.url.com/fixture/suffix")!
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected NSErrors to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -142,7 +142,7 @@ class MatcherTests: XCTestCase {
         let expected = NSURL(string: "https://fixture.url.com/fixture/suffix")!
         let actual = NSURL(string: "https://fixture.url.eu/fixture/suffix")!
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected NSErrors not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
 
@@ -156,7 +156,7 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected arrays to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -165,7 +165,7 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSNumber(floatLiteral: 0.5), NSString(string: "Fixture String"))
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected arrays not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -174,7 +174,7 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSNumber(floatLiteral: 0.5))
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNumber(floatLiteral: 0.5))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected arrays not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -185,7 +185,7 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSNumber(floatLiteral: 0.5), nestedExpectedArray)
         let actual = NSArray(objects: NSNumber(floatLiteral: 0.5), nestedActualArray)
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected arrays to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -196,7 +196,7 @@ class MatcherTests: XCTestCase {
         let expected = NSArray(objects: NSNumber(floatLiteral: 0.5), nestedExpectedArray)
         let actual = NSArray(objects: NSNumber(floatLiteral: 0.5), nestedActualArray)
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected arrays not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -207,7 +207,7 @@ class MatcherTests: XCTestCase {
         let expected = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 2"), NSNumber(floatLiteral: 0.5)))
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 2"), NSNumber(floatLiteral: 0.5)))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected dictionaries to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -216,7 +216,7 @@ class MatcherTests: XCTestCase {
         let expected = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 2"), NSNumber(floatLiteral: 0.5)))
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 2"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 1"), NSNumber(floatLiteral: 0.5)))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected dictionaries not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -225,7 +225,7 @@ class MatcherTests: XCTestCase {
         let expected = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), NSString(string: "Fixture Value")))
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 2"), NSString(string: "Fixture Value")), (NSString(string: "Fixture Key 1"), NSNumber(floatLiteral: 0.5)))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected dictionaries not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -236,7 +236,7 @@ class MatcherTests: XCTestCase {
         let expected = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedExpectedDictionary))
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedActualDictionary))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertTrue(result.matching, "Expected dictionaries to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
     }
@@ -247,7 +247,7 @@ class MatcherTests: XCTestCase {
         let expected = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedExpectedDictionary))
         let actual = NSDictionary(dictionaryLiteral: (NSString(string: "Fixture Key 1"), nestedActualDictionary), (NSString(string: "Fixture Key 2"), nestedExpectedDictionary))
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
         XCTAssertFalse(result.matching, "Expected dictionaries not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
     }
@@ -258,7 +258,7 @@ class MatcherTests: XCTestCase {
         let expected = "data".data(using: .utf8)!
         let actual = "data".data(using: .utf8)!
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
 
         XCTAssertTrue(result.matching, "Expected data to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
@@ -268,7 +268,7 @@ class MatcherTests: XCTestCase {
         let expected = "data1".data(using: .utf8)!
         let actual = "data2".data(using: .utf8)!
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
 
         XCTAssertFalse(result.matching, "Expected data not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
@@ -280,7 +280,7 @@ class MatcherTests: XCTestCase {
         let expected = URLRequest(url: URL(string: "http://www.toptal.com")!)
         let actual = URLRequest(url: URL(string: "http://www.toptal.com")!)
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
 
         XCTAssertTrue(result.matching, "Expected URLRequest to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
@@ -290,7 +290,7 @@ class MatcherTests: XCTestCase {
         let expected = URLRequest(url: URL(string: "http://www.toptal1.com")!)
         let actual = URLRequest(url: URL(string: "http://www.toptal2.com")!)
 
-        let result = matcher.match(expected: [expected], actual: [actual])
+        let result = comparator.match(expected: [expected], actual: [actual])
 
         XCTAssertFalse(result.matching, "Expected URLRequest not to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected one mismatched results")
@@ -303,7 +303,7 @@ class MatcherTests: XCTestCase {
         let nestedArray = NSArray(objects: NSNumber(floatLiteral: 0.5), NSURL(string: "https://fixture.url.com/fixture/suffix")!)
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
-        let result = matcher.match(
+        let result = comparator.match(
             expected: [expected],
             actual: [actual]
         )
@@ -317,7 +317,7 @@ class MatcherTests: XCTestCase {
         let nestedArray = NSArray(objects: NSNumber(floatLiteral: 0.5), NSURL(string: "https://fixture.url.eu/fixture/suffix")!)
         let expected = NSArray(objects: NSString(string: "Fixture String"), NSNull(), NSNumber(integerLiteral: 42), NSNumber(floatLiteral: 1.0), nestedArray, nestedDictionary)
         let actual = NSArray(objects: NSString(string: "Fixture String"), NSNull(), nestedArray, nestedDictionary)
-        let result = matcher.match(
+        let result = comparator.match(
             expected: [expected],
             actual: [actual]
         )

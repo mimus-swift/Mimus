@@ -4,15 +4,15 @@
 
 import Foundation
 
-public class NotMatcher: MockEquatable {
-    private let containedMatcher: MockEquatable
+public class NotMatcher: Matcher {
+    private let containedMatcher: Matcher
 
-    public init(containedMatcher: MockEquatable) {
+    public init(containedMatcher: Matcher) {
         self.containedMatcher = containedMatcher
     }
 
-    public func equalTo(other: Any?) -> Bool {
-        return !containedMatcher.equalTo(other: other)
+    public func matches(argument: Any?) -> Bool {
+        return !containedMatcher.matches(argument: argument)
     }
 
     public var description: String {

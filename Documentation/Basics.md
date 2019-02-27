@@ -93,7 +93,7 @@ First of our `FakeAuthenticationManager` is now much simpler
 ```swift
 class FakeAuthenticationManager: AuthenticationManager, Mock {
 
-    var storage: [RecordedCall] = []
+    var storage = Mimus.Storage()
 
     func beginAuthentication(with email: String, password: String, options: [String: Any]) {
         recordCall(withIdentifier: "BeginAuthentication", arguments: [email, password, options])
@@ -116,11 +116,11 @@ We pass call identifier and arguments - Mimus will then compare passed in argume
 
 # Arguments comparison
 
-Mimus uses a helper protocol to define equality between objects it matches - `MockEquatable`. By default all base types in Swift conform to this protocol, so things will work out of the box for this case.
+Mimus uses a helper protocol to match objects - `Matcher`. By default all base types in Swift conform to this protocol, so things will work out of the box for this case - you can pass in types like `Int` directly.
 
 However for your own types you need to write an extension that conforms to this protocol - check out [Using Your Own Types](https://github.com/AirHelp/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md) for more details.
 
-What's great is that your tests will fail to compile if you attempt to use an object that's not conforming to `MockEquatable` protocol. Unfortunately due to Swift compiler limitations this does not work with Arrays and Dictionaries - check bottom of this document for more details.
+What's great is that your tests will fail to compile if you attempt to use an object that's not conforming to `Matcher` protocol. Unfortunately due to Swift compiler limitations this does not work with Arrays and Dictionaries - check bottom of this document for more details.
 
 # Failure Messages
 
@@ -154,7 +154,7 @@ Mimus supports different argument modes:
 ```swift
 public enum Arguments: ExpressibleByArrayLiteral {
     case any
-    case actual([MockEquatable?])
+    case actual([Matcher?])
     case none
 }
 ```
@@ -169,15 +169,15 @@ The default value for this parameter is `none`.
 
 ## Array and Dictionary matching
 
-Even though Mimus will fail to compile if you pass it a type that doesn't conform to `MockEquatable` this is not the case for Array and Dictionaries.
+Even though Mimus will fail to compile if you pass it a type that doesn't conform to `Matcher` this is not the case for Array and Dictionaries.
 
 The problem lies with limitations on `Array` and `Dictionary` types. You can't define
 
 ```swift
-extension Array: MockEquatable where Element: MockEquatable {    
+extension Array: Matcher where Element: Matcher {
 }
 ```
 
-which would basically mean that `Array` conforms to `MockEquatable` only if its elements conform to it. This might be possible with future versions of Swift, but for now we're stuck with what we have.
+which would basically mean that `Array` conforms to `Matcher` only if its elements conform to it. This might be possible with future versions of Swift, but for now we're stuck with what we have.
 
-On the other hand it would make little sense if we didn't have `Array`/`Dictionary` comparison out of the box. That's why Mimus will fail the test during runtime if you don't pass an element that conforms to `Mockequatable` protocol. Same applies to `Dictionary`.
+On the other hand it would make little sense if we didn't have `Array`/`Dictionary` comparison out of the box. That's why Mimus will fail the test during runtime if you don't pass an element that conforms to `Matcher` protocol. Same applies to `Dictionary`.
