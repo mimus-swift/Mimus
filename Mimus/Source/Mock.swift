@@ -16,11 +16,11 @@ public enum Arguments: ExpressibleByArrayLiteral {
     case any
     case actual([MockEquatable?])
     case none
-    
+
     public init(arrayLiteral elements: MockEquatable?...) {
         self = .actual(elements)
     }
-    
+
     public typealias ArrayLiteralElement = MockEquatable?
 }
 
@@ -43,7 +43,7 @@ public struct RecordedCall {
 
 /// Use this protocol to add mocking functionality for your mock objects. You will have to provide storage for recorded 
 /// calls in your implementation.
-public protocol Mock: class {
+public protocol Mock: AnyObject {
     var storage: [RecordedCall] { get set }
 }
 
