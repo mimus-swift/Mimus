@@ -4,8 +4,7 @@ public class CaptureArgumentMatcher: MockEquatable {
 
     public var capturedValues: [Any?] = []
 
-    public init() {
-    }
+    public init() { }
 
     public func equalTo(other: Any?) -> Bool {
         capturedValues.append(other)

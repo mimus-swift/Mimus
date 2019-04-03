@@ -2,9 +2,9 @@ import Foundation
 
 public final class IdenticalTo<T: AnyObject>: MockEquatable {
     
-    private let object: T
+    private let object: T?
     
-    public init(_ object: T) {
+    public init(_ object: T?) {
         self.object = object
     }
     
