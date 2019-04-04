@@ -153,12 +153,23 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    // MARK: Identical
+
     func testIdentical() {
         let object = TestClass()
 
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
 
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(object)])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+
+    func testIdenticalNilObjects() {
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [nil])
+
+        let value: AnyObject? = nil
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(value)])
 
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
     }
@@ -174,6 +185,24 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    func testIdenticalNilObjectFailure() {
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [nil])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(TestClass())])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
+    func testIdenticalNilObjectInMatcherFailure() {
+        let object = TestClass()
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+
+        let value: AnyObject? = nil
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mIdentical(value)])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
     func testIdenticalFailureDifferentObject() {
         let otherObject = TestClass()
 
@@ -184,6 +213,8 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    // MARK: Equal
+
     func testEqual() {
         let object = TestStruct(value: "Fixture Value 1")
         let anotherObject = TestStruct(value: "Fixture Value 1")
@@ -191,6 +222,16 @@ class MockTests: XCTestCase {
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
 
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(anotherObject)])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
+    }
+
+    func testEqualNilObjects() {
+        let object: TestStruct? = nil
+
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [nil])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(object)])
 
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected verification handler to receive correct number of matches")
     }
@@ -217,6 +258,24 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
     }
 
+    func testEqualNilObjectFailure() {
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [nil])
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(TestStruct(value: "Fixture Value 1"))])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
+    func testEqualNilObjectInMatcherFailure() {
+        let object = TestStruct(value: "Fixture Value 1")
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
+
+        let value: TestStruct? = nil
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [mEqual(value)])
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected verification handler to receive correct number of matches")
+    }
+
     func testEqualFailureDifferentObjects() {
         let anotherObject = TestStruct(value: "Fixture Value 2")
 
@@ -235,7 +294,7 @@ class MockTests: XCTestCase {
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
 
         let matcher = ClosureMatcher<TestStruct>({ v in
-             return v?.value == object.value
+            return v?.value == object.value
         })
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
 
@@ -248,7 +307,7 @@ class MockTests: XCTestCase {
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
 
         let matcher = mClosure({ (v: TestStruct?) in
-             return v?.value == object.value
+            return v?.value == object.value
         })
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
 
@@ -271,7 +330,7 @@ class MockTests: XCTestCase {
 
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
         let matcher = ClosureMatcher<TestStruct>({ v in
-             return v?.value == "Different Value"
+            return v?.value == "Different Value"
         })
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
 
@@ -284,7 +343,7 @@ class MockTests: XCTestCase {
 
         mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [object])
         let matcher = ClosureMatcher<User>({ v in
-             return true
+            return true
         })
         mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
 

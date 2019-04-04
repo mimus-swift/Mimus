@@ -12,6 +12,6 @@ public final class EqualTo<T: Equatable>: MockEquatable {
         if let otherObject = other as? T {
             return object == otherObject
         }
-        return false
+        return other == nil && object == nil
     }
 }
