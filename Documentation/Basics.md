@@ -142,6 +142,8 @@ public enum VerificationMode {
 
 `atLeast` will fail the test if there is less invocations than passed in the enum value.
 
+`atMost` will fail the test if there is more invocations than passed in the enum value.
+
 `times` will fail the test if the number of invocations does not equal to the enum value.
 
 # Argument Modes

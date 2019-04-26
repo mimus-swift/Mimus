@@ -21,6 +21,12 @@ internal class VerificationHandler {
                     matchCount: matchedResults.count,
                     differentArgumentsMatchCount: mismatchedArgumentsResults.count,
                     testLocation: testLocation)
+        case .atMost(let count):
+            assertAtMost(callIdentifier: callIdentifier,
+                    times: count,
+                    matchCount: matchedResults.count,
+                    differentArgumentsMatchCount: mismatchedArgumentsResults.count,
+                    testLocation: testLocation)
         case .times(let count):
             assert(callIdentifier: callIdentifier,
                     times: count,
@@ -40,6 +46,19 @@ internal class VerificationHandler {
         XCTFail("Expected to not receive call with identifier \(callIdentifier)",
                 file: testLocation.file,
                 line: testLocation.line)
+    }
+
+    private func assertAtMost(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatchCount: Int, testLocation: TestLocation) {
+        guard matchCount > times else {
+            return
+        }
+
+        var message = "No call with identifier \(callIdentifier) was captured"
+        if differentArgumentsMatchCount > 0 {
+            message = "Call with identifier \(callIdentifier) was recorded, but arguments didn't match"
+        }
+
+        XCTFail(message, file: testLocation.file, line: testLocation.line)
     }
 
     private func assertAtLeast(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatchCount: Int, testLocation: TestLocation) {
