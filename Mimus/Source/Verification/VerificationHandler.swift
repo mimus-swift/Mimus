@@ -54,8 +54,8 @@ internal class VerificationHandler {
         }
 
         var message = "No call with identifier \(callIdentifier) was captured"
-        if differentArgumentsMatchCount > 0 {
-            message = "Call with identifier \(callIdentifier) was recorded, but arguments didn't match"
+        if matchCount > 0 {
+            message = "Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at most \(times)"
         }
 
         XCTFail(message, file: testLocation.file, line: testLocation.line)
@@ -67,8 +67,10 @@ internal class VerificationHandler {
         }
 
         var message = "No call with identifier \(callIdentifier) was captured"
-        if differentArgumentsMatchCount > 0 {
-            message = "Call with identifier \(callIdentifier) was recorded, but arguments didn't match"
+        if matchCount > 0 {
+            message = "Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at least \(times)"
+        } else if differentArgumentsMatchCount > 0 {
+            message = "Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, but arguments didn't match"
         }
 
         XCTFail(message, file: testLocation.file, line: testLocation.line)
@@ -83,7 +85,7 @@ internal class VerificationHandler {
         if matchCount > 0 {
             message = "Call with identifier was recorded \(matchCount) times, but expected \(times)"
         } else if differentArgumentsMatchCount > 0 {
-            message = "Call with identifier \(callIdentifier) was recorded, but arguments didn't match"
+            message = "Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, but arguments didn't match"
         }
 
         XCTFail(message, file: testLocation.file, line: testLocation.line)
