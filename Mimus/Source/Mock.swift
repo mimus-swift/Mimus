@@ -5,10 +5,12 @@ import XCTest
 ///
 /// - never: fails the test if there is one or more matching invocation
 /// - atLeast: fails the test if there is less invocations than passed in the enum value
+/// - atMost: fails the test if there is more invocations than passed in the enum value
 /// - times: fails the test if the number of invocations does not equal to the enum value
 public enum VerificationMode {
     case never
     case atLeast(Int)
+    case atMost(Int)
     case times(Int)
 }
 

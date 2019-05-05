@@ -18,6 +18,8 @@ public func ==(lhs: VerificationMode, rhs: VerificationMode) -> Bool {
         return true
     case (let .atLeast(time1), let .atLeast(time2)):
         return time1 == time2
+    case (let .atMost(time1), let .atMost(time2)):
+        return time1 == time2
     default:
         return false
     }
