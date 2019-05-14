@@ -1,9 +1,14 @@
-# Next (1.1.2)
+# Next (1.1.4)
+- Nothing yet
+
+# 1.1.3
+- Add '.atMost' VerificationMode (thanks @kamwysoc)
+- Make failure messages more detailed (thanks @kamwysoc)
+- Allow passing of nil values to Equal and Identical matchers
+
+# 1.1.2
 - Added out of the box comparison support for `UInt`
 - Fixed issues with comparing dictionary or array with a different yielded an incorrect message
-- Add '.atMost' VerificationMode
-- Make failure messages more detailed 
-
 
 # 1.1.1
 - Added out of the box system classes that support `MockEquatable` (thanks @karolus)
