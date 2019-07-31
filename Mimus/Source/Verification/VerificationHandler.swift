@@ -6,7 +6,7 @@ import XCTest
 
 internal class VerificationHandler {
     
-    private let mismatchMessageCreator = MismatchMessageCreator()
+    private let mismatchMessageBuilder = MismatchMessageBuilder()
     
     static var shared: VerificationHandler = VerificationHandler()
 
@@ -71,10 +71,10 @@ internal class VerificationHandler {
         let differentArgumentsMatchCount = differentArgumentsMatch.count
         var message = "No call with identifier \(callIdentifier) was captured"
         if matchCount > 0 {
-            let mismatchedResultsMessage = mismatchMessageCreator.message(for: differentArgumentsMatch)
+            let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
             message = "Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at least \(times). \(mismatchedResultsMessage)"
         } else if differentArgumentsMatchCount > 0 {
-            let mismatchedResultsMessage = mismatchMessageCreator.message(for: differentArgumentsMatch)
+            let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
             message = "Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, but arguments didn't match. \(mismatchedResultsMessage)"
         }
 
@@ -88,10 +88,10 @@ internal class VerificationHandler {
         let differentArgumentsMatchCount = differentArgumentsMatch.count
         var message = "No call with identifier \(callIdentifier) was captured"
         if matchCount > 0 {
-            let mismatchedResultsMessage = mismatchMessageCreator.message(for: differentArgumentsMatch)
+            let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
             message = "Call with identifier was recorded \(matchCount) times, but expected \(times). \(mismatchedResultsMessage)"
         } else if differentArgumentsMatchCount > 0 {
-            let mismatchedResultsMessage = mismatchMessageCreator.message(for: differentArgumentsMatch)
+            let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
             message = "Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, but arguments didn't match. \(mismatchedResultsMessage)"
         }
 

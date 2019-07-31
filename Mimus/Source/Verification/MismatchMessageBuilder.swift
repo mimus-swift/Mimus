@@ -4,7 +4,7 @@
 
 import Foundation
 
-class MismatchMessageCreator {
+class MismatchMessageBuilder {
     
     func message(for mismatchedResults: [MatchResult]) -> String {
         guard !mismatchedResults.isEmpty else {
@@ -13,10 +13,10 @@ class MismatchMessageCreator {
         let mismatchedCallsCountInfo = "Found \(mismatchedResults.count) call(s) with expected identifier, but not matching arguments:"
         return mismatchedResults
             .enumerated()
-            .map {[unowned self] (index, result) -> String in
+            .map {(index, result) -> String in
                 let comparisons = result.mismatchedComparisons
                 let callIndex = index + 1
-                return "\nMismatched call #\(callIndex):\(self.comparisonDetails(for: comparisons))"
+                return "\nMismatched call #\(callIndex):\(comparisonDetails(for: comparisons))"
             }
             .reduce(mismatchedCallsCountInfo, +)
     }
@@ -26,8 +26,8 @@ class MismatchMessageCreator {
             return "\nUnexpected behavior, no arguments comparison to present"
         }
         return comparisons
-            .map({[unowned self] (comparison) -> String in
-                return "\nMismatch in argument #\(comparison.argumentIndex) - expected \(self.displayText(for: comparison.expected)), but was \(self.displayText(for: comparison.actual))."})
+            .map({(comparison) -> String in
+                return "\nMismatch in argument #\(comparison.argumentIndex) - expected \(displayText(for: comparison.expected)), but was \(displayText(for: comparison.actual))."})
             .reduce("", +)
     }
     
