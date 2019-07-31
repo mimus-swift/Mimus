@@ -72,10 +72,16 @@ internal class VerificationHandler {
         var message = "No call with identifier \(callIdentifier) was captured"
         if matchCount > 0 {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
-            message = "Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at least \(times). \(mismatchedResultsMessage)"
+            message = """
+                      Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at least \(times). 
+                      \(differentArgumentsMatchCount) additional call(s) matched identifier, but not arguments:\n\(mismatchedResultsMessage)
+                      """
         } else if differentArgumentsMatchCount > 0 {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
-            message = "Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, but arguments didn't match. \(mismatchedResultsMessage)"
+            message = """
+                      Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, 
+                      but arguments didn't match.\n\(mismatchedResultsMessage)
+                      """
         }
 
         XCTFail(message, file: testLocation.file, line: testLocation.line)
@@ -89,10 +95,16 @@ internal class VerificationHandler {
         var message = "No call with identifier \(callIdentifier) was captured"
         if matchCount > 0 {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
-            message = "Call with identifier was recorded \(matchCount) times, but expected \(times). \(mismatchedResultsMessage)"
+            message = """
+                      Call with identifier was recorded \(matchCount) times, but expected \(times). 
+                      \(differentArgumentsMatchCount) additional call(s) matched identifier, but not arguments:\n\(mismatchedResultsMessage)
+                      """
         } else if differentArgumentsMatchCount > 0 {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
-            message = "Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, but arguments didn't match. \(mismatchedResultsMessage)"
+            message = """
+                      Call with identifier \(callIdentifier) was recorded \(differentArgumentsMatchCount) times, 
+                      but arguments didn't match.\n\(mismatchedResultsMessage)
+                      """
         }
 
         XCTFail(message, file: testLocation.file, line: testLocation.line)
