@@ -1,4 +1,7 @@
-# Next (1.1.4)
+# Next
+Nothing yet!
+
+# 1.1.4
 - Mismatched arguments are now included in failure message (thanks @Eluss)
 - Added shorthand for `AnyMatcher()`
 
