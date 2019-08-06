@@ -2,6 +2,8 @@ internal struct MatchResult {
 
     struct MismatchedComparison {
 
+        let argumentIndex: Int
+        
         let expected: MockEquatable?
 
         let actual: Any?
@@ -65,7 +67,7 @@ internal class Matcher {
             }
 
             if !internalEqual {
-                mismatchedComparisons.append(MatchResult.MismatchedComparison(expected: item, actual: other))
+                mismatchedComparisons.append(MatchResult.MismatchedComparison(argumentIndex: index, expected: item, actual: other))
             }
 
             equal = internalEqual && equal
