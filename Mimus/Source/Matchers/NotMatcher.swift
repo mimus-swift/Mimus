@@ -14,5 +14,8 @@ public class NotMatcher: MockEquatable {
     public func equalTo(other: Any?) -> Bool {
         return !containedMatcher.equalTo(other: other)
     }
-}
 
+    public var description: String {
+        return "\(type(of: self)) - \(containedMatcher)"
+    }
+}

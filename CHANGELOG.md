@@ -1,5 +1,6 @@
 # Next (1.1.4)
-- Nothing yet
+- Mismatched arguments are now included in failure message (thanks @Eluss)
+- Added shorthand for `AnyMatcher()`
 
 # 1.1.3
 - Add '.atMost' VerificationMode (thanks @kamwysoc)

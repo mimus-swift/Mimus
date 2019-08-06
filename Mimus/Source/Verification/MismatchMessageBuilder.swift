@@ -5,13 +5,13 @@
 import Foundation
 
 class MismatchMessageBuilder {
-    
+
     func message(for mismatchedResults: [MatchResult]) -> String {
         guard !mismatchedResults.isEmpty else {
             return ""
         }
         let messages = buildRecordedCallsMessages(for: mismatchedResults)
-        return joined(messages)
+        return joined(messages, newlineSeparator: "\n\n")
     }
 
     private func buildRecordedCallsMessages(for matchResults: [MatchResult]) -> [String] {
@@ -34,28 +34,20 @@ class MismatchMessageBuilder {
             return "Unexpected behavior, no arguments comparison to present"
         }
         let messages = comparisons.map { comparison -> String in
-            let details = "expected \(displayText(for: comparison.expected)), but was \(displayText(for: comparison.actual))."
+            let details = "expected \(comparison.expected.mimusDescription()), but was \(comparison.actual.mimusDescription())."
             return "Mismatch in argument #\(comparison.argumentIndex) - \(details)"
         }
         return joined(messages)
     }
-    
-    private func displayText(for value: Any?) -> String {
-        if let value = value {
-            return "<(\(String(describing: value)))>"
-        } else {
-            return "<(nil)>"
-        }
-    }
 
-    private func joined(_ messages: [String]) -> String {
+    private func joined(_ messages: [String], newlineSeparator: String = "\n") -> String {
         return messages
-                .enumerated()
-                .reduce("", { (result, element) in
-                    let (index, message) = element
-                    let isLastMessage = messages.count == index + 1
-                    return isLastMessage ? "\(result)\(message)" : "\(result)\(message)\n"
-                })
+            .enumerated()
+            .reduce("", { (result, element) in
+                let (index, message) = element
+                let isLastMessage = messages.count == index + 1
+                return isLastMessage ? "\(result)\(message)" : "\(result)\(message)\(newlineSeparator)"
+            })
 
     }
 }

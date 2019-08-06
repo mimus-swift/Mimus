@@ -74,7 +74,7 @@ internal class VerificationHandler {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
             message = """
                       Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at least \(times). 
-                      \(differentArgumentsMatchCount) additional call(s) matched identifier, but not arguments:\n\(mismatchedResultsMessage)
+                      \(differentArgumentsMatchCount) additional call(s) matched identifier, but not arguments:\n\n\(mismatchedResultsMessage)
                       """
         } else if differentArgumentsMatchCount > 0 {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
@@ -97,7 +97,7 @@ internal class VerificationHandler {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)
             message = """
                       Call with identifier was recorded \(matchCount) times, but expected \(times). 
-                      \(differentArgumentsMatchCount) additional call(s) matched identifier, but not arguments:\n\(mismatchedResultsMessage)
+                      \(differentArgumentsMatchCount) additional call(s) matched identifier, but not arguments:\n\n\(mismatchedResultsMessage)
                       """
         } else if differentArgumentsMatchCount > 0 {
             let mismatchedResultsMessage = mismatchMessageBuilder.message(for: differentArgumentsMatch)

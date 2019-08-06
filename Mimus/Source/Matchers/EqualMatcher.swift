@@ -1,6 +1,6 @@
 import Foundation
 
-public final class EqualTo<T: Equatable>: MockEquatable {
+public final class EqualTo<T: Equatable>: MockEquatable, CustomStringConvertible {
 
     private let object: T?
 
@@ -13,5 +13,9 @@ public final class EqualTo<T: Equatable>: MockEquatable {
             return object == otherObject
         }
         return other == nil && object == nil
+    }
+
+    public var description: String {
+        return "\(type(of: self)) - \(object.mimusDescription())"
     }
 }

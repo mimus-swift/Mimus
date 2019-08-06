@@ -4,14 +4,14 @@
 
 import Foundation
 
-class ClosureMatcher<T>: MockEquatable {
+public class ClosureMatcher<T>: MockEquatable {
     private let closure: (T?) -> Bool
 
-    init(_ closure: @escaping (T?) -> Bool) {
+    public init(_ closure: @escaping (T?) -> Bool) {
          self.closure = closure
     }
 
-    func equalTo(other: Any?) -> Bool {
+    public func equalTo(other: Any?) -> Bool {
         guard let otherAsType = other as? T? else {
             return false
         }

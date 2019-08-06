@@ -73,9 +73,11 @@ class MismatchMessageBuilderTests: XCTestCase {
         Mismatched call #1:
         Mismatch in argument #1 - expected <(1)>, but was <(2)>.
         Mismatch in argument #2 - expected <(2)>, but was <(3)>.
+
         Mismatched call #2:
         Mismatch in argument #1 - expected <(1)>, but was <(2)>.
         Mismatch in argument #2 - expected <(2)>, but was <(3)>.
+
         Mismatched call #3:
         Mismatch in argument #1 - expected <(1)>, but was <(2)>.
         Mismatch in argument #2 - expected <(2)>, but was <(3)>.

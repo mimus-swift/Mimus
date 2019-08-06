@@ -25,3 +25,6 @@ public func mClosure<T>(_ closure: @escaping (T?) -> Bool) -> MockEquatable {
     return ClosureMatcher(closure)
 }
                                             
+public func mAny() -> MockEquatable {
+    return AnyMatcher()
+}
