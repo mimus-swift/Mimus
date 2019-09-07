@@ -1,0 +1,13 @@
+name: CI
+
+on: [pull_request]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+    
+    steps:
+    - name: Executes tests
+      run: |
+        ./run_tests.sh
