@@ -128,8 +128,8 @@ class FoundationMatcherTests: XCTestCase {
 
     func testIndexPathPassingInvocation() {
         let result = matcher.match(
-                expected: [IndexPath(item: 42, section: 43)],
-                actual: [IndexPath(item: 42, section: 43)]
+                expected: [IndexPath(arrayLiteral: 42, 43)],
+                actual: [IndexPath(arrayLiteral: 42, 43)]
         )
         XCTAssertTrue(result.matching, "Expected index paths to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
@@ -137,8 +137,8 @@ class FoundationMatcherTests: XCTestCase {
 
     func testIndexPathFailingInvocation() {
         let result = matcher.match(
-                expected: [IndexPath(item: 42, section: 43)],
-                actual: [IndexPath(item: 44, section: 43)]
+                expected: [IndexPath(arrayLiteral: 42, 43)],
+                actual: [IndexPath(arrayLiteral: 44, 43)]
         )
         XCTAssertFalse(result.matching, "Expected index paths not to match")
     }

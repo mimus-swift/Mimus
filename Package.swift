@@ -16,5 +16,8 @@ let package = Package(
         .testTarget(
             name: "MimusTests",
             dependencies: ["Mimus"]),
+        .testTarget(
+            name: "MimusExamples",
+            dependencies: ["Mimus"]),
     ]
 )
