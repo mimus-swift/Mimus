@@ -55,6 +55,31 @@ github "Airhelp/Mimus"
 
 and then link it with your test target.
 
+### Swift Package Manager
+
+Mimus is available through [Swift Package Manager](https://swift.org/package-manager/).
+
+- When added as a package dependency:
+```
+dependencies: [
+        .package(
+            url: "https://github.com/AirHelp/Mimus.git", 
+            from: "1.1.4"
+        )
+    ]
+```
+
+- When added as an Application dependency:
+```
+To add a package dependency to your Xcode project, select File > Swift Packages > Add Package Dependency and enter its repository URL. 
+```
+```
+You can also navigate to your target’s General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button. 
+```
+```
+In the “Choose frameworks and libraries to add” dialog, select Add Other, and choose Add Package Dependency.
+```
+
 ## Authors
 
 Mimus is an AirHelp open source project, designed and implemented by
