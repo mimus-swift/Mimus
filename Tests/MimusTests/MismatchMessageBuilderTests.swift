@@ -104,6 +104,16 @@ class MismatchMessageBuilderTests: XCTestCase {
         let expectedMessage = "Mismatch in argument #1 - expected <(DefaultObject(index: 1))>, but was <(DefaultObject(index: 2))>."
         XCTAssertEqual(message, expectedMessage, "Expected to receive correct mismatch details")
     }
+
+    func testComparisonWithCustomMessageMatcher() {
+        let comparison = MimusComparator.ComparisonResult.MismatchedComparison(argumentIndex: 1,
+            expected: DescriptiveEqualTo(FixtureStructure(index: 1)),
+            actual: FixtureStructure(index: 2))
+        let result = MimusComparator.ComparisonResult(matching: false, mismatchedComparisons: [comparison])
+        let message = mismatchMessageBuilder.message(for: [result])
+        let expectedMessage = "Mismatch in argument #1 - custom expected <(FixtureStructure(index: 1))>, but was <(FixtureStructure(index: 2))>."
+        XCTAssertEqual(message, expectedMessage, "Expected to receive correct mismatch details")
+    }
 }
 
 // MARK: helpers
@@ -118,9 +128,34 @@ private struct CustomStringConvertibleObject: Matcher, CustomStringConvertible {
 
     func matches(argument: Any?) -> Bool { return true }
 }
+
 private struct DefaultObject: Matcher {
 
     let index: Int
 
     func matches(argument: Any?) -> Bool { return true }
+}
+
+private struct FixtureStructure: Equatable {
+    let index: Int
+}
+
+public final class DescriptiveEqualTo<T: Equatable>: Matcher {
+
+    private let object: T?
+
+    public init(_ object: T?) {
+        self.object = object
+    }
+
+    public func matches(argument: Any?) -> Bool {
+        if let otherObject = argument as? T {
+            return object == otherObject
+        }
+        return argument == nil && object == nil
+    }
+
+    public func mismatchMessage(for argument: Any?) -> String {
+        "custom expected \(object.mimusDescription()), but was \(argument.mimusDescription())."
+    }
 }

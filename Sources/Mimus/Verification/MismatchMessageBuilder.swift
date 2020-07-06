@@ -34,7 +34,12 @@ class MismatchMessageBuilder {
             return "Unexpected behavior, no arguments comparison to present"
         }
         let messages = comparisons.map { comparison -> String in
-            let details = "expected \(comparison.expected.mimusDescription()), but was \(comparison.actual.mimusDescription())."
+            let details: String
+            if let expected = comparison.expected {
+                details = expected.mismatchMessage(for: comparison.actual)
+            } else {
+                details = "expected \(comparison.expected.mimusDescription()), but was \(comparison.actual.mimusDescription())."
+            }
             return "Mismatch in argument #\(comparison.argumentIndex) - \(details)"
         }
         return joined(messages)
@@ -49,5 +54,11 @@ class MismatchMessageBuilder {
                 return isLastMessage ? "\(result)\(message)" : "\(result)\(message)\(newlineSeparator)"
             })
 
+    }
+}
+
+public extension Matcher {
+    func mismatchMessage(for argument: Any?) -> String {
+        "expected <(\(String(describing: self)))>, but was \(argument.mimusDescription())."
     }
 }

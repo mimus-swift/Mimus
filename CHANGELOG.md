@@ -3,6 +3,7 @@
 - **BREAKING** `Mock.storage` type has been changed from `[RecordedCall]` to `Storage` to better support future features (like e.g. the recording of return values)
 - **BREAKING** Calling verify will now reset previously recorded values
 - Added option to record values that should be returned for specific invocations
+- Added option to provide a custom failure message for a matcher
 
 # 1.1.5
 - SPM Support

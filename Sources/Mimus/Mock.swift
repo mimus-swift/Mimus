@@ -35,6 +35,13 @@ public protocol Matcher {
     /// - Parameter other: other value for comparison
     /// - Returns: true if values matchers this matcher, false if not
     func matches(argument: Any?) -> Bool
+
+    /// Allows modifying error message being reported to Mimus. Will only be called if the arguments didn't match. Default implementation uses description of both
+    /// argument and matcher values.
+    ///
+    /// - Parameter other: other value for comparison
+    /// - Returns: Message passed to XCTest for verification failure.
+    func mismatchMessage(for argument: Any?) -> String
 }
 
 /// Syntax sugar protocol for backwards compatibility with pre-1.2 version.  
