@@ -90,5 +90,7 @@ public extension Mock {
             testLocation: testLocation)
 
         TestLocation.internalTestLocation = nil
+
+        storage = []
     }
 }
