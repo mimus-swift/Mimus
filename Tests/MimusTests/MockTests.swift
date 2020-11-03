@@ -111,6 +111,16 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMismatchedArgumentsResults?.count, 2, "Expected verification handler to receive correct number of unmatched arguments")
     }
 
+    func testCorrectNumberOfMatchesAfterVeryfingTwoTimes() {
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier")
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier")
+
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier")
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 0, "Expected no matched result")
+        XCTAssertEqual(fakeVerificationHandler.lastMismatchedArgumentsResults?.count, 0, "Expected no mismatched result")
+    }
+
     func testCaptureArgument() {
         let argumentCaptor = CaptureArgumentMatcher()
 
