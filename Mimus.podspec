@@ -21,6 +21,6 @@ Pod::Spec.new do |s|
   s.swift_versions = ['4.2', '5.0']
 
   s.source       = { :git => "https://github.com/airhelp/mimus.git", :tag => "#{s.version}" }
-  s.source_files  = "Mimus/Source", "Mimus/Source/**/*.swift"
+  s.source_files  = "Sources/Mimus", "Sources/Mimus/**/*.swift"
   s.framework  = "XCTest"
 end
