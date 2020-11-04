@@ -10,4 +10,4 @@ jobs:
     steps:
     - name: Executes tests
       run: |
-        ./run_tests.sh
+        swift test
