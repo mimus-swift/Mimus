@@ -10,7 +10,7 @@ internal class VerificationHandler {
     
     static var shared: VerificationHandler = VerificationHandler()
 
-    func verifyCall(callIdentifier: String, matchedResults: [MatchResult], mismatchedArgumentsResults: [MatchResult], mode: VerificationMode, testLocation: TestLocation) {
+    func verifyCall(callIdentifier: String, matchedResults: [MimusComparator.ComparisonResult], mismatchedArgumentsResults: [MimusComparator.ComparisonResult], mode: VerificationMode, testLocation: TestLocation) {
         switch mode {
         case .never:
             assertNever(callIdentifier: callIdentifier,
@@ -63,7 +63,7 @@ internal class VerificationHandler {
         XCTFail(message, file: testLocation.file, line: testLocation.line)
     }
 
-    private func assertAtLeast(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatch: [MatchResult], testLocation: TestLocation) {
+    private func assertAtLeast(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatch: [MimusComparator.ComparisonResult], testLocation: TestLocation) {
         guard matchCount < times else {
             return
         }
@@ -87,7 +87,7 @@ internal class VerificationHandler {
         XCTFail(message, file: testLocation.file, line: testLocation.line)
     }
 
-    private func assert(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatch: [MatchResult], testLocation: TestLocation) {
+    private func assert(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatch: [MimusComparator.ComparisonResult], testLocation: TestLocation) {
         guard matchCount != times else {
             return
         }

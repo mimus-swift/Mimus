@@ -1,6 +1,6 @@
 import Foundation
 
-public final class EqualTo<T: Equatable>: MockEquatable, CustomStringConvertible {
+public final class EqualTo<T: Equatable>: Matcher {
 
     private let object: T?
 
@@ -8,11 +8,11 @@ public final class EqualTo<T: Equatable>: MockEquatable, CustomStringConvertible
         self.object = object
     }
 
-    public func equalTo(other: Any?) -> Bool {
-        if let otherObject = other as? T {
+    public func matches(argument: Any?) -> Bool {
+        if let otherObject = argument as? T {
             return object == otherObject
         }
-        return other == nil && object == nil
+        return argument == nil && object == nil
     }
 
     public var description: String {

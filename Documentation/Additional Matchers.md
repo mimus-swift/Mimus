@@ -85,7 +85,7 @@ In our tests we'll use a fake class that impersonates `ApplicationServiceRegistr
 ```swift
 class FakeApplicationServiceRegistrator: ApplicationServiceRegistrator, Mock {
 
-    var storage: [RecordedCall] = []
+    var storage = Mimus.Storage()
 
     func register(service: ApplicationService) {
         recordCall(withIdentifier: "register", arguments: [service])

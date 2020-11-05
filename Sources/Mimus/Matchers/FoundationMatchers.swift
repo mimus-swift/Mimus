@@ -1,75 +1,75 @@
 import Foundation
 
-extension NSError: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherError = other as? NSError {
+extension NSError: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherError = argument as? NSError {
             return self == otherError
         }
         return false
     }
 }
 
-extension NSString: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
+extension NSString: Matcher {
+    public func matches(argument: Any?) -> Bool {
         let selfSwiftString = self as String
-        return selfSwiftString.equalTo(other: other)
+        return selfSwiftString.matches(argument: argument)
     }
 }
 
-extension NSNumber: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherNumber = other as? NSNumber {
+extension NSNumber: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherNumber = argument as? NSNumber {
             return self == otherNumber
         }
         return false
     }
 }
 
-extension NSArray: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let array = self as? Array<Any> {
-            return array.equalTo(other: other)
+extension NSArray: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let array = self as? Array<Matcher> {
+            return array.matches(argument: argument)
         } else {
             return false
         }
     }
 }
 
-extension NSDictionary: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
+extension NSDictionary: Matcher {
+    public func matches(argument: Any?) -> Bool {
         if let dictionary = self as? Dictionary<AnyHashable, Any> {
-            return dictionary.equalTo(other: other)
+            return dictionary.matches(argument: argument)
         } else {
             return false
         }
     }
 }
 
-extension NSNull: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        return other == nil || other is NSNull
+extension NSNull: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        return argument == nil || argument is NSNull
     }
 }
 
-extension NSURL: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
+extension NSURL: Matcher {
+    public func matches(argument: Any?) -> Bool {
         let selfSwiftUrl = self as URL
-        return selfSwiftUrl.equalTo(other: other)
+        return selfSwiftUrl.matches(argument: argument)
     }
 }
 
-extension Data: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let other = other as? Data {
+extension Data: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let other = argument as? Data {
             return other == self
         }
         return false
     }
 }
 
-extension URLRequest: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let other = other as? URLRequest {
+extension URLRequest: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let other = argument as? URLRequest {
             return other == self
         }
         return false

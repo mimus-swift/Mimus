@@ -4,25 +4,25 @@
 
 import XCTest
 
-extension String: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherString = other as? String {
+extension String: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherString = argument as? String {
             return self == otherString
         }
-        if let otherStaticString = other as? StaticString {
+        if let otherStaticString = argument as? StaticString {
             return self == otherStaticString.toString()
         }
         return false
     }
 }
 
-extension StaticString: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
+extension StaticString: Matcher {
+    public func matches(argument: Any?) -> Bool {
         let selfString = self.toString()
-        if let otherString = other as? String {
+        if let otherString = argument as? String {
             return selfString == otherString
         }
-        if let otherStaticString = other as? StaticString {
+        if let otherStaticString = argument as? StaticString {
             return selfString == otherStaticString.toString()
         }
         return false
@@ -36,68 +36,68 @@ extension StaticString: MockEquatable {
     }
 }
 
-extension Int: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherInt = other as? Int {
+extension Int: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherInt = argument as? Int {
             return self == otherInt
         }
         return false
     }
 }
 
-extension UInt: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherInt = other as? UInt {
+extension UInt: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherInt = argument as? UInt {
             return self == otherInt
         }
         return false
     }
 }
 
-extension Float: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherFloat = other as? Float {
+extension Float: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherFloat = argument as? Float {
             return self == otherFloat
         }
         return false
     }
 }
 
-extension Double: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherDouble = other as? Double {
+extension Double: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherDouble = argument as? Double {
             return self == otherDouble
         }
         return false
     }
 }
 
-extension Bool: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherBool = other as? Bool {
+extension Bool: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherBool = argument as? Bool {
             return self == otherBool
         }
         return false
     }
 }
 
-extension URL: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherUrl = other as? URL {
+extension URL: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherUrl = argument as? URL {
             return self == otherUrl
         }
         return false
     }
 }
 
-extension Array: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        guard let actualArray = other as? [Any?] else {
+extension Array: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        guard let actualArray = argument as? [Any?] else {
             return false
         }
         // Small hack to go around type system
         let selfAny = self as Any?
-        guard let expectedArray = selfAny as? [MockEquatable?] else {
+        guard let expectedArray = selfAny as? [Matcher?] else {
             let expectedMirror = Mirror(reflecting: self as Any)
             let location = TestLocation.currentTestLocation()
             XCTFail("Attempted to compare unsupported array types. Expected type \(expectedMirror.subjectType)",
@@ -123,12 +123,12 @@ extension Array: MockEquatable {
                 return false
             }
 
-            equal = expected.equalTo(other: actual) && equal
+            equal = expected.matches(argument: actual) && equal
         }
         return equal
     }
 
-    private func areNullEquivalents(item: MockEquatable?, other: Any?) -> Bool {
+    private func areNullEquivalents(item: Matcher?, other: Any?) -> Bool {
         if item == nil || item is NSNull {
             return other == nil || other is NSNull
         }
@@ -136,14 +136,14 @@ extension Array: MockEquatable {
     }
 }
 
-extension Dictionary: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        guard let actual = other as? [AnyHashable: Any] else {
+extension Dictionary: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        guard let actual = argument as? [AnyHashable: Any] else {
             return false
         }
-        guard let expected = self as? [AnyHashable: MockEquatable] else {
+        guard let expected = self as? [AnyHashable: Matcher] else {
             let location = TestLocation.currentTestLocation()
-            XCTFail("Attempted to compare unsupported dictionary types. Values should conform to \(MockEquatable.self)",
+            XCTFail("Attempted to compare unsupported dictionary types. Values should conform to \(Matcher.self)",
                 file: location.file,
                 line: location.line)
             return false
@@ -160,16 +160,16 @@ extension Dictionary: MockEquatable {
                 return false
             }
 
-            equal = expectedValue.equalTo(other: actualValue) && equal
+            equal = expectedValue.matches(argument: actualValue) && equal
         }
 
         return equal
     }
 }
 
-extension IndexPath: MockEquatable {
-    public func equalTo(other: Any?) -> Bool {
-        if let otherIndexPath = other as? IndexPath {
+extension IndexPath: Matcher {
+    public func matches(argument: Any?) -> Bool {
+        if let otherIndexPath = argument as? IndexPath {
             return self == otherIndexPath
         }
         return false
