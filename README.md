@@ -14,22 +14,46 @@
 
 > Mimus is a bird genus in the family Mimidae. It contains the typical mockingbirds.
 
-Mimus is a Swift mocking library, aiming to reduce boilerplate code required for building mocks in Swift. It's been battle tested at [AirHelp](http://airhelp.com) where we've used it extensively across our test suites.
+Mimus is a Swift mocking library, aiming to reduce boilerplate code required for building mocks in Swift. It's been battle tested at [AirHelp](http://airhelp.com) and [Toptal](https://www.toptal.com) where it's being used extensively across test suites.
 
 # Main features:
 
-* Pure Swift (Support for versions from 3.0 to 4.2)
+* Pure Swift
 * Protocol-oriented implementation
 * Integrated with XCTest
-* Support for basic types
-* Support for optionals
-* Support for collections (Array/Dictionary)
+* Support for verification of basic types and collections (including optionals)
+* Support for writing custom matchers
 * Detailed failure reporting
 * Unit-tested
 
 # Usage
 
-You can find examples and basic usage [here](https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md).
+A Mimus mock can be created by declaring a class that conforms to your custom protocol and Mimus `Mock` type:
+
+```swift
+class FakeAuthenticationManager: AuthenticationManager, Mock {
+
+    var storage = Mimus.Storage()
+
+    func beginAuthentication(with email: String, password: String) {
+        recordCall(withIdentifier: "BeginAuthentication", arguments: [email, password])
+    }
+}
+```
+
+Afterwards you can verify whether specific call was received:
+
+```swift
+let fakeLoginAuthenticationManager = FakeAuthenticationManager()
+
+(...)
+
+fakeLoginAuthenticationManager.verifyCall(withIdentifier: "BeginAuthentication",
+        arguments: [mEqual("Fixture Email"), mEqual("Fixture Password")])
+```
+
+
+You can find more on the basic usage [here](https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md).
 
 For detailed usage refer to [documentation folder](https://github.com/AirHelp/Mimus/tree/master/Documentation).
 
@@ -63,7 +87,7 @@ Mimus is available through [Swift Package Manager](https://swift.org/package-man
 ```
 dependencies: [
         .package(
-            url: "https://github.com/AirHelp/Mimus.git", 
+            url: "https://github.com/AirHelp/Mimus.git",
             from: "1.1.4"
         )
     ]
@@ -71,10 +95,10 @@ dependencies: [
 
 - When added as an Application dependency:
 ```
-To add a package dependency to your Xcode project, select File > Swift Packages > Add Package Dependency and enter its repository URL. 
+To add a package dependency to your Xcode project, select File > Swift Packages > Add Package Dependency and enter its repository URL.
 ```
 ```
-You can also navigate to your target’s General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button. 
+You can also navigate to your target’s General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button.
 ```
 ```
 In the “Choose frameworks and libraries to add” dialog, select Add Other, and choose Add Package Dependency.
