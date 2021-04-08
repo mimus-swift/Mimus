@@ -1,15 +1,14 @@
 Pod::Spec.new do |s|
 
   s.name         = "Mimus"
-  s.version      = "1.1.4"
+  s.version      = "2.0.0"
   s.summary      = "Swift Mocking Library"
 
   s.description  = <<-DESC
                    Mimus is a Swift mocking library, aiming to reduce boilerplate code required for building mocks in Swift.
-                   It's been battle tested at AirHelp where we've used it extensively across our test suites.
                    DESC
 
-  s.homepage     = "https://www.airhelp.com"
+  s.homepage     = "https://github.com/mimus-swift/Mimus"
   s.license      = { :type => "MIT", :file => "LICENSE" }
 
   s.authors = { "Pawel Dudek" => "pawel@dudek.mobi", "Paweł Kozielecki" => "pawel.kozielecki@airhelp.com" }
@@ -20,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.swift_versions = ['4.2', '5.0']
 
-  s.source       = { :git => "https://github.com/airhelp/mimus.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/mimus-swift/mimus.git", :tag => "#{s.version}" }
   s.source_files  = "Sources/Mimus", "Sources/Mimus/**/*.swift"
   s.framework  = "XCTest"
 end
