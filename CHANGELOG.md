@@ -1,4 +1,7 @@
-# Next (2.0.0)
+# Next
+
+
+# 2.0.0
 - **BREAKING** `MockEquatable` has been renamed to `Matcher` to more closely express functionality provided (there is a typealias for backwards compatibility _but_ it might still be breaking in some cases)
 - **BREAKING** `Mock.storage` type has been changed from `[RecordedCall]` to `Storage` to better support future features (like e.g. the recording of return values)
 - **BREAKING** Calling verify will now reset previously recorded values
