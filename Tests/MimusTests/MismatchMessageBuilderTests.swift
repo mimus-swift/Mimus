@@ -39,6 +39,30 @@ class MismatchMessageBuilderTests: XCTestCase {
         let expectedMessage = "Mismatch in argument #1 - expected <(1)>, but was <(2)>."
         XCTAssertEqual(message, expectedMessage, "Expected to receive correct mismatch details")
     }
+    
+    func testOneComparisonWithExpectedValueAsEqualMatcherAndActualValues() {
+        let comparison = MimusComparator.ComparisonResult.MismatchedComparison(
+            argumentIndex: 1,
+            expected: mEqual(Int(1)),
+            actual: 2
+        )
+        let result = MimusComparator.ComparisonResult(matching: false, mismatchedComparisons: [comparison])
+        let message = mismatchMessageBuilder.message(for: [result])
+        let expectedMessage = "Mismatch in argument #1 - expected <(EqualTo<Int> - <(1)>)>, but was <(2)>."
+        XCTAssertEqual(message, expectedMessage, "Expected to receive correct mismatch details")
+    }
+    
+    func testOneComparisonWithExpectedValueAsNotEqualMatcherAndActualValues() {
+        let comparison = MimusComparator.ComparisonResult.MismatchedComparison(
+            argumentIndex: 1,
+            expected: mNot(mEqual(Int(1))),
+            actual: 1
+        )
+        let result = MimusComparator.ComparisonResult(matching: false, mismatchedComparisons: [comparison])
+        let message = mismatchMessageBuilder.message(for: [result])
+        let expectedMessage = "Mismatch in argument #1 - expected <(NotMatcher - EqualTo<Int> - <(1)>)>, but was <(1)>."
+        XCTAssertEqual(message, expectedMessage, "Expected to receive correct mismatch details")
+    }
 
     func testOneComparisonWithExpectedNil() {
         let comparison = MimusComparator.ComparisonResult.MismatchedComparison(argumentIndex: 1, expected: nil, actual: 2)

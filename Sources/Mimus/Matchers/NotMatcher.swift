@@ -4,7 +4,7 @@
 
 import Foundation
 
-public class NotMatcher: Matcher {
+public class NotMatcher: Matcher, CustomStringConvertible {
     private let containedMatcher: Matcher
 
     public init(containedMatcher: Matcher) {
@@ -16,6 +16,6 @@ public class NotMatcher: Matcher {
     }
 
     public var description: String {
-        return "\(type(of: self)) - \(containedMatcher)"
+        return "\(type(of: self)) - \(String(describing: containedMatcher))"
     }
 }

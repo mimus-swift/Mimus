@@ -1,6 +1,6 @@
 import Foundation
 
-public final class IdenticalTo<T: AnyObject>: Matcher {
+public final class IdenticalTo<T: AnyObject>: Matcher, CustomStringConvertible {
 
     private let object: T?
 
