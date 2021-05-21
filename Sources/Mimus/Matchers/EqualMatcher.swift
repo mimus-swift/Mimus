@@ -1,6 +1,6 @@
 import Foundation
 
-public final class EqualTo<T: Equatable>: Matcher {
+public final class EqualTo<T: Equatable>: Matcher, CustomStringConvertible {
 
     private let object: T?
 

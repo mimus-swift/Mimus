@@ -121,6 +121,21 @@ class MockTests: XCTestCase {
         XCTAssertEqual(fakeVerificationHandler.lastMismatchedArgumentsResults?.count, 0, "Expected no mismatched result")
     }
 
+    func testCorrectNumberOfMatchesAfterVeryfingTwoTimesWithNewRecordingDuringVerification() {
+        let matcher = ClosureMatcher<Int>({ _ in
+            self.mockRecorder.recordCall(withIdentifier: "Fixture Identifier 2")
+            return true
+        })
+        
+        mockRecorder.recordCall(withIdentifier: "Fixture Identifier", arguments: [Int(42)])
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier", arguments: [matcher])
+        
+        mockRecorder.verifyCall(withIdentifier: "Fixture Identifier 2")
+
+        XCTAssertEqual(fakeVerificationHandler.lastMatchedResults?.count, 1, "Expected one matched result")
+        XCTAssertEqual(fakeVerificationHandler.lastMismatchedArgumentsResults?.count, 0, "Expected no mismatched result")
+    }
+    
     func testCaptureArgument() {
         let argumentCaptor = CaptureArgumentMatcher()
 

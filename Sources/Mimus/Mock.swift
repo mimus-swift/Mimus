@@ -81,6 +81,10 @@ public extension Mock {
         let callCandidates = storage.recordedCalls.filter {
             $0.identifier == callIdentifier
         }
+        
+        // Note we explicitly reset storage _before_ triggering verification as verification might add new values to
+        // the storage which we want to keep around for additional verification (e.g. when simulating callbacks).
+        storage.reset()
 
         let matchResults = callCandidates.map({ mockMatcher.match(expected: arguments, actual: $0.arguments) })
 
@@ -94,8 +98,6 @@ public extension Mock {
             testLocation: testLocation)
 
         TestLocation.internalTestLocation = nil
-
-        storage.reset()
     }
 
     func record(returnValue: Any?, forCallWithIdentifier identifier: String, arguments: [Any?]? = nil) {
