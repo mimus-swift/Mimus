@@ -81,21 +81,24 @@ public extension Mock {
         let callCandidates = storage.recordedCalls.filter {
             $0.identifier == callIdentifier
         }
-        
-        // Note we explicitly reset storage _before_ triggering verification as verification might add new values to
-        // the storage which we want to keep around for additional verification (e.g. when simulating callbacks).
-        storage.reset()
+
+        // Note we explicitly remove all calls of a given identified from the storage _before_ triggering verification
+        // ... as verification might add new values to the storage which we want to keep around for additional verification
+        // (e.g. when simulating callbacks).
+        storage.remove(callsWithIdentifier: callIdentifier)
 
         let matchResults = callCandidates.map({ mockMatcher.match(expected: arguments, actual: $0.arguments) })
 
         let matchedResults = matchResults.filter({ $0.matching })
         let mismatchedResults = matchResults.filter({ !$0.matching })
 
-        VerificationHandler.shared.verifyCall(callIdentifier: callIdentifier,
-            matchedResults: matchedResults,
-            mismatchedArgumentsResults: mismatchedResults,
-            mode: mode,
-            testLocation: testLocation)
+        VerificationHandler.shared.verifyCall(
+                callIdentifier: callIdentifier,
+                matchedResults: matchedResults,
+                mismatchedArgumentsResults: mismatchedResults,
+                mode: mode,
+                testLocation: testLocation
+        )
 
         TestLocation.internalTestLocation = nil
     }

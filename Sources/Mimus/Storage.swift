@@ -39,6 +39,11 @@ public class Storage {
         recordedCalls = []
         recordedReturnValueEntries = []
     }
+
+    /// Removes all calls at a given identifier.
+    func remove(callsWithIdentifier identifier: String) {
+        recordedCalls.removeAll(where: { $0.identifier == identifier })
+    }
 }
 
 extension Storage {
