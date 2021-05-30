@@ -40,9 +40,13 @@ public class Storage {
         recordedReturnValueEntries = []
     }
 
-    /// Removes all calls at a given identifier.
-    func remove(callsWithIdentifier identifier: String) {
-        recordedCalls.removeAll(where: { $0.identifier == identifier })
+    /// Removes recorded calls at given indexes.
+    /// 
+    /// - Parameter indexes: a list of recorded call indexes to be removed. 
+    func remove(callsAtIndexes indexes: [Int]) {
+        for index in indexes.reversed() {
+            recordedCalls.remove(at: index)
+        }
     }
 }
 

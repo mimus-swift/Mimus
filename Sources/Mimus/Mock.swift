@@ -78,26 +78,32 @@ public extension Mock {
         TestLocation.internalTestLocation = testLocation
         let mockMatcher = MimusComparator()
 
-        let callCandidates = storage.recordedCalls.filter {
-            $0.identifier == callIdentifier
+        var matchedResults = [MimusComparator.ComparisonResult]()
+        var mismatchedResults = [MimusComparator.ComparisonResult]()
+        var callsToRemove = [Int]()
+
+        for (index, recordedCall) in storage.recordedCalls.enumerated() {
+            if recordedCall.identifier == callIdentifier {
+                let matcherResult = mockMatcher.match(expected: arguments, actual: recordedCall.arguments)
+                if matcherResult.matching {
+                    callsToRemove.append(index)
+                    matchedResults.append(matcherResult)
+                } else {
+                    mismatchedResults.append(matcherResult)
+                }
+            }
         }
 
-        // Note we explicitly remove all calls of a given identified from the storage _before_ triggering verification
-        // ... as verification might add new values to the storage which we want to keep around for additional verification
-        // (e.g. when simulating callbacks).
-        storage.remove(callsWithIdentifier: callIdentifier)
-
-        let matchResults = callCandidates.map({ mockMatcher.match(expected: arguments, actual: $0.arguments) })
-
-        let matchedResults = matchResults.filter({ $0.matching })
-        let mismatchedResults = matchResults.filter({ !$0.matching })
+        // Note we explicitly remove all calls of a given identifier with matching arguments from the storage _before_ triggering verification
+        // ... as verification might add new values to the storage which we want to keep around for additional verification (e.g. when simulating callbacks).
+        storage.remove(callsAtIndexes: callsToRemove)
 
         VerificationHandler.shared.verifyCall(
-                callIdentifier: callIdentifier,
-                matchedResults: matchedResults,
-                mismatchedArgumentsResults: mismatchedResults,
-                mode: mode,
-                testLocation: testLocation
+            callIdentifier: callIdentifier,
+            matchedResults: matchedResults,
+            mismatchedArgumentsResults: mismatchedResults,
+            mode: mode,
+            testLocation: testLocation
         )
 
         TestLocation.internalTestLocation = nil
