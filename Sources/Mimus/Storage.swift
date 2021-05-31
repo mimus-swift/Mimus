@@ -39,6 +39,15 @@ public class Storage {
         recordedCalls = []
         recordedReturnValueEntries = []
     }
+
+    /// Removes recorded calls at given indexes.
+    /// 
+    /// - Parameter indexes: a list of recorded call indexes to be removed. 
+    func remove(callsAtIndexes indexes: [Int]) {
+        for index in indexes.reversed() {
+            recordedCalls.remove(at: index)
+        }
+    }
 }
 
 extension Storage {
