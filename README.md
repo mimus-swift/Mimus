@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/AirHelp/Mimus/raw/master/Design/mimus%403x.png" width="250" height="250"/>
+  <img src="https://github.com/mimus-swift/Mimus/raw/master/Design/mimus%403x.png" width="250" height="250"/>
 </p>
 
 # Mimus
@@ -10,7 +10,7 @@
 [![CocoaPods compatible](https://img.shields.io/badge/CocoaPods-compatible-4BC51D.svg?style=flat)](https://github.com/CocoaPods/CocoaPods)
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)]()
 [![Public Yes](https://img.shields.io/badge/Public-yes-green.svg?style=flat)]()
-[![Build Status](https://travis-ci.org/AirHelp/Mimus.svg?branch=master)](https://travis-ci.org/AirHelp/Mimus)
+[![Build Status](https://travis-ci.org/mimus-swift/Mimus.svg?branch=master)](https://travis-ci.org/mimus-swift/Mimus)
 
 > Mimus is a bird genus in the family Mimidae. It contains the typical mockingbirds.
 
@@ -53,9 +53,9 @@ fakeLoginAuthenticationManager.verifyCall(withIdentifier: "BeginAuthentication",
 ```
 
 
-You can find more on the basic usage [here](https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md).
+You can find more on the basic usage [here](https://github.com/mimus-swift/Mimus/blob/master/Documentation/Basics.md).
 
-For detailed usage refer to [documentation folder](https://github.com/AirHelp/Mimus/tree/master/Documentation).
+For detailed usage refer to [documentation folder](https://github.com/mimus-swift/Mimus/tree/master/Documentation).
 
 ## Installation
 
@@ -74,7 +74,7 @@ You can also use [Carthage](https://github.com/Carthage/Carthage) for installing
 Simply add it to your Cartfile:
 
 ```
-github "Airhelp/Mimus"
+github "mimus-swift/Mimus"
 ```
 
 and then link it with your test target.
@@ -87,7 +87,7 @@ Mimus is available through [Swift Package Manager](https://swift.org/package-man
 ```
 dependencies: [
         .package(
-            url: "https://github.com/AirHelp/Mimus.git",
+            url: "https://github.com/mimus-swift/Mimus.git",
             from: "1.1.4"
         )
     ]

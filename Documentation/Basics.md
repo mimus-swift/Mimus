@@ -118,7 +118,7 @@ We pass call identifier and arguments - Mimus will then compare passed in argume
 
 Mimus uses a helper protocol to match objects - `Matcher`. By default all base types in Swift conform to this protocol, so things will work out of the box for this case - you can pass in types like `Int` directly.
 
-However for your own types you need to write an extension that conforms to this protocol - check out [Using Your Own Types](https://github.com/AirHelp/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md) for more details.
+However for your own types you need to write an extension that conforms to this protocol - check out [Using Your Own Types](https://github.com/mimus-swift/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md) for more details.
 
 What's great is that your tests will fail to compile if you attempt to use an object that's not conforming to `Matcher` protocol. Unfortunately due to Swift compiler limitations this does not work with Arrays and Dictionaries - check bottom of this document for more details.
 

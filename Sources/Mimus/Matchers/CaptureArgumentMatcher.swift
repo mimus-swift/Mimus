@@ -1,5 +1,5 @@
 /// Records are compared values.
-/// See https://github.com/AirHelp/Mimus/blob/master/Documentation/Capturing%20Arguments.md for more details. 
+/// See https://github.com/mimus-swift/Mimus/blob/master/Documentation/Capturing%20Arguments.md for more details. 
 public class CaptureArgumentMatcher: Matcher {
 
     public var capturedValues: [Any?] = []

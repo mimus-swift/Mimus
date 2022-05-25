@@ -1,0 +1,183 @@
+// swiftlint:disable superfluous_disable_command file_length
+// swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
+// swiftlint:disable nesting type_body_length type_name
+// swiftlint:disable vertical_whitespace weak_delegate
+import Mimus
+{% for argument in argument.imports %}
+import {{ argument }}
+{% endfor %}
+@testable import {{ argument.module }}
+
+{# Template derived from https://github.com/krzysztofzablocki/Sourcery/blob/master/Templates/Templates/AutoMockable.stencil #}
+{% macro normalizeMethodName name %}{{ name | replace:"(","_" | replace:")","" | replace:":","_" | replace:"`","" | snakeToCamelCase | lowerFirstWord }}{% endmacro %}
+{% macro normalizeUpperMethodName name %}{{ name | replace:"(","_" | replace:")","" | replace:":","_" | replace:"`","" | snakeToCamelCase | upperFirstLetter }}{% endmacro %}
+
+{% macro mockOptionalVariable variable %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }}
+{% endmacro %}
+
+{% macro mockNonOptionalArrayOrDictionaryVariable variable %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }} = {% if variable.isArray %}[]{% elif variable.isDictionary %}[:]{% endif %}
+{% endmacro %}
+
+{% macro mockNonOptionalVariable variable %}
+    {% if variable.type.kind == 'protocol' and type.annotations.automockable  %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }} = Mock{{ variable.typeName }}()
+    {% else %}
+    var {% call mockedVariableName variable %}: {{ variable.typeName }} {
+        get { return {% call underlyingMockedVariableName variable %} }
+        set(value) { {% call underlyingMockedVariableName variable %} = value }
+    }
+    var {% call underlyingMockedVariableName variable %}: {{ variable.typeName }}!
+    {% endif %}
+{% endmacro %}
+
+{% macro underlyingMockedVariableName variable %}underlying{{ variable.name|upperFirstLetter }}{% endmacro %}
+{% macro mockedVariableName variable %}{%if variable.definedInType.isExtension %}extension{% endif %}{{ variable.name }}{% endmacro %}
+{% macro addOverrideIfNeeded method type %}{%if type|annotated:"mockBaseClass" and method.annotations.definedIn == type.annotations.mockBaseClass  %}override {% endif %}{% endmacro %}
+
+{% macro parameterLabel p %}{% if not p.argumentLabel == p.name%}{{ p.argumentLabel }} {% endif %}{% endmacro %}
+
+{% macro verificationMethod method %}{# We intentionally use callName below to skip generic parameters, these are not needed here #}
+        func {{ method.callName }}({% for p in method.parameters %}{% call parameterLabel p %}{{ p.name }}: Matcher?{% if not forloop.last %}, {% endif %}{% endfor %}) {
+            {% if method.parameters.count == 0 %}
+            mock.verifyCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: .none, mode: self.mode, file: self.file, line: self.line)
+            {% else %}
+            mock.verifyCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}], mode: self.mode, file: self.file, line: self.line)
+            {% endif %}
+        }
+{% endmacro %}
+{% macro returnTypeForMethod method %}{% if method|annotated:'forceMock' %}Mock{{ method.returnTypeName }}{% else %}{{ method.returnTypeName }}{% endif %}{% endmacro %}
+{# Note that this is a non-trivial solution - we explicitly store the rawType inside a separate variable b/c otherwise Sourcery doesn't get it. We also use rawValueType on enum along implemented protocols becasue of http://merowing.info/Sourcery/Classes/Enum.html#/c:@M@SourceryRuntime@objc(cs)Enum(py)rawTypeName #}
+{# as protocols with no actual raw value will use the first inherited protocol as the raw value #}
+{% macro advancedReturnMatcher methodParameter %}{% set rawTypeName %}{{ methodParameter.type.rawTypeName }}{% endset %}{% if rawTypeName == 'Equatable' or methodParameter.type.based["Equatable"] %}mEqual({{ methodParameter.name }}){% elif methodParameter.type|annotated:"forceEquatableComparison" %}mEqual({{ methodParameter.name }}){% elif methodParameter.type.kind == 'class' %}mIdentical({{ methodParameter.name }}){% else %}{{ methodParameter.name }}{% if methodParameter.isOptional %}?{% endif %}.toRecordValueMatcher(){% endif %}{% endmacro %}
+
+// MARK: - AutoMockable Generated
+{% for type in types.protocols %}{% if type.annotations.automockable %}{% if not argument.onlyPublicTypes or argument.onlyPublicTypes == true and type.accessLevel == "public" %}
+// MARK: - {{ type.name }} AutoMockable
+final class Mock{{ type.name }}:{% if type|annotated:"mockBaseClass" %} {{ type.annotations.mockBaseClass }},{% endif %} {{ argument.module }}.{{ type.name }}, Mock {
+
+    let storage: Mimus.Storage = Mimus.Storage()
+
+    // MARK: - Verifier Support
+    {% if type.staticMethods.count > 0 %}
+
+    class Static: Mock {
+        let storage: Mimus.Storage = Mimus.Storage()
+    }
+    class StaticVerifier: {{ argument.module }}Verifier {
+        {% for method in type.staticMethods|!definedInExtension %}
+        {% call verificationMethod method %}
+        {% endfor %}
+    }
+    static let `static` = Static()
+
+    static func verify(mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) -> StaticVerifier {
+        return StaticVerifier(mock: `static`, mode: mode, file: file, line: line)
+    }
+    {% endif %}
+
+    class InstanceVerifier: {{ argument.module }}Verifier {
+        {% for method in type.allMethods|!definedInExtension %}{# We intentionally use callName below to skip generic parameters, these are not needed here #}
+        {% if not method.isStatic %}
+        {% call verificationMethod method %}
+        {% endif %}
+        {% endfor %}
+    }
+
+    func verify(mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) -> InstanceVerifier {
+        return InstanceVerifier(mock: self, mode: mode, file: file, line: line)
+    }
+
+    {% for method in type.allMethods|!definedInExtension %}
+    {% if forloop.first %}// MARK: - Mocked Functions{% endif %}
+    {% if not method.returnTypeName.isVoid %}
+    {% if not method|annotated:'advancedReturn' %}
+    {% if method.isOptionalReturnType %}
+    {% if method.isStatic %}static {% endif %}var simulated{% call normalizeUpperMethodName method.selectorName %}: {{ method.returnTypeName }} = nil
+    {% elif method.returnType.kind == 'protocol' and type.annotations.automockable %}
+    {% if method.isStatic %}static {% endif %}var simulated{% call normalizeUpperMethodName method.selectorName %}: {{ method.returnTypeName }} = Mock{{ method.returnTypeName }}()
+    {% elif method.returnTypeName.name == "Any" %}
+    {% if method.isStatic %}static {% endif %}var simulated{% call normalizeUpperMethodName method.selectorName %}: {{ method.returnTypeName }} = "Fixture Value"
+    {% else %}
+    {% if method.isStatic %}static {% endif %}var simulated{% call normalizeUpperMethodName method.selectorName %}: {% call returnTypeForMethod method %}!
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% if method.throws and not method|annotated:'advancedReturn' %}
+    var simulated{% call normalizeUpperMethodName method.selectorName %}Error: Error? = nil
+    {% endif %}
+
+    {% call addOverrideIfNeeded method type %}{% if method.isStatic %}static {% endif %}func {{ method.name }}{% if method.throws %} throws{% endif %}{% if not method.returnTypeName.isVoid %} -> {{ method.returnTypeName }}{% endif %} {
+        {% if method.parameters.count == 0 %}
+        {% if method.isStatic %}Mock{{ type.name }}.static.{% endif %}recordCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}")
+        {% else %}
+        {% if method.isStatic %}Mock{{ type.name }}.static.{% endif %}recordCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}])
+        {% endif %}
+        {% if method.throws %}if let error = {% if method|annotated:'advancedReturn' %}recordedError(forCallWithIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: [{% for p in method.parameters %}{% call advancedReturnMatcher p %}{% if not forloop.last %}, {% endif %}{% endfor %}]){% else %}simulated{% call normalizeUpperMethodName method.selectorName %}Error{% endif %} {
+            throw error
+        }
+        {% endif %}
+        {% if not method.returnTypeName.isVoid %}
+        {% if method|annotated:'advancedReturn' %}
+        return recordedValue(
+            forCallWithIdentifier: "{% call normalizeMethodName method.selectorName %}",
+            arguments: [{% for p in method.parameters %}{% call advancedReturnMatcher p %}{% if not forloop.last %}, {% endif %}{% endfor %}]
+        )!
+        {% else %}
+        return simulated{% call normalizeUpperMethodName method.selectorName %}
+        {% endif %}
+        {% endif %}
+    }
+    {% if method|annotated:'advancedReturn' %}
+    func stubValue(_ value: {{ method.returnTypeName }}, for {% for p in method.parameters %}{{ p.name }}: {{ p.typeName }}{% if not forloop.last %}, {% endif %}{% endfor %}) {
+        record(
+            returnValue: value,
+            forCallWithIdentifier: "{% call normalizeMethodName method.selectorName %}",
+            arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}]
+        )
+    }
+    {% if method.throws %}
+    func stubError(_ error: Error, for {% for p in method.parameters %}{{ p.name }}: {{ p.typeName }}{% if not forloop.last %}, {% endif %}{% endfor %}) {
+        record(
+            error: error,
+            forCallWithIdentifier: "{% call normalizeMethodName method.selectorName %}",
+            arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}]
+        )
+    }
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+    {% if type.allVariables.count > 0 %}
+
+    // MARK: - Mocked Variables
+
+    {% for variable in type.allVariables|!definedInExtension %}
+        {% if variable.isOptional %}{% call mockOptionalVariable variable %}{% elif variable.isArray or variable.isDictionary %}{% call mockNonOptionalArrayOrDictionaryVariable variable %}{% else %}{% call mockNonOptionalVariable variable %}{% endif %}
+    {% endfor %}
+    {% endif %}
+}
+
+{% endif %}
+{% endif %}
+{% endfor %}
+
+// MARK: - Verifier Support
+
+class {{ argument.module }}Verifier {
+    fileprivate let mock: Mock
+    fileprivate let mode: VerificationMode
+    fileprivate let file: StaticString
+    fileprivate let line: UInt
+    fileprivate init(mock: Mock, mode: VerificationMode, file: StaticString, line: UInt) {
+        self.mock = mock
+        self.mode = mode
+        self.file = file
+        self.line = line
+    }
+}
+
+// swiftlint:enable file_length weak_delegates
+// swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
+// swiftlint:enable nesting type_body_length type_name
+// swiftlint:enable vertical_whitespace

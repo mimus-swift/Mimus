@@ -1,5 +1,7 @@
 # Next
 
+# 2.0.1
+- Added Sourcery stencil
 
 # 2.0.0
 - **BREAKING** `MockEquatable` has been renamed to `Matcher` to more closely express functionality provided (there is a typealias for backwards compatibility _but_ it might still be breaking in some cases)
@@ -26,8 +28,8 @@
 
 # 1.1.1
 - Added out of the box system classes that support `MockEquatable` (thanks @karolus)
-- Allow specifying none or any arguments when verifying calls (see [here for details](https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md#argument-modes))
-- Added additional `ClosureMatcher` and `NotMatcher` (see [here for details](https://github.com/AirHelp/Mimus/blob/master/Documentation/Additional%20Matchers.md#not))
+- Allow specifying none or any arguments when verifying calls (see [here for details](https://github.com/mimus-swift/Mimus/blob/master/Documentation/Basics.md#argument-modes))
+- Added additional `ClosureMatcher` and `NotMatcher` (see [here for details](https://github.com/mimus-swift/Mimus/blob/master/Documentation/Additional%20Matchers.md#not))
 
 # 1.1.0
 - *BREAKING* Changed `MockEquatable` equation function to `equalTo(other: Any)`. This allows to record any type of value, not just types that conform to `MockEquatable`, greatly increasing how versatile this framework is

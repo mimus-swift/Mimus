@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Mimus"
-  s.version      = "2.0.0"
+  s.version      = "2.0.1"
   s.summary      = "Swift Mocking Library"
 
   s.description  = <<-DESC
@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
   s.swift_versions = ['4.2', '5.0']
 
   s.source       = { :git => "https://github.com/mimus-swift/mimus.git", :tag => "#{s.version}" }
+  s.preserve_path = 'SourceryStencils/AutoMockable.stencil'
   s.source_files  = "Sources/Mimus", "Sources/Mimus/**/*.swift"
   s.framework  = "XCTest"
 end

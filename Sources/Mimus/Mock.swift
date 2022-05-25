@@ -1,7 +1,7 @@
 import XCTest
 
 /// Enum defining all possible verification modes.
-/// See https://github.com/AirHelp/Mimus/blob/master/Documentation/Basics.md for more details.
+/// See https://github.com/mimus-swift/Mimus/blob/master/Documentation/Basics.md for more details.
 ///
 /// - never: fails the test if there is one or more matching invocation
 /// - atLeast: fails the test if there is less invocations than passed in the enum value
@@ -27,7 +27,7 @@ public enum Arguments: ExpressibleByArrayLiteral {
 }
 
 /// Protocol used for verifying equality between objects. Mimus delivers support for base Swift types, check out
-/// https://github.com/AirHelp/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md if you want to use your own
+/// https://github.com/mimus-swift/Mimus/blob/master/Documentation/Using%20Your%20Own%20Types.md if you want to use your own
 /// types
 public protocol Matcher {
     /// Function verifying whether this matcher matches passed in argument.
