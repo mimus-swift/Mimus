@@ -1,6 +1,6 @@
 # Sourcery Stencil 
 
-The recommended way of using Mimus is by leveraging Sourcery code generation for generating mocks. Mimus includes [a basic Sourcery Stencil]() that you can use directly (or modify for your own needs). You can find more about integrating Sourcery into your project [here](). 
+The recommended way of using Mimus is by leveraging [Sourcery](https://github.com/krzysztofzablocki/Sourcery) code generation for generating mocks. Mimus includes [a basic Sourcery Stencil](https://github.com/mimus-swift/Mimus/blob/master/SourceryStencil/AutoMockable.stencil) that you can use directly (or modify for your own needs). You can find more about integrating Sourcery into your project [here](https://github.com/krzysztofzablocki/Sourcery#usage). 
 
 ## Configuration Options
 
