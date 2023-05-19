@@ -11,6 +11,7 @@
 		10539B5D1E7BF218006EA51F /* Mimus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10115C281E6DA39B0001E9A2 /* Mimus.framework */; };
 		431F19EB24ACAC89004FD063 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F19E924ACAC88004FD063 /* Storage.swift */; };
 		431F19EC24ACAC89004FD063 /* Comparator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F19EA24ACAC89004FD063 /* Comparator.swift */; };
+		BBF148E52A1765BE00A2A89E /* CapturePointerMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF148E42A1765BE00A2A89E /* CapturePointerMatcher.swift */; };
 		E81870DE9867E5B78F431086 /* MatcherShorthands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8187527E891A12C4F39E24D /* MatcherShorthands.swift */; };
 		E818713FAF0EA34056A5B174 /* MismatchMessageBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8187ABE479B2C9973C74C32 /* MismatchMessageBuilderTests.swift */; };
 		E81871ED887519597856D130 /* Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8187A66F5508F72A023D3F8 /* Mock.swift */; };
@@ -40,6 +41,7 @@
 		E8187CF85000AE32BEE6284B /* EqualMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8187A7DA7675D91778A60E7 /* EqualMatcher.swift */; };
 		E8187E4DC42CB6BECD05FB8E /* FoundationMatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8187EBE36C86D583042ABE9 /* FoundationMatchers.swift */; };
 		E8187F7C788F4A28F89CD1CB /* FoundationMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81875A78BC6770983DD40AC /* FoundationMatcherTests.swift */; };
+		F4940EE12B55E99DFC5DC1CD /* CapturePointerMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49406D2ED7E72EEDAAB90E3 /* CapturePointerMatcherTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +68,7 @@
 		108EB0A31E7149CE0006E2EF /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		431F19E924ACAC88004FD063 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		431F19EA24ACAC89004FD063 /* Comparator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparator.swift; sourceTree = "<group>"; };
+		BBF148E42A1765BE00A2A89E /* CapturePointerMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePointerMatcher.swift; sourceTree = "<group>"; };
 		E818703285E3864C54C7790C /* InstanceOfMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstanceOfMatcher.swift; sourceTree = "<group>"; };
 		E8187037C5BD46B261D03C5C /* CaptureArgumentMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureArgumentMatcher.swift; sourceTree = "<group>"; };
 		E8187058120E6649B9943982 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
@@ -100,6 +103,7 @@
 		E8187F1364DC4D1AE4212F38 /* ComparatorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComparatorTests.swift; sourceTree = "<group>"; };
 		E8187F7891669D46248AA8BA /* ApplicationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationService.swift; sourceTree = "<group>"; };
 		E8187FC037E71749B0B2890B /* Package.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		F49406D2ED7E72EEDAAB90E3 /* CapturePointerMatcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CapturePointerMatcherTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +210,7 @@
 				E8187BA9DB7DC64514B71C4B /* MockTests.swift */,
 				E81875A78BC6770983DD40AC /* FoundationMatcherTests.swift */,
 				E8187ABE479B2C9973C74C32 /* MismatchMessageBuilderTests.swift */,
+				F49406D2ED7E72EEDAAB90E3 /* CapturePointerMatcherTests.swift */,
 			);
 			path = MimusTests;
 			sourceTree = "<group>";
@@ -250,6 +255,7 @@
 				E8187BBF5609DB8745AE25FC /* ClosureMatcher.swift */,
 				E81876F2427E6ACE7650E0E5 /* NotMatcher.swift */,
 				E8187527E891A12C4F39E24D /* MatcherShorthands.swift */,
+				BBF148E42A1765BE00A2A89E /* CapturePointerMatcher.swift */,
 			);
 			path = Matchers;
 			sourceTree = "<group>";
@@ -434,6 +440,7 @@
 				431F19EC24ACAC89004FD063 /* Comparator.swift in Sources */,
 				E8187B37802C4A311FFDC62B /* IdenticalMatcher.swift in Sources */,
 				E818753391D7421C11EEB0AF /* ClosureMatcher.swift in Sources */,
+				BBF148E52A1765BE00A2A89E /* CapturePointerMatcher.swift in Sources */,
 				E818759D99B7B1DA292F336E /* NotMatcher.swift in Sources */,
 				E81870DE9867E5B78F431086 /* MatcherShorthands.swift in Sources */,
 			);
@@ -450,6 +457,7 @@
 				E8187609D32B2C331D3811D2 /* MockTests.swift in Sources */,
 				E8187F7C788F4A28F89CD1CB /* FoundationMatcherTests.swift in Sources */,
 				E818713FAF0EA34056A5B174 /* MismatchMessageBuilderTests.swift in Sources */,
+				F4940EE12B55E99DFC5DC1CD /* CapturePointerMatcherTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

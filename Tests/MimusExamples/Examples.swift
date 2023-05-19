@@ -66,6 +66,16 @@ class AuthenticationCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(capturedOptions?["type"], "login")
     }
+
+    func testCapturePointerArgument() {
+        sut.login(with: "Fixture Email", password: "Fixture Password")
+        var capturedEmail: String?
+
+        fakeLoginAuthenticationManager.verifyCall(withIdentifier: "BeginAuthentication",
+            arguments: [mCaptureInto(pointer: &capturedEmail), "Fixture Password", mAny()])
+
+        XCTAssertEqual(capturedEmail, "Fixture Email")
+    }
     
     // MARK: InstanceOf
     
