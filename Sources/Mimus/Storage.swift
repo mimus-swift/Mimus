@@ -18,26 +18,47 @@ struct RecordedReturnEntry {
 
 /// Class responsible for storing recorded calls.
 public class Storage {
-    var recordedCalls: [RecordedCall]
-    var recordedReturnValueEntries: [RecordedReturnEntry]
+    private let recordedCallsQueue = DispatchQueue(label: "recorded-calls", attributes: .concurrent)
+    private var _recordedCalls: [RecordedCall]
+    var recordedCalls: [RecordedCall] {
+        recordedCallsQueue.sync {
+            _recordedCalls
+        }
+    }
+    private let recordedReturnValueEntriesQueue = DispatchQueue(label: "recorded_return_value-entries", attributes: .concurrent)
+    private var _recordedReturnValueEntries: [RecordedReturnEntry]
+    var recordedReturnValueEntries: [RecordedReturnEntry] {
+        recordedReturnValueEntriesQueue.sync {
+            _recordedReturnValueEntries
+        }
+    }
 
     public init() {
-        recordedCalls = []
-        recordedReturnValueEntries = []
+        _recordedCalls = []
+        _recordedReturnValueEntries = []
     }
 
     func record(call: RecordedCall) {
-        recordedCalls.append(call)
+        recordedCallsQueue.sync(flags: .barrier) {
+            _recordedCalls.append(call)
+        }
     }
 
     func record(entry: RecordedReturnEntry) {
-        recordedReturnValueEntries.append(entry)
+        recordedReturnValueEntriesQueue.sync(flags: .barrier) {
+            _recordedReturnValueEntries.append(entry)
+        }
+
     }
 
     /// Resets all recorded calls. Use to return given mock to initial state.
     public func reset() {
-        recordedCalls = []
-        recordedReturnValueEntries = []
+        recordedCallsQueue.sync(flags: .barrier) {
+            _recordedCalls = []
+        }
+        recordedReturnValueEntriesQueue.sync(flags: .barrier) {
+            _recordedReturnValueEntries = []
+        }
     }
 
     /// Removes recorded calls at given indexes.
@@ -45,7 +66,9 @@ public class Storage {
     /// - Parameter indexes: a list of recorded call indexes to be removed. 
     func remove(callsAtIndexes indexes: [Int]) {
         for index in indexes.reversed() {
-            recordedCalls.remove(at: index)
+            _ = recordedCallsQueue.sync(flags: .barrier) {
+                _recordedCalls.remove(at: index)
+            }
         }
     }
 }
