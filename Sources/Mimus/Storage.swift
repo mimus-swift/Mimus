@@ -25,7 +25,7 @@ public class Storage {
             _recordedCalls
         }
     }
-    private let recordedReturnValueEntriesQueue = DispatchQueue(label: "recorded_return_value-entries", attributes: .concurrent)
+    private let recordedReturnValueEntriesQueue = DispatchQueue(label: "recorded-return-value-entries", attributes: .concurrent)
     private var _recordedReturnValueEntries: [RecordedReturnEntry]
     var recordedReturnValueEntries: [RecordedReturnEntry] {
         recordedReturnValueEntriesQueue.sync {
