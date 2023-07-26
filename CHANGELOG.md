@@ -1,5 +1,12 @@
 # Next
 
+# 2.1.0
+
+- Fixes incorrect description of some matchers when they fail
+- **POSSIBLY BREAKING** Only verified calls are removed from storage (previously each verification caused all recored calls to be removed)
+- Adds capture into pointer matcher
+- Makes Mimus Mocks thread safe (thanks @adiki)
+
 # 2.0.1
 - Added Sourcery stencil
 
