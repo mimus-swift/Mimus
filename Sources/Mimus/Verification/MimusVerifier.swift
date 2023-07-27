@@ -1,6 +1,6 @@
 import Foundation
 
-public class MimusVerifier {
+open class MimusVerifier {
     public let mock: Mock
     public let mode: VerificationMode
     public let file: StaticString
