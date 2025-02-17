@@ -16,7 +16,7 @@
 
 Mimus is a Swift mocking library, aiming to reduce boilerplate code required for building mocks in Swift. It's been battle tested at [AirHelp](http://airhelp.com) and [Toptal](https://www.toptal.com) where it's being used extensively across test suites.
 
-# Main features:
+# Main features
 
 * Pure Swift
 * Protocol-oriented implementation
@@ -58,24 +58,13 @@ For detailed usage refer to [documentation folder](https://github.com/mimus-swif
 
 ## Installation
 
-### Carthage
-
-You can also use [Carthage](https://github.com/Carthage/Carthage) for installing Mimus.
-Simply add it to your Cartfile:
-
-```
-github "mimus-swift/Mimus"
-```
-
-and then link it with your test target.
-
 ### Swift Package Manager
 
 Mimus is available through [Swift Package Manager](https://swift.org/package-manager/).
 
-- When added as a package dependency:
+#### When added as a package dependency
 
-```
+``` swift
 dependencies: [
         .package(
             url: "https://github.com/mimus-swift/Mimus.git",
@@ -84,20 +73,25 @@ dependencies: [
     ]
 ```
 
-- When added as an Application dependency:
+#### When added as an Application dependency:
 
-```
 To add a package dependency to your Xcode project, select File > Swift Packages > Add Package Dependency and enter its repository URL.
-```
-```
+
 You can also navigate to your target’s General pane, and in the “Frameworks, Libraries, and Embedded Content” section, click the + button.
-```
-```
 In the “Choose frameworks and libraries to add” dialog, select Add Other, and choose Add Package Dependency.
+
+### Carthage
+
+You can also use [Carthage](https://github.com/Carthage/Carthage) for installing Mimus.
+Simply add it to your Cartfile:
+
+``` ruby
+github "mimus-swift/Mimus"
 ```
 
+and then link it with your test target.
 
-### Cocoapods - DEPRECATED
+### Cocoapods - 🚨 DEPRECATED 🚨
 
 Mimus is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile against your test target:
