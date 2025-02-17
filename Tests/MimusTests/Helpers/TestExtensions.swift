@@ -7,7 +7,7 @@ import XCTest
 
 @testable import Mimus
 
-extension VerificationMode: Equatable {
+extension VerificationMode: @retroactive Equatable {
 }
 
 public func ==(lhs: VerificationMode, rhs: VerificationMode) -> Bool {

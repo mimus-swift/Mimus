@@ -1,5 +1,9 @@
 # Next
 
+# 2.2.0
+
+- Adds simulate callback matchers
+
 # 2.1.0
 
 - Fixes incorrect description of some matchers when they fail

@@ -11,6 +11,8 @@
 		10539B5D1E7BF218006EA51F /* Mimus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10115C281E6DA39B0001E9A2 /* Mimus.framework */; };
 		431F19EB24ACAC89004FD063 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F19E924ACAC88004FD063 /* Storage.swift */; };
 		431F19EC24ACAC89004FD063 /* Comparator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F19EA24ACAC89004FD063 /* Comparator.swift */; };
+		BBD61B3B2D6340F7007FDFDC /* SimulateCallbackMatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD61B3A2D6340EC007FDFDC /* SimulateCallbackMatchers.swift */; };
+		BBD61B3D2D63416D007FDFDC /* SimulateCallbackMatchersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD61B3C2D634166007FDFDC /* SimulateCallbackMatchersTests.swift */; };
 		BBE30A1A2A71C93B0002F226 /* MimusVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE30A192A71C93B0002F226 /* MimusVerifier.swift */; };
 		BBF148E52A1765BE00A2A89E /* CapturePointerMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF148E42A1765BE00A2A89E /* CapturePointerMatcher.swift */; };
 		E81870DE9867E5B78F431086 /* MatcherShorthands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8187527E891A12C4F39E24D /* MatcherShorthands.swift */; };
@@ -70,6 +72,8 @@
 		431F19E924ACAC88004FD063 /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		431F19EA24ACAC89004FD063 /* Comparator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparator.swift; sourceTree = "<group>"; };
 		BBAE96B22A50B6AE0092029B /* MimusMocks */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MimusMocks; path = ../MimusMocks; sourceTree = "<group>"; };
+		BBD61B3A2D6340EC007FDFDC /* SimulateCallbackMatchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulateCallbackMatchers.swift; sourceTree = "<group>"; };
+		BBD61B3C2D634166007FDFDC /* SimulateCallbackMatchersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulateCallbackMatchersTests.swift; sourceTree = "<group>"; };
 		BBE30A192A71C93B0002F226 /* MimusVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MimusVerifier.swift; sourceTree = "<group>"; };
 		BBF148E42A1765BE00A2A89E /* CapturePointerMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePointerMatcher.swift; sourceTree = "<group>"; };
 		E818703285E3864C54C7790C /* InstanceOfMatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstanceOfMatcher.swift; sourceTree = "<group>"; };
@@ -210,12 +214,13 @@
 				E8187CEEC62A645984B50D5D /* Helpers */,
 				E8187516E7B616DD5C6FB2D1 /* XCTestManifests.swift */,
 				E8187058120E6649B9943982 /* Info.plist */,
-				E818752F102FA9207C030529 /* MatcherExtensionsTests.swift */,
+				F49406D2ED7E72EEDAAB90E3 /* CapturePointerMatcherTests.swift */,
 				E8187F1364DC4D1AE4212F38 /* ComparatorTests.swift */,
 				E8187BA9DB7DC64514B71C4B /* MockTests.swift */,
 				E81875A78BC6770983DD40AC /* FoundationMatcherTests.swift */,
+				E818752F102FA9207C030529 /* MatcherExtensionsTests.swift */,
 				E8187ABE479B2C9973C74C32 /* MismatchMessageBuilderTests.swift */,
-				F49406D2ED7E72EEDAAB90E3 /* CapturePointerMatcherTests.swift */,
+				BBD61B3C2D634166007FDFDC /* SimulateCallbackMatchersTests.swift */,
 			);
 			path = MimusTests;
 			sourceTree = "<group>";
@@ -261,6 +266,7 @@
 				E81876F2427E6ACE7650E0E5 /* NotMatcher.swift */,
 				E8187527E891A12C4F39E24D /* MatcherShorthands.swift */,
 				BBF148E42A1765BE00A2A89E /* CapturePointerMatcher.swift */,
+				BBD61B3A2D6340EC007FDFDC /* SimulateCallbackMatchers.swift */,
 			);
 			path = Matchers;
 			sourceTree = "<group>";
@@ -438,6 +444,7 @@
 				E81879E73004511A0B378327 /* SwiftMatchers.swift in Sources */,
 				E8187E4DC42CB6BECD05FB8E /* FoundationMatchers.swift in Sources */,
 				E8187A89A312BC15D10A408A /* AnyMatcher.swift in Sources */,
+				BBD61B3B2D6340F7007FDFDC /* SimulateCallbackMatchers.swift in Sources */,
 				E81879D5456CDC249CEAC8EA /* CaptureArgumentMatcher.swift in Sources */,
 				E8187C5569FCECDA9DF9161B /* MatcherHelpers.swift in Sources */,
 				E81872900FF9D7AC04FFED51 /* InstanceOfMatcher.swift in Sources */,
@@ -462,6 +469,7 @@
 				E8187428A8F0EEB64499CD88 /* TestExtensions.swift in Sources */,
 				E8187609D32B2C331D3811D2 /* MockTests.swift in Sources */,
 				E8187F7C788F4A28F89CD1CB /* FoundationMatcherTests.swift in Sources */,
+				BBD61B3D2D63416D007FDFDC /* SimulateCallbackMatchersTests.swift in Sources */,
 				E818713FAF0EA34056A5B174 /* MismatchMessageBuilderTests.swift in Sources */,
 				F4940EE12B55E99DFC5DC1CD /* CapturePointerMatcherTests.swift in Sources */,
 			);
@@ -634,6 +642,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/Mimus/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"-weak_framework",
@@ -666,6 +675,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/Mimus/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"-weak_framework",
@@ -688,6 +698,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 287LWMYEQ7;
 				INFOPLIST_FILE = Tests/MimusTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -704,6 +715,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 287LWMYEQ7;
 				INFOPLIST_FILE = Tests/MimusTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -720,6 +732,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 287LWMYEQ7;
 				INFOPLIST_FILE = Tests/MimusExamples/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusExamples;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -736,6 +749,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 287LWMYEQ7;
 				INFOPLIST_FILE = Tests/MimusExamples/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.airhelp.MimusExamples;
 				PRODUCT_NAME = "$(TARGET_NAME)";

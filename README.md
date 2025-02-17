@@ -52,21 +52,11 @@ fakeLoginAuthenticationManager.verifyCall(withIdentifier: "BeginAuthentication",
         arguments: [mEqual("Fixture Email"), mEqual("Fixture Password")])
 ```
 
-
 You can find more on the basic usage [here](https://github.com/mimus-swift/Mimus/blob/master/Documentation/Basics.md).
 
 For detailed usage refer to [documentation folder](https://github.com/mimus-swift/Mimus/tree/master/Documentation).
 
 ## Installation
-
-### Cocoapods
-
-Mimus is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile against your test target:
-
-```ruby
-pod "Mimus"
-```
 
 ### Carthage
 
@@ -84,6 +74,7 @@ and then link it with your test target.
 Mimus is available through [Swift Package Manager](https://swift.org/package-manager/).
 
 - When added as a package dependency:
+
 ```
 dependencies: [
         .package(
@@ -94,6 +85,7 @@ dependencies: [
 ```
 
 - When added as an Application dependency:
+
 ```
 To add a package dependency to your Xcode project, select File > Swift Packages > Add Package Dependency and enter its repository URL.
 ```
@@ -103,6 +95,18 @@ You can also navigate to your target’s General pane, and in the “Frameworks,
 ```
 In the “Choose frameworks and libraries to add” dialog, select Add Other, and choose Add Package Dependency.
 ```
+
+
+### Cocoapods - DEPRECATED
+
+Mimus is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile against your test target:
+
+```ruby
+pod "Mimus"
+```
+
+Note that starting with 2.1.0 Mimus will not be distributed via Cocoapods - we're moving to Swift Package Manager and we recommend everyone to do the same. You can still use Cocoapods with latest versions by pinning to a specific tag.
 
 ## Authors
 

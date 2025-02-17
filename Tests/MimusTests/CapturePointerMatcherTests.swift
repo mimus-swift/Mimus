@@ -17,13 +17,51 @@ class CapturePointerMatcherTests: XCTestCase {
         comparator = nil
     }
 
-    func testCapturePointer() {
-        var capturedValue: Int?
+    func testSimulateCompletion() {
+        var completionCalled: Bool = false
+        let completion: () -> Void = {
+            completionCalled = true
+        }
 
-        let result = comparator.match(expected: [mCaptureInto(pointer: &capturedValue), mAny()], actual: [42, 43])
+        let result = comparator.match(
+            expected: [mSimulateCompletion(), mAny()],
+            actual: [completion, 43]
+        )
 
-        XCTAssertTrue(result.matching, "Expected strings to match")
+        XCTAssertTrue(result.matching, "Expected values to match")
         XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
-        XCTAssertEqual(capturedValue, 42, "Expected captured value to hold the right int")
+        XCTAssertTrue(completionCalled, "Expected completion to be called")
+    }
+
+    func testSimulateCompletionWithSingleArgument() {
+        var capturedArgument: String?
+        let completion: (String) -> Void = {
+            capturedArgument = $0
+        }
+
+        let result = comparator.match(
+            expected: [mSimulateCallback("Fixture"), mAny()],
+            actual: [completion, 43]
+        )
+
+        XCTAssertTrue(result.matching, "Expected values to match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 0, "Expected no mismatched results")
+        XCTAssertEqual(capturedArgument, "Fixture", "Expected completion to be called")
+    }
+
+    func testSimulateCompletionWithSingleIncorrectArgument() {
+        var capturedArgument: String?
+        let completion: (String) -> Void = {
+            capturedArgument = $0
+        }
+
+        let result = comparator.match(
+            expected: [mSimulateCallback(42), mAny()],
+            actual: [completion, 43]
+        )
+
+        XCTAssertFalse(result.matching, "Expected values to not match")
+        XCTAssertEqual(result.mismatchedComparisons.count, 1, "Expected mismatched results")
+        XCTAssertNil(capturedArgument, "Expected completion to not be called")
     }
 }
