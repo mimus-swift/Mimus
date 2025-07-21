@@ -73,8 +73,9 @@ public extension Mock {
     ///   - mode: Verification mode. Defaults to .times(1)
     ///   - file: The file where your verification happens. Defaults to file where given call was made.
     ///   - line: The line where your verification happens. Defaults to line where given call was made.
-    func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) {
-        let testLocation = TestLocation(file: file, line: line)
+    ///   - column: The column where your verification happens. Defaults to column where given call was made.
+    func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), file: StaticString = #filePath, fileId: StaticString = #fileID, line: UInt = #line, column: UInt = #column) {
+        let testLocation = TestLocation(file: file, fileId: fileId, line: line, column: column)
         TestLocation.internalTestLocation = testLocation
         let mockMatcher = MimusComparator()
 

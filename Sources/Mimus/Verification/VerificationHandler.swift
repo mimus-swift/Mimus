@@ -45,9 +45,13 @@ internal class VerificationHandler {
             return
         }
 
-        XCTFail("Expected to not receive call with identifier \(callIdentifier)",
-                file: testLocation.file,
-                line: testLocation.line)
+        recordIssue(
+            "Expected to not receive call with identifier \(callIdentifier)",
+            filePath: testLocation.file,
+            fileID: testLocation.fileId,
+            line: testLocation.line,
+            column: testLocation.column
+        )
     }
 
     private func assertAtMost(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatchCount: Int, testLocation: TestLocation) {
@@ -60,7 +64,13 @@ internal class VerificationHandler {
             message = "Call with identifier \(callIdentifier) was recorded \(matchCount) times, but expected at most \(times)"
         }
 
-        XCTFail(message, file: testLocation.file, line: testLocation.line)
+        recordIssue(
+            message,
+            filePath: testLocation.file,
+            fileID: testLocation.fileId,
+            line: testLocation.line,
+            column: testLocation.column
+        )
     }
 
     private func assertAtLeast(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatch: [MimusComparator.ComparisonResult], testLocation: TestLocation) {
@@ -84,7 +94,13 @@ internal class VerificationHandler {
                       """
         }
 
-        XCTFail(message, file: testLocation.file, line: testLocation.line)
+        recordIssue(
+            message,
+            filePath: testLocation.file,
+            fileID: testLocation.fileId,
+            line: testLocation.line,
+            column: testLocation.column
+        )
     }
 
     private func assert(callIdentifier: String, times: Int, matchCount: Int, differentArgumentsMatch: [MimusComparator.ComparisonResult], testLocation: TestLocation) {
@@ -107,6 +123,12 @@ internal class VerificationHandler {
                       """
         }
 
-        XCTFail(message, file: testLocation.file, line: testLocation.line)
+        recordIssue(
+            message,
+            filePath: testLocation.file,
+            fileID: testLocation.fileId,
+            line: testLocation.line,
+            column: testLocation.column
+        )
     }
 }

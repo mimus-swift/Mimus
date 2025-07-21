@@ -5,12 +5,18 @@
 internal struct TestLocation {
 
     let file: StaticString
-
+    let fileId: StaticString
     let line: UInt
+    let column: UInt
 
-    static func currentTestLocation(file: StaticString = #file, line: UInt = #line) -> TestLocation {
+    static func currentTestLocation(
+        file: StaticString = #filePath, 
+        fileId: StaticString = #fileID,
+        line: UInt = #line,
+        column: UInt = #column
+    ) -> TestLocation {
         guard let testLocation = TestLocation.internalTestLocation else {
-            return TestLocation(file: file, line: line)
+            return TestLocation(file: file, fileId: fileId, line: line, column: column)
         }
         return testLocation
     }
