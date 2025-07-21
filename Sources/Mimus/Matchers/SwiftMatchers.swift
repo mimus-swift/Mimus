@@ -100,9 +100,13 @@ extension Array: Matcher {
         guard let expectedArray = selfAny as? [Matcher?] else {
             let expectedMirror = Mirror(reflecting: self as Any)
             let location = TestLocation.currentTestLocation()
-            XCTFail("Attempted to compare unsupported array types. Expected type \(expectedMirror.subjectType)",
-                file: location.file,
-                line: location.line)
+            recordIssue(
+                "Attempted to compare unsupported array types. Expected type \(expectedMirror.subjectType)",
+                filePath: location.file,
+                fileID: location.fileId,
+                line: location.line,
+                column: location.column
+            )
             return false
         }
 
@@ -143,9 +147,13 @@ extension Dictionary: Matcher {
         }
         guard let expected = self as? [AnyHashable: Matcher] else {
             let location = TestLocation.currentTestLocation()
-            XCTFail("Attempted to compare unsupported dictionary types. Values should conform to \(Matcher.self)",
-                file: location.file,
-                line: location.line)
+            recordIssue(
+                "Attempted to compare unsupported dictionary types. Values should conform to \(Matcher.self)",
+                filePath: location.file,
+                fileID: location.fileId,
+                line: location.line,
+                column: location.column
+            )
             return false
         }
 
