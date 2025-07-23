@@ -1,5 +1,9 @@
 # Next
 
+# 2.3.0
+
+- **POSSIBLY BREAKING** Adds Swift Test Support - you might have to adjust wrappers around Mock.verify function to pass correctly new arguments required by Swift Test (#column and #fileId)
+
 # 2.2.0
 
 - Adds simulate callback matchers
