@@ -4,13 +4,14 @@
 
 # Mimus
 
-[![Version](https://img.shields.io/cocoapods/v/Mimus.svg?style=flat)](http://cocoapods.org/pods/Mimus)
-[![Platform](https://img.shields.io/cocoapods/p/Mimus.svg?style=flat)](http://cocoapods.org/pods/Mimus)
+[![Swift 5.0+](https://img.shields.io/badge/Swift-5.0+-orange.svg?style=flat)](https://swift.org/)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-blue.svg?style=flat)]()
+[![SPM compatible](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager/)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![CocoaPods compatible](https://img.shields.io/badge/CocoaPods-compatible-4BC51D.svg?style=flat)](https://github.com/CocoaPods/CocoaPods)
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)]()
 [![Public Yes](https://img.shields.io/badge/Public-yes-green.svg?style=flat)]()
-[![Build Status](https://travis-ci.org/mimus-swift/Mimus.svg?branch=master)](https://travis-ci.org/mimus-swift/Mimus)
+[![CI](https://github.com/mimus-swift/Mimus/actions/workflows/default.yml/badge.svg)](https://github.com/mimus-swift/Mimus/actions/workflows/default.yml)
 
 > Mimus is a bird genus in the family Mimidae. It contains the typical mockingbirds.
 
@@ -20,7 +21,7 @@ Mimus is a Swift mocking library, aiming to reduce boilerplate code required for
 
 * Pure Swift
 * Protocol-oriented implementation
-* Integrated with XCTest
+* Integrated with XCTest and Swift Test
 * Support for verification of basic types and collections (including optionals)
 * Support for writing custom matchers
 * Detailed failure reporting
@@ -68,7 +69,7 @@ Mimus is available through [Swift Package Manager](https://swift.org/package-man
 dependencies: [
         .package(
             url: "https://github.com/mimus-swift/Mimus.git",
-            from: "1.1.4"
+            from: "2.3.0"
         )
     ]
 ```
