@@ -49,7 +49,7 @@ public protocol MockEquatable: Matcher { }
 
 /// Use this protocol to add mocking functionality for your mock objects. You will have to provide storage for recorded 
 /// calls in your implementation.
-public protocol Mock: AnyObject {
+public protocol Mock: AnyObject, Sendable {
     var storage: Storage { get }
 }
 
