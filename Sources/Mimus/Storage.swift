@@ -17,7 +17,7 @@ struct RecordedReturnEntry {
 }
 
 /// Class responsible for storing recorded calls.
-public class Storage {
+public class Storage: @unchecked Sendable {
     private let recordedCallsQueue = DispatchQueue(label: "recorded-calls", attributes: .concurrent)
     private var _recordedCalls: [RecordedCall]
     var recordedCalls: [RecordedCall] {
