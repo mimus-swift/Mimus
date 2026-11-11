@@ -8,7 +8,6 @@
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-blue.svg?style=flat)]()
 [![SPM compatible](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager/)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
-[![CocoaPods compatible](https://img.shields.io/badge/CocoaPods-compatible-4BC51D.svg?style=flat)](https://github.com/CocoaPods/CocoaPods)
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)]()
 [![Public Yes](https://img.shields.io/badge/Public-yes-green.svg?style=flat)]()
 [![CI](https://github.com/mimus-swift/Mimus/actions/workflows/default.yml/badge.svg)](https://github.com/mimus-swift/Mimus/actions/workflows/default.yml)
@@ -93,17 +92,6 @@ github "mimus-swift/Mimus"
 ```
 
 and then link it with your test target.
-
-### Cocoapods - 🚨 DEPRECATED 🚨
-
-Mimus is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile against your test target:
-
-```ruby
-pod "Mimus"
-```
-
-Note that starting with 2.1.0 Mimus will not be distributed via Cocoapods - we're moving to Swift Package Manager and we recommend everyone to do the same. You can still use Cocoapods with latest versions by pinning to a specific tag.
 
 ## Authors
 
