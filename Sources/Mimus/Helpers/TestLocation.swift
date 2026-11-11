@@ -2,7 +2,7 @@
 // Copyright (©) 2017 AirHelp. All rights reserved.
 //
 
-internal struct TestLocation {
+internal struct TestLocation: Sendable {
 
     let file: StaticString
     let fileId: StaticString
@@ -15,11 +15,15 @@ internal struct TestLocation {
         line: UInt = #line,
         column: UInt = #column
     ) -> TestLocation {
-        guard let testLocation = TestLocation.internalTestLocation else {
+        guard let testLocation = current else {
             return TestLocation(file: file, fileId: fileId, line: line, column: column)
         }
         return testLocation
     }
 
-    static var internalTestLocation: TestLocation?
+    @TaskLocal static var current: TestLocation?
+
+    static func withLocation<Result>(_ location: TestLocation, perform operation: () throws -> Result) rethrows -> Result {
+        try $current.withValue(location, operation: operation)
+    }
 }

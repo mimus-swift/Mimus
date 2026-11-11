@@ -26,6 +26,16 @@ class MockTests: XCTestCase {
 
     class MockRecorder: Mock {
         var storage = Storage()
+        let verificationHandler: VerificationHandler
+
+        init(verificationHandler: VerificationHandler) {
+            self.verificationHandler = verificationHandler
+        }
+
+        func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), file: StaticString = #filePath, fileId: StaticString = #fileID, line: UInt = #line, column: UInt = #column) {
+            let location = TestLocation(file: file, fileId: fileId, line: line, column: column)
+            verifyCall(withIdentifier: callIdentifier, arguments: arguments, mode: mode, testLocation: location, verificationHandler: verificationHandler)
+        }
     }
 
     var mockRecorder: MockRecorder!
@@ -34,17 +44,13 @@ class MockTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        mockRecorder = MockRecorder()
         fakeVerificationHandler = FakeVerificationHandler()
-
-        VerificationHandler.shared = fakeVerificationHandler
+        mockRecorder = MockRecorder(verificationHandler: fakeVerificationHandler)
     }
 
     override func tearDown() {
         mockRecorder = nil
         fakeVerificationHandler = nil
-
-        VerificationHandler.shared = VerificationHandler()
     }
 
     // MARK: Test No Recorder Invocations

@@ -4,7 +4,7 @@
 
 # Mimus
 
-[![Swift 5.0+](https://img.shields.io/badge/Swift-5.0+-orange.svg?style=flat)](https://swift.org/)
+[![Swift 5.5+](https://img.shields.io/badge/Swift-5.5+-orange.svg?style=flat)](https://swift.org/)
 [![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-blue.svg?style=flat)]()
 [![SPM compatible](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager/)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
@@ -58,6 +58,8 @@ You can find more on the basic usage [here](https://github.com/mimus-swift/Mimus
 For detailed usage refer to [documentation folder](https://github.com/mimus-swift/Mimus/tree/master/Documentation).
 
 ## Installation
+
+Requires Swift 5.5 or later and iOS 13, macOS 10.15, tvOS 13, or watchOS 6 or later.
 
 ### Swift Package Manager
 

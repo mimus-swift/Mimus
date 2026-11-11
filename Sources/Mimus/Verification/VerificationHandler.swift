@@ -8,8 +8,6 @@ internal class VerificationHandler {
     
     private let mismatchMessageBuilder = MismatchMessageBuilder()
     
-    static var shared: VerificationHandler = VerificationHandler()
-
     func verifyCall(callIdentifier: String, matchedResults: [MimusComparator.ComparisonResult], mismatchedArgumentsResults: [MimusComparator.ComparisonResult], mode: VerificationMode, testLocation: TestLocation) {
         switch mode {
         case .never:
