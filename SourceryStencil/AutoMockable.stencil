@@ -41,9 +41,9 @@ import {{ argument }}
 {% macro verificationMethod method %}{# We intentionally use callName below to skip generic parameters, these are not needed here #}
         func {{ method.callName }}({% for p in method.parameters %}{% call parameterLabel p %}{{ p.name }}: Matcher?{% if not forloop.last %}, {% endif %}{% endfor %}) {
             {% if method.parameters.count == 0 %}
-            mock.verifyCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: .none, mode: self.mode, file: self.file, line: self.line)
+            mock.verifyCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: .none, mode: self.mode, file: self.file, fileId: self.fileId, line: self.line, column: self.column)
             {% else %}
-            mock.verifyCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}], mode: self.mode, file: self.file, line: self.line)
+            mock.verifyCall(withIdentifier: "{% call normalizeMethodName method.selectorName %}", arguments: [{% for p in method.parameters %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}], mode: self.mode, file: self.file, fileId: self.fileId, line: self.line, column: self.column)
             {% endif %}
         }
 {% endmacro %}
@@ -72,8 +72,8 @@ final class Mock{{ type.name }}:{% if type|annotated:"mockBaseClass" %} {{ type.
     }
     static let `static` = Static()
 
-    static func verify(mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) -> StaticVerifier {
-        return StaticVerifier(mock: `static`, mode: mode, file: file, line: line)
+    static func verify(mode: VerificationMode = .times(1), file: StaticString = #filePath, fileId: StaticString = #fileID, line: UInt = #line, column: UInt = #column) -> StaticVerifier {
+        return StaticVerifier(mock: `static`, mode: mode, file: file, fileId: fileId, line: line, column: column)
     }
     {% endif %}
 
@@ -85,8 +85,8 @@ final class Mock{{ type.name }}:{% if type|annotated:"mockBaseClass" %} {{ type.
         {% endfor %}
     }
 
-    func verify(mode: VerificationMode = .times(1), file: StaticString = #file, line: UInt = #line) -> InstanceVerifier {
-        return InstanceVerifier(mock: self, mode: mode, file: file, line: line)
+    func verify(mode: VerificationMode = .times(1), file: StaticString = #filePath, fileId: StaticString = #fileID, line: UInt = #line, column: UInt = #column) -> InstanceVerifier {
+        return InstanceVerifier(mock: self, mode: mode, file: file, fileId: fileId, line: line, column: column)
     }
 
     {% for method in type.allMethods|!definedInExtension %}
@@ -168,12 +168,16 @@ class {{ argument.module }}Verifier {
     fileprivate let mock: Mock
     fileprivate let mode: VerificationMode
     fileprivate let file: StaticString
+    fileprivate let fileId: StaticString
     fileprivate let line: UInt
-    fileprivate init(mock: Mock, mode: VerificationMode, file: StaticString, line: UInt) {
+    fileprivate let column: UInt
+    fileprivate init(mock: Mock, mode: VerificationMode, file: StaticString, fileId: StaticString, line: UInt, column: UInt) {
         self.mock = mock
         self.mode = mode
         self.file = file
+        self.fileId = fileId
         self.line = line
+        self.column = column
     }
 }
 
