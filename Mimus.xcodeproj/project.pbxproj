@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0D3C07E0000000000000001 /* VerificationContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3C07E0000000000000002 /* VerificationContextTests.swift */; };
 		10115C321E6DA39B0001E9A2 /* Mimus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10115C281E6DA39B0001E9A2 /* Mimus.framework */; };
 		10539B5D1E7BF218006EA51F /* Mimus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10115C281E6DA39B0001E9A2 /* Mimus.framework */; };
 		431F19EB24ACAC89004FD063 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431F19E924ACAC88004FD063 /* Storage.swift */; };
@@ -65,6 +66,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C0D3C07E0000000000000002 /* VerificationContextTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerificationContextTests.swift; sourceTree = "<group>"; };
 		10115C281E6DA39B0001E9A2 /* Mimus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mimus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		10115C311E6DA39B0001E9A2 /* MimusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MimusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		10539B581E7BF218006EA51F /* MimusExamples.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MimusExamples.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -217,6 +219,7 @@
 				F49406D2ED7E72EEDAAB90E3 /* CapturePointerMatcherTests.swift */,
 				E8187F1364DC4D1AE4212F38 /* ComparatorTests.swift */,
 				E8187BA9DB7DC64514B71C4B /* MockTests.swift */,
+				C0D3C07E0000000000000002 /* VerificationContextTests.swift */,
 				E81875A78BC6770983DD40AC /* FoundationMatcherTests.swift */,
 				E818752F102FA9207C030529 /* MatcherExtensionsTests.swift */,
 				E8187ABE479B2C9973C74C32 /* MismatchMessageBuilderTests.swift */,
@@ -468,6 +471,7 @@
 				E818785BF0DD15C603C3CB0B /* ComparatorTests.swift in Sources */,
 				E8187428A8F0EEB64499CD88 /* TestExtensions.swift in Sources */,
 				E8187609D32B2C331D3811D2 /* MockTests.swift in Sources */,
+				C0D3C07E0000000000000001 /* VerificationContextTests.swift in Sources */,
 				E8187F7C788F4A28F89CD1CB /* FoundationMatcherTests.swift in Sources */,
 				BBD61B3D2D63416D007FDFDC /* SimulateCallbackMatchersTests.swift in Sources */,
 				E818713FAF0EA34056A5B174 /* MismatchMessageBuilderTests.swift in Sources */,
@@ -553,8 +557,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -611,8 +615,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

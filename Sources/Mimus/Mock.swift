@@ -49,7 +49,7 @@ public protocol MockEquatable: Matcher { }
 
 /// Use this protocol to add mocking functionality for your mock objects. You will have to provide storage for recorded 
 /// calls in your implementation.
-public protocol Mock: AnyObject, Sendable {
+public protocol Mock: AnyObject {
     var storage: Storage { get }
 }
 
@@ -76,38 +76,41 @@ public extension Mock {
     ///   - column: The column where your verification happens. Defaults to column where given call was made.
     func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), file: StaticString = #filePath, fileId: StaticString = #fileID, line: UInt = #line, column: UInt = #column) {
         let testLocation = TestLocation(file: file, fileId: fileId, line: line, column: column)
-        TestLocation.internalTestLocation = testLocation
-        let mockMatcher = MimusComparator()
+        verifyCall(withIdentifier: callIdentifier, arguments: arguments, mode: mode, testLocation: testLocation, verificationHandler: VerificationHandler())
+    }
 
-        var matchedResults = [MimusComparator.ComparisonResult]()
-        var mismatchedResults = [MimusComparator.ComparisonResult]()
-        var callsToRemove = [Int]()
+    internal func verifyCall(withIdentifier callIdentifier: String, arguments: Arguments = .none, mode: VerificationMode = .times(1), testLocation: TestLocation, verificationHandler: VerificationHandler) {
+        TestLocation.withLocation(testLocation) {
+            let mockMatcher = MimusComparator()
 
-        for (index, recordedCall) in storage.recordedCalls.enumerated() {
-            if recordedCall.identifier == callIdentifier {
-                let matcherResult = mockMatcher.match(expected: arguments, actual: recordedCall.arguments)
-                if matcherResult.matching {
-                    callsToRemove.append(index)
-                    matchedResults.append(matcherResult)
-                } else {
-                    mismatchedResults.append(matcherResult)
+            var matchedResults = [MimusComparator.ComparisonResult]()
+            var mismatchedResults = [MimusComparator.ComparisonResult]()
+            var callsToRemove = [Int]()
+
+            for (index, recordedCall) in storage.recordedCalls.enumerated() {
+                if recordedCall.identifier == callIdentifier {
+                    let matcherResult = mockMatcher.match(expected: arguments, actual: recordedCall.arguments)
+                    if matcherResult.matching {
+                        callsToRemove.append(index)
+                        matchedResults.append(matcherResult)
+                    } else {
+                        mismatchedResults.append(matcherResult)
+                    }
                 }
             }
+
+            // Note we explicitly remove all calls of a given identifier with matching arguments from the storage _before_ triggering verification
+            // ... as verification might add new values to the storage which we want to keep around for additional verification (e.g. when simulating callbacks).
+            storage.remove(callsAtIndexes: callsToRemove)
+
+            verificationHandler.verifyCall(
+                callIdentifier: callIdentifier,
+                matchedResults: matchedResults,
+                mismatchedArgumentsResults: mismatchedResults,
+                mode: mode,
+                testLocation: testLocation
+            )
         }
-
-        // Note we explicitly remove all calls of a given identifier with matching arguments from the storage _before_ triggering verification
-        // ... as verification might add new values to the storage which we want to keep around for additional verification (e.g. when simulating callbacks).
-        storage.remove(callsAtIndexes: callsToRemove)
-
-        VerificationHandler.shared.verifyCall(
-            callIdentifier: callIdentifier,
-            matchedResults: matchedResults,
-            mismatchedArgumentsResults: mismatchedResults,
-            mode: mode,
-            testLocation: testLocation
-        )
-
-        TestLocation.internalTestLocation = nil
     }
 
     func record(returnValue: Any?, forCallWithIdentifier identifier: String, arguments: [Any?]? = nil) {

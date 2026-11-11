@@ -1,5 +1,9 @@
 # Next
 
+- **BREAKING** Removes the `Sendable` requirement from `Mock`; individual mocks can adopt it when needed.
+- Uses task-local source locations so nested and concurrent verifications retain the correct failure location.
+- **BREAKING** Requires Swift 5.5+, iOS 13+, macOS 10.15+, tvOS 13+, and watchOS 6+.
+
 # 2.3.1
 
 - Marks `Mock` as `Sendable`
