@@ -1,6 +1,12 @@
-# Sourcery Stencil 
+# Sourcery Stencil
 
-The recommended way of using Mimus is by leveraging [Sourcery](https://github.com/krzysztofzablocki/Sourcery) code generation for generating mocks. Mimus includes [a basic Sourcery Stencil](https://github.com/mimus-swift/Mimus/blob/master/SourceryStencil/AutoMockable.stencil) that you can use directly (or modify for your own needs). You can find more about integrating Sourcery into your project [here](https://github.com/krzysztofzablocki/Sourcery#usage). 
+The recommended way of using Mimus is by leveraging [Sourcery](https://github.com/krzysztofzablocki/Sourcery) code generation for generating mocks. Mimus includes [a basic Sourcery Stencil](https://github.com/mimus-swift/Mimus/blob/master/SourceryStencil/AutoMockable.stencil) that you can use directly (or modify for your own needs). You can find more about integrating Sourcery into your project [here](https://github.com/krzysztofzablocki/Sourcery#usage).
+
+Regenerate mocks after updating the template to preserve Swift Testing failure
+locations. Generated `verify()` methods capture the test's file path, file ID,
+line, and column. Custom verifier wrappers must forward all four values to
+`verifyCall`; subclasses of `MimusVerifier` can use its `file`, `fileId`, `line`,
+and `column` properties.
 
 ## Configuration Options
 
@@ -56,8 +62,8 @@ You can use `forceMock` annotation to force the first behavior regardless of the
 
 # Advanced Return Logic
 
-This is still very much in the works but the general idea behind this stencil feature is for better control over what values get returned for what arguments. 
+This is still very much in the works but the general idea behind this stencil feature is for better control over what values get returned for what arguments.
 
-This might be especially useful for factory-style functions where you might want to return different values based on input arguments. 
+This might be especially useful for factory-style functions where you might want to return different values based on input arguments.
 
-You can use `advancedReturn` annotation on a function with return value to trigger this behavior. Note that all the input arguments have to currently either be Equatable or class types otherwise the stencil will generate code that does not compile. 
+You can use `advancedReturn` annotation on a function with return value to trigger this behavior. Note that all the input arguments have to currently either be Equatable or class types otherwise the stencil will generate code that does not compile.
