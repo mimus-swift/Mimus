@@ -1,5 +1,7 @@
 # Next
 
+# 2.4.0
+
 - Reports each XCTest verification failure once and preserves the complete test source location in generated verifiers.
 - Removes the remaining CocoaPods support and unused Ruby tooling, including the podspec, Gemfile, and lockfile.
 - **BREAKING** Removes the `Sendable` requirement from `Mock`; individual mocks can adopt it when needed.
