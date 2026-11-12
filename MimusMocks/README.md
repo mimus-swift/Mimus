@@ -1,0 +1,123 @@
+# MimusMocks
+
+A separate Swift package in the Mimus repository that generates Mimus mocks with
+Swift compiler macros. The parent runtime keeps its Swift 5.5 minimum; this package
+uses Swift 6.2+ and is currently tested with Swift 6.3.2 / Xcode 26.5.
+
+## Local integration
+
+Add both the parent Mimus package and this directory as local package dependencies.
+Add the `MimusMocks` and `Mimus` products to a test or dedicated mocks target.
+Keep Mimus's XCTest dependency in those targets.
+
+For a protocol defined in that target:
+
+```swift
+import Mimus
+import MimusMocks
+
+@Mockable
+protocol AuthenticationService {
+    func authenticate(email: String, password: String) throws -> String
+}
+
+let mock = MockAuthenticationService()
+mock.simulatedAuthenticateEmailPassword = "Fixture token"
+let token = try mock.authenticate(email: "Fixture email", password: "Fixture password")
+mock.verify().authenticate(email: mEqual("Fixture email"), password: mAny())
+```
+
+Each method also has a `simulated…Handler` closure. It can implement callbacks,
+async suspension, argument-dependent returns, or `inout` changes. Non-escaping
+closures are forwarded directly to the handler and represented by an opaque marker
+in call history; verify those arguments with `mAny()`.
+
+For typed throws, handlers return `Result<Return, Failure>`. This preserves the
+error type without requiring typed-throws function metadata on older deployment
+OSes. Ordinary throwing handlers use `throws`.
+
+`Sendable` and actor mocks keep mutable stub state behind a lock and require
+`@Sendable` handlers. Returned objects retain their own concurrency contracts.
+Global actor annotations are preserved. Observable properties participate in
+Observation tracking. `resetMock()` clears calls and configured stub state.
+Static stubs are shared for their generated type; tests that use them must control
+that shared lifetime.
+
+## Protocols in production modules
+
+Use `MimusMocksPlugin` on a dedicated mocks target that depends on its production
+module, Mimus, and MimusMocks:
+
+```swift
+.target(
+    name: "DomainMocks",
+    dependencies: [
+        "Domain",
+        .product(name: "Mimus", package: "Mimus"),
+        .product(name: "MimusMocks", package: "MimusMocks"),
+    ],
+    plugins: [.plugin(name: "MimusMocksPlugin", package: "MimusMocks")]
+)
+```
+
+The production protocol can retain `// sourcery: automockable` or use
+`// mimus: mockable`. Sourcery is not executed. The adapter indexes source targets,
+flattens inherited requirements, qualifies protocol references, and prepares
+private declaration proxies. The compiler macro emits the public mock beside
+those proxies in the mocks target. Production sources do not import Mimus or
+MimusMocks.
+
+If a mocks target has other source dependencies, select its modules explicitly
+in the package root's `.mimus-mocks.json`:
+
+```json
+{"targets":{"DomainMocks":{"modules":["Domain"],"includeInternal":false}}}
+```
+
+Set `includeInternal` to true for internal mocks built with `@testable` imports.
+The plugin supports SwiftPM targets. Xcode project build phases can run the
+`MimusMockDeclarations` executable with `--module`, `--input Module=File.swift`,
+and `--output` arguments, then compile its output in the mocks target.
+
+## Compatibility and limits
+
+- Existing non-overloaded `verify()` calls use Mimus matchers.
+- Overloaded methods use typed `Argument<T>` values, e.g. `.fetch(.value(42))`.
+  Return-type-only overloads also require `returning: Int.self`.
+- Overloaded stub names include parameter and return types, e.g.
+  `simulatedFetchIntReturningString`.
+- Generic return values use `stubIdentity(42)` or `stubIdentity("Fixture value")`;
+  generic methods do not expose a polymorphic handler property.
+- Associated types become generic mock parameters, e.g. `MockRepository<Int>()`.
+- Properties, initializers, static throwing methods, subscripts, `async`, typed
+  throws, variadics, autoclosures, and `inout` parameters are covered by tests.
+- `rethrows` requirements are implemented with nonthrowing witnesses.
+- `@Mockable(excluding: ["canReserve"])` retains a protocol extension's
+  implementation. The adapter also reads `// mimus: excluding = "canReserve"`.
+- A direct macro cannot discover inherited declarations. Use the build-tool
+  adapter, or supply a flattened protocol with
+  `inheritedRequirementsAreDeclared: true`. The compiler still verifies conformance.
+- External inherited protocols whose source is unavailable, nested protocols,
+  operator requirements, and static requirements combined with generic associated
+  types require an adapter or custom implementation. Unsupported requirements
+  should produce a diagnostic rather than silently disappear.
+- App-specific `.mock()` defaults and Combine subjects from custom Sourcery
+  templates need explicit property or handler setup; they are not inferred.
+- This nested package currently uses a local path to the parent runtime. Remote
+  distribution needs a package/release arrangement that exposes both packages.
+
+## Validation
+
+```sh
+swift test --package-path MimusMocks
+```
+
+The tests compile and execute expanded mocks, including public mocks emitted into
+another module by the build-tool plugin. Diagnostic tests exercise unsupported
+inputs.
+
+All fixtures are defined in this package. They exercise inherited requirements,
+optional properties, async failures, escaping result callbacks, async sequences,
+and protocol extension defaults that call stubbed requirements. The production
+fixture module has no dependency on Mimus or MimusMocks; generated mocks live in
+a separate fixture module. Run the same command locally and in CI.

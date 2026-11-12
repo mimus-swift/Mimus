@@ -1,5 +1,6 @@
 # Next
 
+- Adds the experimental `MimusMocks` package for Swift macro generation and mocks generated across module boundaries.
 - Reports each XCTest verification failure once and preserves the complete test source location in generated verifiers.
 - Removes the remaining CocoaPods support and unused Ruby tooling, including the podspec, Gemfile, and lockfile.
 - **BREAKING** Removes the `Sendable` requirement from `Mock`; individual mocks can adopt it when needed.
