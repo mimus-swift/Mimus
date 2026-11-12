@@ -70,7 +70,7 @@ Mimus is available through [Swift Package Manager](https://swift.org/package-man
 dependencies: [
         .package(
             url: "https://github.com/mimus-swift/Mimus.git",
-            from: "2.3.0"
+            from: "2.4.0"
         )
     ]
 ```
