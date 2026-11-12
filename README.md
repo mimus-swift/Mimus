@@ -28,6 +28,9 @@ Mimus is a Swift mocking library, aiming to reduce boilerplate code required for
 
 # Usage
 
+For native Swift macro generation, see the experimental [MimusMocks package](MimusMocks/README.md).
+It includes a build-tool adapter for protocols defined in another module.
+
 A Mimus mock can be created by declaring a class that conforms to your custom protocol and Mimus `Mock` type:
 
 ```swift

@@ -1,0 +1,150 @@
+import Foundation
+import XCTest
+
+final class DeclarationToolTests: XCTestCase {
+  func testReportsCallControlCommentsOnProperties() throws {
+    let result = try run(
+      "// mimus: mockable\npublic protocol Service {\n  // mimus: callControl\n  var name: String { get }\n}"
+    )
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Call control applies only to protocol methods"))
+  }
+  private func run(_ source: String) throws -> (status: Int32, error: String, output: String) {
+    let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let input = directory.appendingPathComponent("Contract.swift")
+    try source.write(to: input, atomically: true, encoding: .utf8)
+    var location = Bundle(for: Self.self).bundleURL
+    var executable: URL?
+    for _ in 0..<8 {
+      for name in ["MimusMockDeclarations", "MimusMockDeclarations-tool"] {
+        let candidate = location.appendingPathComponent(name)
+        if FileManager.default.isExecutableFile(atPath: candidate.path) {
+          executable = candidate
+          break
+        }
+      }
+      if executable != nil { break }
+      location.deleteLastPathComponent()
+    }
+    let process = Process()
+    process.executableURL = try XCTUnwrap(executable)
+    process.arguments = [
+      "--module", "Contracts", "--input", "Contracts=" + input.path,
+      "--output", directory.appendingPathComponent("Mocks.swift").path,
+    ]
+    let errors = Pipe()
+    process.standardError = errors
+    process.standardOutput = FileHandle.nullDevice
+    try process.run()
+    process.waitUntilExit()
+    return (
+      process.terminationStatus,
+      String(decoding: errors.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self),
+      (try? String(contentsOf: directory.appendingPathComponent("Mocks.swift"), encoding: .utf8))
+        ?? ""
+    )
+  }
+
+  func testReportsUnavailableInheritedSource() throws {
+    let result = try run("// mimus: mockable\npublic protocol Service: ExternalParent {}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Cannot resolve inherited protocol 'ExternalParent'"))
+  }
+
+  func testPreservesConditionalProtocols() throws {
+    let result = try run("#if DEBUG\n// mimus: mockable\npublic protocol Service {}\n#endif")
+    XCTAssertEqual(result.status, 0, result.error)
+    XCTAssertTrue(result.output.contains("#if DEBUG"))
+    XCTAssertTrue(result.output.contains("#endif"))
+  }
+
+  func testPreservesElseifAndElseConditionsWithDuplicateNames() throws {
+    let result = try run(
+      """
+      #if os(macOS)
+      // mimus: mockable
+      public protocol Service { func mac() }
+      #elseif os(Linux)
+      // mimus: mockable
+      public protocol Service { func linux() }
+      #else
+      // mimus: mockable
+      public protocol Service { func other() }
+      #endif
+      """)
+    XCTAssertEqual(result.status, 0, result.error)
+    XCTAssertTrue(result.output.contains("#if os(macOS)\n#elseif os(Linux)"))
+    XCTAssertTrue(result.output.contains("#if os(macOS)\n#elseif os(Linux)\n#else"))
+  }
+
+  func testRejectsAmbiguousConditionalParents() throws {
+    let result = try run(
+      """
+      #if DEBUG
+      public protocol Parent { func first() }
+      #else
+      public protocol Parent { func second() }
+      #endif
+      // mimus: mockable
+      public protocol Child: Parent {}
+      """)
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("conditional parents must resolve unambiguously"))
+  }
+
+  func testReportsGenericNamespaces() throws {
+    let result = try run(
+      "public struct Container<Value> {\n// mimus: mockable\npublic protocol Service {}\n}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("generic namespace needs a concrete adapter"))
+  }
+
+  func testReportsInheritanceCycles() throws {
+    let result = try run(
+      "public protocol Parent: Service {}\n// mimus: mockable\npublic protocol Service: Parent {}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("inheritance cycle"))
+  }
+
+  func testReportsInvalidFixturePolicies() throws {
+    let result = try run(
+      "// mimus: mockable\n// mimus: defaults = \"unknown\"\npublic protocol Service {}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Mock defaults must be 'none' or 'fixtures'"))
+  }
+
+  func testReportsInvalidStubbingPolicies() throws {
+    let result = try run(
+      "// mimus: mockable\n// mimus: stubbing = \"unknown\"\npublic protocol Service {}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Mock stubbing must be 'simple' or 'argumentMatching'"))
+  }
+
+  func testReportsInvalidPublisherConfigurations() throws {
+    let result = try run(
+      """
+      // mimus: mockable
+      public protocol Service {
+        // mimus: publisher = "unknown"
+        var events: AnyPublisher<Int, Never> { get }
+      }
+      """)
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("publisher must be \"passthrough\""))
+  }
+
+  func testReportsPublisherCommentsOnMethods() throws {
+    let result = try run(
+      """
+      // mimus: mockable
+      public protocol Service {
+        // mimus: publisher = "passthrough"
+        func events() -> AnyPublisher<Int, Never>
+      }
+      """)
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Publisher helpers apply only to protocol properties"))
+  }
+}

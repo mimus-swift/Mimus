@@ -1,0 +1,9 @@
+name: Swift macros
+on: [pull_request]
+jobs:
+  test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test native macros and generated mocks targets
+        run: swift test --package-path MimusMocks
