@@ -63,4 +63,30 @@ final class DeclarationToolTests: XCTestCase {
     XCTAssertNotEqual(result.status, 0)
     XCTAssertTrue(result.error.contains("Mock defaults must be 'none' or 'fixtures'"))
   }
+
+  func testReportsInvalidPublisherConfigurations() throws {
+    let result = try run(
+      """
+      // mimus: mockable
+      public protocol Service {
+        // mimus: publisher = "unknown"
+        var events: AnyPublisher<Int, Never> { get }
+      }
+      """)
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("publisher must be \"passthrough\""))
+  }
+
+  func testReportsPublisherCommentsOnMethods() throws {
+    let result = try run(
+      """
+      // mimus: mockable
+      public protocol Service {
+        // mimus: publisher = "passthrough"
+        func events() -> AnyPublisher<Int, Never>
+      }
+      """)
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Publisher helpers apply only to protocol properties"))
+  }
 }

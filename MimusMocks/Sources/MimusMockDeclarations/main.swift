@@ -233,6 +233,13 @@ func run() throws {
       guard let item = rewritten.as(MemberBlockItemSyntax.self) else {
         throw GenerationError("Cannot prepare protocol member for " + entry.key)
       }
+      if !item.decl.is(VariableDeclSyntax.self),
+        let attributed = item.decl.asProtocol(WithAttributesSyntax.self),
+        try PublisherSyntax.configuration(
+          attributes: attributed.attributes, trivia: item.decl.leadingTrivia) != nil
+      {
+        throw GenerationError("Publisher helpers apply only to protocol properties")
+      }
       func withDefault<D: DeclSyntaxProtocol & WithAttributesSyntax>(
         _ declaration: D, type: TypeSyntax, isGeneric: Bool = false
       ) throws -> String {
@@ -263,10 +270,16 @@ func run() throws {
       {
         return try withDefault(method, type: type, isGeneric: method.genericParameterClause != nil)
       }
-      if let variable = item.decl.as(VariableDeclSyntax.self), variable.bindings.count == 1,
-        let type = variable.bindings.first?.typeAnnotation?.type
-      {
-        return try withDefault(variable, type: type)
+      if let variable = item.decl.as(VariableDeclSyntax.self) {
+        if try PublisherSyntax.configuration(
+          attributes: variable.attributes, trivia: variable.leadingTrivia) != nil
+        {
+          try PublisherSyntax.validate(variable)
+          return variable.description.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if variable.bindings.count == 1, let type = variable.bindings.first?.typeAnnotation?.type {
+          return try withDefault(variable, type: type)
+        }
       }
       if let subscriptDecl = item.decl.as(SubscriptDeclSyntax.self) {
         return try withDefault(subscriptDecl, type: subscriptDecl.returnClause.type)

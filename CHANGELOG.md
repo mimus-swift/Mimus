@@ -1,5 +1,6 @@
 # Next
 
+- Adds opt-in `@MockPublisher` subject helpers and matching source directives for Combine publisher properties.
 - Adds opt-in fixture factories, explicit mock defaults, and cached nested mock defaults to `MimusMocks`.
 - Adds the experimental `MimusMocks` package for Swift macro generation and mocks generated across module boundaries.
 - Reports each XCTest verification failure once and preserves the complete test source location in generated verifiers.

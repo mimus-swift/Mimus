@@ -35,6 +35,17 @@ public macro MockDefault<Value>(_ value: Value) =
 public macro MockDefault(_ source: MockDefaultSource) =
   #externalMacro(module: "MockableMacro", type: "MockDefaultMacro")
 
+/// Opts a publisher property into a generated PassthroughSubject helper.
+@attached(peer)
+public macro MockPublisher() =
+  #externalMacro(module: "MockableMacro", type: "MockPublisherMacro")
+
+/// Opts a publisher property into a generated CurrentValueSubject helper.
+/// The emitted subject initializer type-checks the value against its Output.
+@attached(peer)
+public macro MockPublisher(initial: Any?) =
+  #externalMacro(module: "MockableMacro", type: "MockPublisherMacro")
+
 /// Keeps argument types in overloaded verifier signatures.
 public struct Argument<Value> {
   private let predicate: (Value?) -> Bool

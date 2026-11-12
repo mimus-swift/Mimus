@@ -57,6 +57,13 @@ struct MockBuilder {
       $0.decl.as(AssociatedTypeDeclSyntax.self)
     }
     for member in declaration.memberBlock.members {
+      if !member.decl.is(VariableDeclSyntax.self),
+        let attributed = member.decl.asProtocol(WithAttributesSyntax.self),
+        try PublisherSyntax.configuration(
+          attributes: attributed.attributes, trivia: member.decl.leadingTrivia) != nil
+      {
+        throw MockableDiagnostic("@MockPublisher applies to a protocol property")
+      }
       guard
         member.decl.is(FunctionDeclSyntax.self) || member.decl.is(VariableDeclSyntax.self)
           || member.decl.is(AssociatedTypeDeclSyntax.self)
@@ -382,6 +389,11 @@ struct MockBuilder {
   }
 
   private func property(_ variable: VariableDeclSyntax) throws -> String {
+    if let publisher = try PublisherSyntax.configuration(
+      attributes: variable.attributes, trivia: variable.leadingTrivia)
+    {
+      return try publisherProperty(variable, configuration: publisher)
+    }
     let prefix = variable.modifiers.contains { $0.name.text == "static" } ? "static " : ""
     let state = prefix.isEmpty ? "_mimusState" : "Self._mimusStaticState"
     var result = [String]()
@@ -432,6 +444,69 @@ struct MockBuilder {
       }
     }
     return result.joined(separator: "\n")
+  }
+
+  private func publisherProperty(
+    _ variable: VariableDeclSyntax, configuration: PublisherConfiguration
+  ) throws -> String {
+    try PublisherSyntax.validate(variable)
+    let binding = variable.bindings.first!
+    let name = binding.pattern.as(IdentifierPatternSyntax.self)!.identifier.trimmedDescription
+    let subjectName = name.replacingOccurrences(of: "`", with: "") + "Subject"
+    let conflicts = declaration.memberBlock.members.contains { member in
+      if let property = member.decl.as(VariableDeclSyntax.self) {
+        return property.bindings.contains {
+          $0.pattern.as(IdentifierPatternSyntax.self)?.identifier.text
+            .replacingOccurrences(of: "`", with: "") == subjectName
+        }
+      }
+      return member.decl.as(FunctionDeclSyntax.self)?.name.text == subjectName
+    }
+    guard !conflicts else {
+      throw MockableDiagnostic(
+        "Generated subject '\(subjectName)' conflicts with another requirement")
+    }
+    let type = binding.typeAnnotation!.type
+    let types = try PublisherSyntax.types(for: type)
+    let subject: String
+    let initializer: String
+    switch configuration {
+    case .passthrough:
+      subject = "Combine.PassthroughSubject<\(types.output), \(types.failure)>"
+      initializer = "\(subject)()"
+    case .currentValue(let value):
+      subject = "Combine.CurrentValueSubject<\(types.output), \(types.failure)>"
+      initializer = "\(subject)(\(value.trimmedDescription))"
+    }
+    let prefix = variable.modifiers.contains { $0.name.text == "static" } ? "static " : ""
+    let isolation =
+      variable.modifiers.contains { $0.name.text == "nonisolated" } ? "nonisolated " : ""
+    let state = prefix.isEmpty ? "_mimusState" : "Self._mimusStaticState"
+    let subjectKey = quoted("publisher:" + name)
+    let propertyKey = quoted("property:" + name)
+    let attributes = variable.attributes.filter {
+      $0.as(AttributeSyntax.self).map {
+        !["MockPublisher", "MockDefault"].contains(FixtureSyntax.attributeName($0))
+      } ?? true
+    }.trimmedDescription
+    return """
+      \(attributes)
+      \(access)\(isolation)\(prefix)var \(subjectName): \(subject) {
+          \(state).value(for: \(subjectKey), as: (\(subject)).self, default: { \(initializer) })
+      }
+      \(attributes)
+      \(access)\(isolation)\(prefix)var \(name): \(type) {
+          get {
+              \(isObservable && prefix.isEmpty ? "_mimusRegistrar.access(self, keyPath: \\." + name + ")" : "")
+              return \(state).value(for: \(propertyKey), as: (\(type)).self, default: { \(subjectName).eraseToAnyPublisher() })
+          }
+          set {
+              \(isObservable && prefix.isEmpty ? "_mimusRegistrar.withMutation(of: self, keyPath: \\." + name + ") {" : "")
+              \(state).set(newValue, for: \(propertyKey))
+              \(isObservable && prefix.isEmpty ? "}" : "")
+          }
+      }
+      """
   }
 
   private func subscriptMember(_ subscriptDecl: SubscriptDeclSyntax) throws -> String {

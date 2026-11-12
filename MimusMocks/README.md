@@ -96,6 +96,58 @@ The adapter also accepts existing `mockValue` and `forceMock` annotations and
 recognizes nested protocols selected for mock generation. Define fixture factories
 in the mocks target or a module imported by the generated declarations.
 
+## Opt-in Combine publishers
+
+Annotate an `AnyPublisher<Output, Failure>` property to generate a subject helper:
+
+```swift
+import Combine
+
+@Mockable
+protocol EventSource {
+    @MockPublisher
+    var events: AnyPublisher<String, Never> { get }
+
+    @MockPublisher(initial: 0)
+    var count: AnyPublisher<Int, Never> { get }
+}
+
+let mock = MockEventSource()
+mock.eventsSubject.send("connected")
+mock.countSubject.send(1)
+```
+
+`@MockPublisher` creates a `PassthroughSubject`; `initial:` selects a
+`CurrentValueSubject`. The initial expression must match the publisher's Output
+and can be `nil` for optional output. `<property>Subject` retains its concrete
+Output and Failure types. The subject and erased publisher are initialized lazily
+and cached per mock. An explicitly configured publisher overrides the generated
+one. Unannotated publisher properties keep ordinary property stubbing, including
+when the protocol has other opted-in publishers.
+
+`resetMock()` replaces subjects for future subscriptions. It does not complete or
+cancel subscriptions that already retain an old subject; subscriptions remain
+under the test's control. Property actor isolation and availability are preserved.
+Subjects and their output values retain Combine's concurrency contracts; the macro
+does not add Sendable conformance to them. The MimusMocks runtime imports only
+Foundation; Combine is imported by the target that compiles the generated code.
+
+For production protocols, opt in with one source comment per property:
+
+```swift
+// mimus: publisher = "passthrough"
+var events: AnyPublisher<String, Never> { get }
+
+// mimus: publisherInitial = "0"
+var count: AnyPublisher<Int, Never> { get }
+```
+
+Inherited property annotations are retained by the build plugin. Publisher helpers
+require a synchronous, nonthrowing property with an explicit `AnyPublisher` type;
+aliases and publisher-returning methods keep ordinary stubbing. A publisher helper
+and `@MockDefault` on the same property are conflicting choices. The protocol-wide
+fixture policy can coexist with opted-in publishers.
+
 ## Protocols in production modules
 
 Use `MimusMocksPlugin` on a dedicated mocks target that depends on its production
@@ -155,8 +207,7 @@ and `--output` arguments, then compile its output in the mocks target.
   types require an adapter or custom implementation. Unsupported requirements
   should produce a diagnostic rather than silently disappear.
 - Fixture factories are opt-in; `defaults: .none` is the default policy.
-- Combine subjects are not generated automatically. Publisher values can be
-  configured explicitly through properties, fixture defaults, or handlers.
+- Combine subject helpers require `@MockPublisher` or an explicit source comment.
 - This nested package currently uses a local path to the parent runtime. Remote
   distribution needs a package/release arrangement that exposes both packages.
 

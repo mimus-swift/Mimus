@@ -3,5 +3,7 @@ import SwiftSyntaxMacros
 
 @main
 struct MimusMocksPlugin: CompilerPlugin {
-  let providingMacros: [Macro.Type] = [MockableMacro.self, MockDefaultMacro.self]
+  let providingMacros: [Macro.Type] = [
+    MockableMacro.self, MockDefaultMacro.self, MockPublisherMacro.self,
+  ]
 }
