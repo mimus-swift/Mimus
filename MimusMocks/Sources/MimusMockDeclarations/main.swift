@@ -8,42 +8,6 @@ struct GenerationError: Error, CustomStringConvertible {
   init(_ description: String) { self.description = description }
 }
 
-struct ProtocolEntry {
-  let module: String
-  let declaration: ProtocolDeclSyntax
-  var name: String { declaration.name.text }
-  var key: String { module + "." + name }
-  var annotations: String { declaration.leadingTrivia.description }
-  var isPublic: Bool { declaration.modifiers.contains { $0.name.text == "public" } }
-}
-
-final class QualifyProtocols: SyntaxRewriter {
-  let module: String
-  let entries: [ProtocolEntry]
-  let boundNames: Set<String>
-  init(module: String, entries: [ProtocolEntry], boundNames: Set<String>) {
-    self.module = module
-    self.entries = entries
-    self.boundNames = boundNames
-    super.init(viewMode: .sourceAccurate)
-  }
-  override func visit(_ node: IdentifierTypeSyntax) -> TypeSyntax {
-    guard !boundNames.contains(node.name.text) else { return super.visit(node) }
-    let candidates = entries.filter { $0.name == node.name.text }
-    guard
-      let entry = candidates.first(where: { $0.module == module })
-        ?? (candidates.count == 1 ? candidates.first : nil)
-    else {
-      return super.visit(node)
-    }
-    return TypeSyntax(
-      MemberTypeSyntax(
-        baseType: TypeSyntax(IdentifierTypeSyntax(name: .identifier(entry.module))),
-        name: node.name, genericArgumentClause: node.genericArgumentClause
-      ))
-  }
-}
-
 func annotation(_ text: String, named name: String) -> String? {
   FixtureSyntax.annotation(text, named: name)
 }
@@ -51,24 +15,6 @@ func annotation(_ text: String, named name: String) -> String? {
 func isMarked(_ text: String) -> Bool {
   text.range(of: "(?:sourcery:\\s*automockable|mimus:\\s*mockable)", options: .regularExpression)
     != nil
-}
-
-final class UnsupportedDeclarations: SyntaxVisitor {
-  var message: String?
-  override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
-    if isMarked(node.leadingTrivia.description) {
-      var ancestor = node.parent
-      while let current = ancestor, !current.is(SourceFileSyntax.self) {
-        if current.is(MemberBlockItemSyntax.self) || current.is(IfConfigDeclSyntax.self) {
-          message =
-            "Marked nested or conditional protocol '\(node.name.text)' needs a top-level platform-specific declaration"
-          break
-        }
-        ancestor = current.parent
-      }
-    }
-    return .skipChildren
-  }
 }
 
 let markers: Set<String> = ["AnyObject", "Sendable", "Actor", "Observable", "NSObjectProtocol"]
@@ -95,6 +41,7 @@ func memberKey(_ member: MemberBlockItemSyntax) -> String {
 
 struct MemberSource {
   let module: String
+  let namespace: [String]
   let syntax: MemberBlockItemSyntax
 }
 
@@ -116,16 +63,33 @@ func flattened(_ entry: ProtocolEntry, entries: [ProtocolEntry], visiting: Set<S
     let name = canonical(inherited.type.trimmedDescription)
     if markers.contains(name) {
       result.traits.insert(name)
+      if name == "NSObjectProtocol", result.baseClass == nil { result.baseClass = "NSObject" }
       continue
     }
     if name == result.baseClass { continue }
-    let candidates = entries.filter { $0.key == name || $0.name == name }
-    guard
-      let parent = candidates.first(where: { $0.module == entry.module })
-        ?? (candidates.count == 1 ? candidates.first : nil)
-    else {
+    let candidates = entries.filter {
+      !$0.isExclusive(with: entry)
+        && ($0.key == name || $0.path == name || $0.name == name || $0.requirementsFor == name
+          || $0.requirementsFor?.split(separator: ".").last.map(String.init) == name)
+    }
+    var scoped = [ProtocolEntry]()
+    for depth in stride(from: entry.namespace.count, through: 0, by: -1) {
+      scoped = candidates.filter {
+        $0.module == entry.module && $0.namespace == Array(entry.namespace.prefix(depth))
+      }
+      if !scoped.isEmpty { break }
+    }
+    let local = scoped.isEmpty ? candidates.filter { $0.module == entry.module } : scoped
+    let available = local.isEmpty ? candidates : local
+    let matching = available.filter { parent in
+      parent.conditions.allSatisfy { context in
+        entry.conditions.contains { $0.prefix == context.prefix }
+      }
+    }
+    let parents = matching.isEmpty ? available : matching
+    guard parents.count == 1, let parent = parents.first else {
       throw GenerationError(
-        "Cannot resolve inherited protocol '\(name)' for \(entry.key). Include its source module or supply a concrete adapter protocol."
+        "Cannot resolve inherited protocol '\(name)' for \(entry.key). Include its source module or supply a requirementsFor overlay; conditional parents must resolve unambiguously."
       )
     }
     let inherited = try flattened(parent, entries: entries, visiting: visiting.union([entry.key]))
@@ -135,7 +99,8 @@ func flattened(_ entry: ProtocolEntry, entries: [ProtocolEntry], visiting: Set<S
   }
   for member in entry.declaration.memberBlock.members {
     result.members.removeAll { memberKey($0.syntax) == memberKey(member) }
-    result.members.append(MemberSource(module: entry.module, syntax: member))
+    result.members.append(
+      MemberSource(module: entry.module, namespace: entry.namespace, syntax: member))
   }
   return result
 }
@@ -190,31 +155,31 @@ func run() throws {
   for input in inputs {
     let tree = Parser.parse(source: try String(contentsOfFile: input.path, encoding: .utf8))
     guard !tree.hasError else { throw GenerationError("Cannot parse " + input.path) }
-    let unsupported = UnsupportedDeclarations(viewMode: .sourceAccurate)
-    unsupported.walk(tree)
-    if let message = unsupported.message { throw GenerationError(message) }
-    for item in tree.statements {
-      if let declaration = item.item.as(ProtocolDeclSyntax.self) {
-        entries.append(ProtocolEntry(module: input.module, declaration: declaration))
-      }
-      if selected.contains(input.module), let declaration = item.item.as(ImportDeclSyntax.self) {
-        imports.insert(declaration.trimmedDescription)
-      }
+    let index = DeclarationIndex(module: input.module, file: input.path)
+    index.walk(tree)
+    if let message = index.message { throw GenerationError(message) }
+    entries += index.entries
+    if selected.contains(input.module)
+      || index.entries.contains(where: { $0.requirementsFor != nil })
+    {
+      imports.formUnion(index.imports)
     }
   }
   let eligible = entries.filter {
-    selected.contains($0.module) && ($0.isPublic || includeInternal)
+    selected.contains($0.module) && $0.accessible && ($0.isPublic || includeInternal)
+      && $0.requirementsFor == nil
       && isMarked($0.annotations)
   }
   var rendered = [String]()
-  var names = Set<String>()
+  var names = [String: [ProtocolEntry]]()
   let mockProtocols = Dictionary(
-    eligible.map { ($0.key, "Mock" + $0.name) }, uniquingKeysWith: { first, _ in first })
+    eligible.map { ($0.key, "Mock" + $0.proxyName) }, uniquingKeysWith: { first, _ in first })
   for entry in eligible.sorted(by: { $0.key < $1.key }) {
-    guard names.insert(entry.name).inserted else {
+    guard (names[entry.proxyName] ?? []).allSatisfy({ $0.isExclusive(with: entry) }) else {
       throw GenerationError(
         "Duplicate protocol name '\(entry.name)'. Use separate mocks targets for its modules.")
     }
+    names[entry.proxyName, default: []].append(entry)
     let flat = try flattened(entry, entries: entries)
     let defaults = annotation(entry.annotations, named: "defaults")
     let stubbing = annotation(entry.annotations, named: "stubbing")
@@ -232,7 +197,8 @@ func run() throws {
           $0.name.text
         } ?? []
       let rewriter = QualifyProtocols(
-        module: member.module, entries: entries, boundNames: boundNames.union(generics))
+        module: member.module, namespace: member.namespace, entries: entries,
+        boundNames: boundNames.union(generics))
       let rewritten = rewriter.rewrite(member.syntax)
       guard let item = rewritten.as(MemberBlockItemSyntax.self) else {
         throw GenerationError("Cannot prepare protocol member for " + entry.key)
@@ -256,7 +222,8 @@ func run() throws {
       ) throws -> String {
         var declaration = declaration
         let explicit = try FixtureSyntax.explicitDefault(
-          attributes: declaration.attributes, trivia: declaration.leadingTrivia, type: type)
+          attributes: declaration.attributes, trivia: declaration.leadingTrivia, type: type,
+          mockProtocols: mockProtocols)
         let value =
           try explicit
           ?? (defaults == "fixtures" && !isGeneric
@@ -295,7 +262,7 @@ func run() throws {
       if let subscriptDecl = item.decl.as(SubscriptDeclSyntax.self) {
         return try withDefault(subscriptDecl, type: subscriptDecl.returnClause.type)
       }
-      return item.trimmedDescription
+      return item.description.trimmingCharacters(in: .whitespacesAndNewlines)
     }.joined(separator: "\n")
     var options = [String]()
     if let base = flat.baseClass {
@@ -318,13 +285,14 @@ func run() throws {
     }.trimmedDescription
     let traits = flat.traits.sorted().map { ", " + $0 }.joined()
     rendered.append(
-      """
-      \(attributes)
-      @Mockable(\(options.joined(separator: ", ")))
-      fileprivate protocol \(entry.name): \(entry.key)\(traits) \(entry.declaration.genericWhereClause?.trimmedDescription ?? "") {
-          \(members)
-      }
-      """)
+      guarded(
+        """
+        \(attributes)
+        @Mockable(\(options.joined(separator: ", ")))
+        fileprivate protocol \(entry.proxyName): \(entry.key)\(traits) \(entry.declaration.genericWhereClause?.trimmedDescription ?? "") {
+            \(members)
+        }
+        """, by: entry.conditions))
   }
   for module in selected {
     imports.insert((includeInternal ? "@testable " : "") + "import " + module)

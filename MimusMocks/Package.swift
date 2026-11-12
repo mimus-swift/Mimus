@@ -43,6 +43,7 @@ let package = Package(
         "MockGenerationSupport",
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
       ]),
     .plugin(
       name: "MimusMocksPlugin", capability: .buildTool(), dependencies: ["MimusMockDeclarations"]),

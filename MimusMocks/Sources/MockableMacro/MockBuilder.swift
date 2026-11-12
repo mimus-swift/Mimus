@@ -21,7 +21,6 @@ struct MockBuilder {
     fixtureDefaults: Bool = false, ruleStubbing: Bool = false
   ) throws {
     self.declaration = declaration
-    self.baseClassName = baseClassName
     self.fixtureDefaults = fixtureDefaults
     self.ruleStubbing = ruleStubbing
     access =
@@ -31,13 +30,15 @@ struct MockBuilder {
         $0.type.trimmedDescription.replacingOccurrences(of: "Swift.", with: "")
           .replacingOccurrences(of: "Observation.", with: "")
       } ?? []
+    let resolvedBase = baseClassName ?? (inherited.contains("NSObjectProtocol") ? "NSObject" : nil)
+    self.baseClassName = resolvedBase
     isActor = inherited.contains("Actor")
     isSendable = isActor || inherited.contains("Sendable")
     isObservable = inherited.contains("Observable")
     let allowed: Set<String> = ["AnyObject", "Sendable", "Actor", "Observable"]
     for name in inherited where !allowed.contains(name) {
       if inheritedRequirementsAreDeclared { continue }
-      if name == "NSObjectProtocol", baseClassName == "NSObject" { continue }
+      if name == "NSObjectProtocol", resolvedBase == "NSObject" { continue }
       throw MockableDiagnostic(
         "@Mockable cannot inspect inherited requirements of '\(name)'. Flatten the protocol into a mocks target before applying the macro."
       )
@@ -330,6 +331,25 @@ struct MockBuilder {
     let throwing = throwsClause != nil && !rethrowsMethod
     let errorType = throwsClause?.type?.trimmedDescription ?? "any Error"
     let asyncMethod = method.signature.effectSpecifiers?.asyncSpecifier != nil
+    let forwardingCandidates = parameters.filter { parameter in
+      guard rethrowsMethod, !isAutoclosure(parameter),
+        let callback = unwrapped(parameter.type).as(FunctionTypeSyntax.self),
+        callback.parameters.isEmpty, callback.effectSpecifiers?.throwsClause != nil,
+        callback.returnClause.type.trimmedDescription == returnType
+          || (returnsVoid
+            && ["Void", "Swift.Void", "()"].contains(callback.returnClause.type.trimmedDescription))
+      else { return false }
+      return asyncMethod || callback.effectSpecifiers?.asyncSpecifier == nil
+    }
+    let forwardingParameter = forwardingCandidates.count == 1 ? forwardingCandidates.first : nil
+    let callThrough: String
+    if let parameter = forwardingParameter {
+      let callback = unwrapped(parameter.type).as(FunctionTypeSyntax.self)!
+      callThrough =
+        "return try \(callback.effectSpecifiers?.asyncSpecifier == nil ? "" : "await ")\(local(parameter))()"
+    } else {
+      callThrough = "preconditionFailure(\"This method has no unambiguous callback to forward\")"
+    }
     let typedThrows = throwing && throwsClause?.type != nil
     let handlerEffect = (asyncMethod ? " async" : "") + (throwing && !typedThrows ? " throws" : "")
     let handlerResult = typedThrows ? "Result<\(returnType), \(errorType)>" : returnType
@@ -437,6 +457,8 @@ struct MockBuilder {
             case .answer:
                 let \(handlerName) = \(actionName).handler(as: (\(handlerType)).self)
                 \(handlerBody)
+            case .callThrough:
+                \(callThrough)
             }
         }
         """
@@ -460,12 +482,13 @@ struct MockBuilder {
       let stubType =
         throwing
         ? "MimusMocks.ThrowingStub<\(returnType), \(errorType), \(handlerType)>"
-        : "MimusMocks.Stub<\(returnType), \(handlerType)>"
+        : "MimusMocks.\(forwardingParameter == nil ? "Stub" : "RethrowingStub")<\(returnType), \(handlerType)>"
       let guardItems = ["\(argumentName).count == \(parameters.count)"] + bindings
       let attributes = method.attributes.filter {
         $0.as(AttributeSyntax.self).map {
-          !["MockDefault", "Mockable", "MockCallControl", "discardableResult"].contains(
-            FixtureSyntax.attributeName($0))
+          !["MockDefault", "Mockable", "MockCallControl", "MockOverride", "discardableResult"]
+            .contains(
+              FixtureSyntax.attributeName($0))
         } ?? true
       }.trimmedDescription
       stubbing = """
@@ -491,20 +514,25 @@ struct MockBuilder {
     var witness = method
     witness.attributes = method.attributes.filter {
       guard let attribute = $0.as(AttributeSyntax.self) else { return true }
-      return !["Mockable", "MockDefault", "MockCallControl"].contains(
+      return !["Mockable", "MockDefault", "MockCallControl", "MockOverride"].contains(
         FixtureSyntax.attributeName(attribute))
     }
     witness.modifiers = method.modifiers.filter {
       !["mutating", "nonmutating", "optional"].contains($0.name.text)
     }
+    if try OverrideSyntax.isEnabled(
+      attributes: method.attributes, trivia: method.leadingTrivia, baseClassName: baseClassName)
+    {
+      witness.modifiers.insert(
+        DeclModifierSyntax(name: .keyword(.override)), at: witness.modifiers.startIndex)
+    }
     if !access.isEmpty {
       witness.modifiers.insert(
         DeclModifierSyntax(name: .keyword(.public)), at: witness.modifiers.startIndex)
     }
-    if rethrowsMethod { witness.signature.effectSpecifiers?.throwsClause = nil }
     witness.body = CodeBlockSyntax(
       stringLiteral:
-        "{\n\(capturePrelude)\n\(record)(withIdentifier: \(id), arguments: [\(arguments)])\n\(callControl)\n\(ruleDispatch)\n\(useHandler)\n\(useError)\n\(result)\n}"
+        "{\n\(capturePrelude)\n\(record)(withIdentifier: \(key), arguments: [\(arguments)])\n\(callControl)\n\(ruleDispatch)\n\(useHandler)\n\(useError)\n\(result)\n}"
     )
     let typed = overloaded || isGeneric
     var verifierParameters = parameters.map { parameter -> String in
@@ -523,12 +551,18 @@ struct MockBuilder {
     {
       verifierParameters.append("returning: (\(returnType)).Type")
     }
-    let matcherArguments = parameters.map {
-      typed ? "Mimus.ClosureMatcher<\(valueType($0))> { \(local($0)).matches($0) }" : local($0)
+    let matcherArguments = parameters.map { parameter in
+      if typed && isNonEscaping(parameter) {
+        return
+          "Mimus.ClosureMatcher<MimusMocks.NonEscapingArgument> { _ in \(local(parameter)).matches(nil) }"
+      }
+      return typed
+        ? "Mimus.ClosureMatcher<\(valueType(parameter))> { \(local(parameter)).matches($0) }"
+        : local(parameter)
     }.joined(separator: ", ")
     let verification = """
       \(access)func \(method.name)\(method.genericParameterClause?.trimmedDescription ?? "")(\(verifierParameters.joined(separator: ", "))) \(method.genericWhereClause?.trimmedDescription ?? "") {
-          mock.verifyCall(withIdentifier: \(id), arguments: [\(matcherArguments)], mode: mode, file: file, fileId: fileId, line: line, column: column)
+          mock.verifyCall(withIdentifier: \(key), arguments: [\(matcherArguments)], mode: mode, file: file, fileId: fileId, line: line, column: column)
       }
       """
     return (
@@ -544,6 +578,21 @@ struct MockBuilder {
       return try publisherProperty(variable, configuration: publisher)
     }
     let prefix = variable.modifiers.contains { $0.name.text == "static" } ? "static " : ""
+    let overridePrefix =
+      try OverrideSyntax.isEnabled(
+        attributes: variable.attributes, trivia: variable.leadingTrivia,
+        baseClassName: baseClassName) ? "override " : ""
+    let attributes = variable.attributes.filter {
+      $0.as(AttributeSyntax.self).map {
+        !["MockDefault", "MockOverride"].contains(FixtureSyntax.attributeName($0))
+      } ?? true
+    }.trimmedDescription
+    let isolation =
+      isActor
+      ? "nonisolated "
+      : variable.modifiers.filter { $0.name.text == "nonisolated" }.map {
+        $0.trimmedDescription + " "
+      }.joined()
     let state = prefix.isEmpty ? "_mimusState" : "Self._mimusStaticState"
     var result = [String]()
     for binding in variable.bindings {
@@ -568,7 +617,7 @@ struct MockBuilder {
           fake, overloaded: false, defaultExpression: fixture, allowRules: false)
         result.append(generated.members)
         result.append(
-          "\(access)\(prefix)var \(name): \(type) { get \(effects) { return \(effects.contains("throws") ? "try " : "")\(effects.contains("async") ? "await " : "")_get\(upper(name))() } }"
+          "\(attributes)\n\(access)\(isolation)\(overridePrefix)\(prefix)var \(name): \(type) { get \(effects) { return \(effects.contains("throws") ? "try " : "")\(effects.contains("async") ? "await " : "")_get\(upper(name))() } }"
         )
       } else {
         let fallback =
@@ -579,7 +628,8 @@ struct MockBuilder {
           ?? "require(for: \(key), as: (\(type)).self)"
         result.append(
           """
-          \(access)\(isActor ? "nonisolated " : "")\(prefix)var \(name): \(type) {
+          \(attributes)
+          \(access)\(isolation)\(overridePrefix)\(prefix)var \(name): \(type) {
               get {
                   \(isObservable && prefix.isEmpty ? "_mimusRegistrar.access(self, keyPath: \\." + name + ")" : "")
                   return \(state).\(fallback)
@@ -636,7 +686,7 @@ struct MockBuilder {
     let propertyKey = quoted("property:" + name)
     let attributes = variable.attributes.filter {
       $0.as(AttributeSyntax.self).map {
-        !["MockPublisher", "MockDefault"].contains(FixtureSyntax.attributeName($0))
+        !["MockPublisher", "MockDefault", "MockOverride"].contains(FixtureSyntax.attributeName($0))
       } ?? true
     }.trimmedDescription
     return """
@@ -645,7 +695,7 @@ struct MockBuilder {
           \(state).value(for: \(subjectKey), as: (\(subject)).self, default: { \(initializer) })
       }
       \(attributes)
-      \(access)\(isolation)\(prefix)var \(name): \(type) {
+      \(access)\(isolation)\(try OverrideSyntax.isEnabled(attributes: variable.attributes, trivia: variable.leadingTrivia, baseClassName: baseClassName) ? "override " : "")\(prefix)var \(name): \(type) {
           get {
               \(isObservable && prefix.isEmpty ? "_mimusRegistrar.access(self, keyPath: \\." + name + ")" : "")
               return \(state).value(for: \(propertyKey), as: (\(type)).self, default: { \(subjectName).eraseToAnyPublisher() })
@@ -683,9 +733,17 @@ struct MockBuilder {
     var signature = subscriptDecl
     signature.accessorBlock = nil
     signature.attributes = signature.attributes.filter {
-      $0.as(AttributeSyntax.self).map { FixtureSyntax.attributeName($0) != "MockDefault" } ?? true
+      $0.as(AttributeSyntax.self).map {
+        !["MockDefault", "MockOverride"].contains(FixtureSyntax.attributeName($0))
+      } ?? true
     }
     signature.modifiers = access.isEmpty ? [] : [DeclModifierSyntax(name: .keyword(.public))]
+    if try OverrideSyntax.isEnabled(
+      attributes: subscriptDecl.attributes, trivia: subscriptDecl.leadingTrivia,
+      baseClassName: baseClassName)
+    {
+      signature.modifiers.append(DeclModifierSyntax(name: .keyword(.override)))
+    }
     let setter =
       accessors.contains { $0.accessorSpecifier.text == "set" }
       ? "set { _mimusState.set(newValue, for: \(quoted(fake.name.text + fake.signature.trimmedDescription))) }"

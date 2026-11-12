@@ -61,6 +61,8 @@ struct MimusMocksPlugin: BuildToolPlugin {
       sourceTargets(source.dependencies).forEach(collect)
     }
     selected.forEach(collect)
+    // Mocks-target source can declare overlays for SDK/binary-only protocols.
+    if let source = target as? SourceModuleTarget { modules.append(source) }
     let output = context.pluginWorkDirectoryURL.appendingPathComponent("Mocks.generated.swift")
     let manifestURL = context.pluginWorkDirectoryURL.appendingPathComponent("Inputs.json")
     var files = [URL]()

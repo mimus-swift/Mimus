@@ -59,6 +59,11 @@ public macro MockPublisher(initial: Any?) =
 public macro MockCallControl() =
   #externalMacro(module: "MockableMacro", type: "MockCallControlMacro")
 
+/// Marks a requirement whose generated witness overrides the mock's base class.
+@attached(peer)
+public macro MockOverride() =
+  #externalMacro(module: "MockableMacro", type: "MockOverrideMacro")
+
 /// Keeps argument types in overloaded verifier signatures.
 public struct Argument<Value> {
   private let predicate: (Value?) -> Bool

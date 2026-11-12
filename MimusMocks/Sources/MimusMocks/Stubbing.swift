@@ -57,6 +57,7 @@ public enum StubAction {
   case value(Any)
   case failure(any Error)
   case answer(Any)
+  case callThrough
 
   public func returned<Value>(as type: Value.Type) -> Value {
     guard case .value(let value) = self, let result = value as? Value else {
@@ -218,6 +219,65 @@ extension Stub where Output == Void {
     Output, Handler
   > {
     returns((), file: file, line: line)
+  }
+}
+
+/// A rethrows method can forward its original throwing callback without allowing
+/// unrelated configured errors. Other answers remain nonthrowing.
+public struct RethrowingStub<Output, Handler> {
+  private let selection: StubSelection
+  public init(rules: StubRules, method: StubMethodKey, matches: @escaping ([Any]) -> Bool) {
+    selection = StubSelection(rules: rules, method: method, matches: matches)
+  }
+  public func returning(_ type: Output.Type) -> Self { self }
+  @discardableResult
+  public func returns(
+    _ first: Output, _ rest: Output..., file: StaticString = #filePath, line: UInt = #line
+  ) -> RethrowingStubSequence<Output, Handler> {
+    RethrowingStubSequence(
+      handle: selection.register(([first] + rest).map { .value($0 as Any) }, file: file, line: line)
+    )
+  }
+  @discardableResult
+  public func answers(file: StaticString = #filePath, line: UInt = #line, _ handler: Handler)
+    -> RethrowingStubSequence<Output, Handler>
+  {
+    RethrowingStubSequence(handle: selection.register([.answer(handler)], file: file, line: line))
+  }
+  @discardableResult
+  public func callsThrough(file: StaticString = #filePath, line: UInt = #line)
+    -> RethrowingStubSequence<
+      Output, Handler
+    >
+  {
+    RethrowingStubSequence(handle: selection.register([.callThrough], file: file, line: line))
+  }
+}
+
+extension RethrowingStub where Output == Void {
+  @discardableResult
+  public func doesNothing(file: StaticString = #filePath, line: UInt = #line)
+    -> RethrowingStubSequence<
+      Output, Handler
+    >
+  {
+    returns((), file: file, line: line)
+  }
+}
+
+public struct RethrowingStubSequence<Output, Handler> {
+  fileprivate let handle: StubRuleHandle
+  @discardableResult public func thenReturn(_ value: Output) -> Self {
+    handle.append(.value(value as Any))
+    return self
+  }
+  @discardableResult public func thenAnswer(_ handler: Handler) -> Self {
+    handle.append(.answer(handler))
+    return self
+  }
+  @discardableResult public func thenCallThrough() -> Self {
+    handle.append(.callThrough)
+    return self
   }
 }
 

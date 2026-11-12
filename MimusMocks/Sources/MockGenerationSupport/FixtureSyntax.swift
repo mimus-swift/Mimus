@@ -33,7 +33,8 @@ public enum FixtureSyntax {
   }
 
   public static func explicitDefault(
-    attributes: AttributeListSyntax, trivia: Trivia, type: TypeSyntax
+    attributes: AttributeListSyntax, trivia: Trivia, type: TypeSyntax,
+    mockProtocols: [String: String] = [:]
   ) throws -> ExprSyntax? {
     let defaults = attributes.compactMap { $0.as(AttributeSyntax.self) }
       .filter { attributeName($0) == "MockDefault" }
@@ -49,8 +50,12 @@ public enum FixtureSyntax {
           || ["MockDefaultSource", "MimusMocks.MockDefaultSource"].contains(
             member.base!.trimmedDescription)
       {
-        if member.declName.baseName.text == "fixture" { return try fixtureDefault(for: type) }
-        if member.declName.baseName.text == "nestedMock" { return try nestedMock(for: type) }
+        if member.declName.baseName.text == "fixture" {
+          return try fixtureDefault(for: type, mockProtocols: mockProtocols)
+        }
+        if member.declName.baseName.text == "nestedMock" {
+          return try nestedMock(for: type, mockProtocols: mockProtocols)
+        }
       }
       return argument.expression
     }
@@ -62,7 +67,9 @@ public enum FixtureSyntax {
       }
       return expression
     }
-    if hasAnnotation(text, named: "forceMock") { return try nestedMock(for: type) }
+    if hasAnnotation(text, named: "forceMock") {
+      return try nestedMock(for: type, mockProtocols: mockProtocols)
+    }
     return nil
   }
 
@@ -101,7 +108,7 @@ public enum FixtureSyntax {
       return ExprSyntax(stringLiteral: "(" + elements.joined(separator: ", ") + ")")
     }
     if type.as(SomeOrAnyTypeSyntax.self)?.someOrAnySpecifier.text == "any" {
-      return try nestedMock(for: type)
+      return try nestedMock(for: type, mockProtocols: mockProtocols)
     }
     if type.is(FunctionTypeSyntax.self) || type.is(SomeOrAnyTypeSyntax.self)
       || type.is(CompositionTypeSyntax.self)
@@ -126,7 +133,9 @@ public enum FixtureSyntax {
     return ExprSyntax(stringLiteral: "\(type.trimmedDescription).mock()")
   }
 
-  public static func nestedMock(for type: TypeSyntax) throws -> ExprSyntax {
+  public static func nestedMock(for type: TypeSyntax, mockProtocols: [String: String] = [:]) throws
+    -> ExprSyntax
+  {
     let base: TypeSyntax
     if let optional = type.as(OptionalTypeSyntax.self) {
       base = optional.wrappedType
@@ -151,7 +160,10 @@ public enum FixtureSyntax {
     } else {
       base = type
     }
-    if base.id != type.id { return try nestedMock(for: base) }
+    if base.id != type.id { return try nestedMock(for: base, mockProtocols: mockProtocols) }
+    if let mock = mockProtocols[base.trimmedDescription] {
+      return ExprSyntax(stringLiteral: mock + "()")
+    }
     let name: String
     let generics: String
     if let identifier = base.as(IdentifierTypeSyntax.self) {
@@ -163,6 +175,10 @@ public enum FixtureSyntax {
     } else {
       throw FixtureDiagnostic("This nested mock type needs an explicit @MockDefault expression")
     }
+    let lookup =
+      base.as(MemberTypeSyntax.self).map { $0.baseType.trimmedDescription + "." + $0.name.text }
+      ?? name
+    if let mock = mockProtocols[lookup] { return ExprSyntax(stringLiteral: mock + generics + "()") }
     return ExprSyntax(stringLiteral: "Mock\(name)\(generics)()")
   }
 }

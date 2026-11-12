@@ -3,6 +3,16 @@ import SwiftSyntaxMacrosTestSupport
 import XCTest
 
 final class DiagnosticsTests: XCTestCase {
+  func testRejectsOverridesWithoutASuperclass() {
+    assertMacroExpansion(
+      "@Mockable\nprotocol Service {\n  @MockOverride\n  func ping()\n}",
+      expandedSource: "protocol Service {\n  @MockOverride\n  func ping()\n}",
+      diagnostics: [
+        DiagnosticSpec(message: "@MockOverride requires a mock base class", line: 1, column: 1)
+      ],
+      macros: ["Mockable": MockableMacro.self]
+    )
+  }
 
   func testRejectsCallControlOnProperties() {
     assertMacroExpansion(

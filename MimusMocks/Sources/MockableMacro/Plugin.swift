@@ -5,5 +5,6 @@ import SwiftSyntaxMacros
 struct MimusMocksPlugin: CompilerPlugin {
   let providingMacros: [Macro.Type] = [
     MockableMacro.self, MockDefaultMacro.self, MockPublisherMacro.self, MockCallControlMacro.self,
+    MockOverrideMacro.self,
   ]
 }

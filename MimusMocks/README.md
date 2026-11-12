@@ -156,8 +156,8 @@ set on the task. This preserves nonthrowing and typed-throws method contracts; a
 handler can respond to cancellation according to its own declared error type.
 `resetMock()` clears counts, releases paused calls, and fails pending observers
 with `CallCoordinationError.reset`. Retained helper values observe the new lifetime.
-Released calls use the current stubs, so finish or cancel operations before reset
-when their responses depend on configuration that reset clears.
+Released calls use the current stubs. Finish operations, or cancel and await them,
+before reset when their responses depend on configuration that reset clears.
 
 Synchronous methods receive a `CallObserver` with `waitForCall(count:)` and
 `callCount`; they are never paused. Only annotated methods emit coordination hooks.
@@ -311,6 +311,69 @@ The plugin supports SwiftPM targets. Xcode project build phases can run the
 `MimusMockDeclarations` executable with `--module`, `--input Module=File.swift`,
 and `--output` arguments, then compile its output in the mocks target.
 
+## Protocol compatibility
+
+The source adapter supports protocols nested in concrete namespaces, including
+namespace extensions. It emits names such as `MockWarehouse_Client` for
+`Warehouse.Client`, resolves inherited protocols in the enclosing namespace, and
+qualifies protocol references in requirements and fixture defaults.
+
+Conditional protocol declarations retain their original `#if`, `#elseif`, and
+`#else` branches, including nested conditions and conditional imports. Inactive
+declarations stay inactive in the mocks target. Use consistent compilation flags
+in the production and mocks targets. Conditional parent declarations must resolve
+unambiguously in the child's context; unresolved alternatives produce a diagnostic.
+
+An SDK or binary dependency might expose a protocol whose source the adapter
+cannot index. Provide a small requirement overlay in the mocks target:
+
+```swift
+import Foundation
+
+// mimus: requirementsFor = "Foundation.ProgressReporting"
+private protocol ProgressRequirements: NSObjectProtocol {
+    var progress: Progress { get }
+}
+```
+
+The plugin reads mocks-target source for overlays. An overlay supplies requirements
+and inherited traits for flattening; generated mocks conform to the real production
+protocol. The compiler checks their conformance to the actual external protocol,
+so an incomplete or incorrect overlay still fails compilation. Fully qualify the
+external protocol name. Keep overlays limited to the external contracts you use.
+
+`NSObjectProtocol` automatically selects `NSObject` as the mock base class. Other
+base classes remain explicit through `baseClassName:` or the `mockBaseClass`
+source annotation. Mark a redeclared member that should override that base:
+
+```swift
+@Mockable(baseClassName: "NSObject")
+protocol DescribedService: NSObjectProtocol {
+    @MockOverride
+    var description: String { get }
+}
+```
+
+`@MockOverride` supports methods, properties, and subscripts. Production-source
+equivalents are `// mimus: override` and the legacy `definedIn = "BaseClass"`
+annotation when it identifies the configured base class. The Swift compiler checks
+that the member is a valid override. A marker without a base class is diagnosed.
+
+`rethrows` witnesses retain their original signature. With argument matching,
+methods with one unambiguous throwing callback that takes no arguments and returns
+the method's result also expose `.callsThrough()`:
+
+```swift
+mock.stub().perform(.any).callsThrough().thenReturn(42)
+```
+
+Use `.thenCallThrough()` to append callback forwarding to a response sequence.
+Call-through invokes the original callback, preserving its return value, errors,
+and async suspension. Configured return values can suppress callback execution.
+Rethrowing selectors expose no arbitrary throwing action, and their custom answers
+remain nonthrowing. More complex callback signatures need a consumer adapter or
+an explicit nonthrowing answer; the generator does not guess callback inputs.
+
 ## Compatibility and limits
 
 - Existing non-overloaded `verify()` calls use Mimus matchers.
@@ -324,16 +387,19 @@ and `--output` arguments, then compile its output in the mocks target.
 - Associated types become generic mock parameters, e.g. `MockRepository<Int>()`.
 - Properties, initializers, static throwing methods, subscripts, `async`, typed
   throws, variadics, autoclosures, and `inout` parameters are covered by tests.
-- `rethrows` requirements are implemented with nonthrowing witnesses.
+- `rethrows` requirements retain their signature; zero-argument callback forwarding
+  is available through `.callsThrough()` as described above.
 - `@Mockable(excluding: ["canReserve"])` retains a protocol extension's
   implementation. The adapter also reads `// mimus: excluding = "canReserve"`.
 - A direct macro cannot discover inherited declarations. Use the build-tool
   adapter, or supply a flattened protocol with
   `inheritedRequirementsAreDeclared: true`. The compiler still verifies conformance.
-- External inherited protocols whose source is unavailable, nested protocols,
-  operator requirements, and static requirements combined with generic associated
-  types require an adapter or custom implementation. Unsupported requirements
-  should produce a diagnostic rather than silently disappear.
+- External inherited protocols whose source is unavailable require an explicit
+  requirement overlay or a concrete flattened adapter.
+- Generic namespaces, constrained namespace extensions, conditional requirement
+  blocks inside protocols, ambiguous conditional parents, operator requirements,
+  and static requirements combined with generic associated types require an
+  adapter or custom implementation. Unsupported requirements produce diagnostics.
 - Fixture factories are opt-in; `defaults: .none` is the default policy.
 - Combine subject helpers require `@MockPublisher` or an explicit source comment.
 - This nested package currently uses a local path to the parent runtime. Remote

@@ -9,7 +9,7 @@ final class DeclarationToolTests: XCTestCase {
     XCTAssertNotEqual(result.status, 0)
     XCTAssertTrue(result.error.contains("Call control applies only to protocol methods"))
   }
-  private func run(_ source: String) throws -> (status: Int32, error: String) {
+  private func run(_ source: String) throws -> (status: Int32, error: String, output: String) {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -41,7 +41,9 @@ final class DeclarationToolTests: XCTestCase {
     process.waitUntilExit()
     return (
       process.terminationStatus,
-      String(decoding: errors.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+      String(decoding: errors.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self),
+      (try? String(contentsOf: directory.appendingPathComponent("Mocks.swift"), encoding: .utf8))
+        ?? ""
     )
   }
 
@@ -51,10 +53,52 @@ final class DeclarationToolTests: XCTestCase {
     XCTAssertTrue(result.error.contains("Cannot resolve inherited protocol 'ExternalParent'"))
   }
 
-  func testReportsConditionalProtocols() throws {
+  func testPreservesConditionalProtocols() throws {
     let result = try run("#if DEBUG\n// mimus: mockable\npublic protocol Service {}\n#endif")
+    XCTAssertEqual(result.status, 0, result.error)
+    XCTAssertTrue(result.output.contains("#if DEBUG"))
+    XCTAssertTrue(result.output.contains("#endif"))
+  }
+
+  func testPreservesElseifAndElseConditionsWithDuplicateNames() throws {
+    let result = try run(
+      """
+      #if os(macOS)
+      // mimus: mockable
+      public protocol Service { func mac() }
+      #elseif os(Linux)
+      // mimus: mockable
+      public protocol Service { func linux() }
+      #else
+      // mimus: mockable
+      public protocol Service { func other() }
+      #endif
+      """)
+    XCTAssertEqual(result.status, 0, result.error)
+    XCTAssertTrue(result.output.contains("#if os(macOS)\n#elseif os(Linux)"))
+    XCTAssertTrue(result.output.contains("#if os(macOS)\n#elseif os(Linux)\n#else"))
+  }
+
+  func testRejectsAmbiguousConditionalParents() throws {
+    let result = try run(
+      """
+      #if DEBUG
+      public protocol Parent { func first() }
+      #else
+      public protocol Parent { func second() }
+      #endif
+      // mimus: mockable
+      public protocol Child: Parent {}
+      """)
     XCTAssertNotEqual(result.status, 0)
-    XCTAssertTrue(result.error.contains("nested or conditional protocol 'Service'"))
+    XCTAssertTrue(result.error.contains("conditional parents must resolve unambiguously"))
+  }
+
+  func testReportsGenericNamespaces() throws {
+    let result = try run(
+      "public struct Container<Value> {\n// mimus: mockable\npublic protocol Service {}\n}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("generic namespace needs a concrete adapter"))
   }
 
   func testReportsInheritanceCycles() throws {
