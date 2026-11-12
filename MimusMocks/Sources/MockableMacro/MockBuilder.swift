@@ -1,4 +1,5 @@
 import Foundation
+import MockGenerationSupport
 import SwiftSyntax
 import SwiftSyntaxBuilder
 
@@ -11,13 +12,16 @@ struct MockBuilder {
   let isObservable: Bool
   let methods: [FunctionDeclSyntax]
   let associatedTypes: [AssociatedTypeDeclSyntax]
+  let fixtureDefaults: Bool
 
   init(
     _ declaration: ProtocolDeclSyntax, baseClassName: String?, excluding: Set<String> = [],
-    publicMock: Bool = false, inheritedRequirementsAreDeclared: Bool = false
+    publicMock: Bool = false, inheritedRequirementsAreDeclared: Bool = false,
+    fixtureDefaults: Bool = false
   ) throws {
     self.declaration = declaration
     self.baseClassName = baseClassName
+    self.fixtureDefaults = fixtureDefaults
     access =
       publicMock || declaration.modifiers.contains { $0.name.text == "public" } ? "public " : ""
     let inherited =
@@ -90,7 +94,7 @@ struct MockBuilder {
     }.joined(separator: "\n")
     let globalAttributes = declaration.attributes.filter {
       guard let attribute = $0.as(AttributeSyntax.self) else { return false }
-      return attribute.attributeName.trimmedDescription != "Mockable"
+      return FixtureSyntax.attributeName(attribute) != "Mockable"
     }.map(\.trimmedDescription).joined(separator: "\n")
     let visibility =
       access.isEmpty && declaration.modifiers.contains { $0.name.text == "private" }
@@ -212,7 +216,9 @@ struct MockBuilder {
     return DeclSyntax(stringLiteral: source)
   }
 
-  private func generate(_ originalMethod: FunctionDeclSyntax, overloaded: Bool) throws -> (
+  private func generate(
+    _ originalMethod: FunctionDeclSyntax, overloaded: Bool, defaultExpression: ExprSyntax? = nil
+  ) throws -> (
     members: String, verification: String
   ) {
     var method = originalMethod
@@ -230,6 +236,19 @@ struct MockBuilder {
     let returnsVoid = returnType == "Void" || returnType == "Swift.Void" || returnType == "()"
     let generics = method.genericParameterClause?.parameters.map { $0.name.text } ?? []
     let isGeneric = !generics.isEmpty
+    let explicitDefault = try FixtureSyntax.explicitDefault(
+      attributes: method.attributes, trivia: method.leadingTrivia,
+      type: method.signature.returnClause?.type ?? TypeSyntax(stringLiteral: "Void"))
+    if returnsVoid && explicitDefault != nil {
+      throw MockableDiagnostic("Void requirements do not accept a mock default")
+    }
+    if isGeneric && explicitDefault != nil {
+      throw MockableDiagnostic("Generic methods require explicit stubs instead of @MockDefault")
+    }
+    let fallback =
+      try defaultExpression ?? explicitDefault
+      ?? (!returnsVoid && !isGeneric && fixtureDefaults
+        ? FixtureSyntax.fixtureDefault(for: method.signature.returnClause!.type) : nil)
     let staticPrefix = isStatic(method) ? "static " : ""
     let isolation = isActor ? "nonisolated " : ""
     let state = isStatic(method) ? "Self._mimusStaticState" : "_mimusState"
@@ -270,7 +289,7 @@ struct MockBuilder {
         stubs.append(
           stubProperty(
             "simulated" + stem, type: returnType, key: id, state: state,
-            prefix: isolation + staticPrefix))
+            prefix: isolation + staticPrefix, defaultExpression: fallback))
       }
       if throwing {
         stubs.append(
@@ -311,10 +330,14 @@ struct MockBuilder {
     let result =
       returnsVoid
       ? ""
-      : "return \(state).\(isOptional(returnType) ? "value" : "require")(for: \(key), as: (\(returnType)).self)\(isOptional(returnType) ? " ?? nil" : "")"
+      : fallback.map {
+        "return \(state).value(for: \(key), as: (\(returnType)).self, default: { \($0.trimmedDescription) })"
+      }
+        ?? "return \(state).\(isOptional(returnType) ? "value" : "require")(for: \(key), as: (\(returnType)).self)\(isOptional(returnType) ? " ?? nil" : "")"
     var witness = method
     witness.attributes = method.attributes.filter {
-      $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription != "Mockable"
+      guard let attribute = $0.as(AttributeSyntax.self) else { return true }
+      return !["Mockable", "MockDefault"].contains(FixtureSyntax.attributeName(attribute))
     }
     witness.modifiers = method.modifiers.filter {
       !["mutating", "nonmutating", "optional"].contains($0.name.text)
@@ -370,21 +393,27 @@ struct MockBuilder {
         throw MockableDiagnostic("Mocked properties require a name and an explicit type")
       }
       let key = quoted("property:" + name)
+      let fixture = try requirementDefault(
+        type: binding.typeAnnotation!.type, attributes: variable.attributes,
+        trivia: variable.leadingTrivia)
       var accessors: [AccessorDeclSyntax] = []
       if case .accessors(let items) = binding.accessorBlock?.accessors { accessors = Array(items) }
       let getter = accessors.first { $0.accessorSpecifier.text == "get" }
       let effects = getter?.effectSpecifiers?.trimmedDescription ?? ""
       if !effects.isEmpty {
         let fake = try FunctionDeclSyntax(
-          "func _get\(raw: upper(name))() \(raw: effects) -> \(raw: type)")
-        let generated = try generate(fake, overloaded: false)
+          "\(raw: prefix)func _get\(raw: upper(name))() \(raw: effects) -> \(raw: type)")
+        let generated = try generate(fake, overloaded: false, defaultExpression: fixture)
         result.append(generated.members)
         result.append(
           "\(access)\(prefix)var \(name): \(type) { get \(effects) { return \(effects.contains("throws") ? "try " : "")\(effects.contains("async") ? "await " : "")_get\(upper(name))() } }"
         )
       } else {
         let fallback =
-          defaultValue(type).map { "value(for: \(key), as: (\(type)).self) ?? \($0)" }
+          fixture.map {
+            "value(for: \(key), as: (\(type)).self, default: { \($0.trimmedDescription) })"
+          }
+          ?? defaultValue(type).map { "value(for: \(key), as: (\(type)).self) ?? \($0)" }
           ?? "require(for: \(key), as: (\(type)).self)"
         result.append(
           """
@@ -421,9 +450,15 @@ struct MockBuilder {
     let fake = try FunctionDeclSyntax(
       "func \(raw: stem)\(raw: subscriptDecl.parameterClause.trimmedDescription) \(raw: effects) \(raw: subscriptDecl.returnClause.trimmedDescription)"
     )
-    let generated = try generate(fake, overloaded: false)
+    let fixture = try requirementDefault(
+      type: subscriptDecl.returnClause.type, attributes: subscriptDecl.attributes,
+      trivia: subscriptDecl.leadingTrivia)
+    let generated = try generate(fake, overloaded: false, defaultExpression: fixture)
     var signature = subscriptDecl
     signature.accessorBlock = nil
+    signature.attributes = signature.attributes.filter {
+      $0.as(AttributeSyntax.self).map { FixtureSyntax.attributeName($0) != "MockDefault" } ?? true
+    }
     signature.modifiers = access.isEmpty ? [] : [DeclModifierSyntax(name: .keyword(.public))]
     let setter =
       accessors.contains { $0.accessorSpecifier.text == "set" }
@@ -434,15 +469,23 @@ struct MockBuilder {
   }
 
   private func stubProperty(
-    _ name: String, type: String, key: String, state: String, prefix: String
+    _ name: String, type: String, key: String, state: String, prefix: String,
+    defaultExpression: ExprSyntax? = nil
   ) -> String {
     let optional = isOptional(type)
     return """
       \(access)\(prefix)var \(name): \(optional ? type : "(\(type))!") {
-          get { \(state).value(for: \(key))\(optional ? " ?? nil" : "") }
+          get { \(defaultExpression.map { "\(state).value(for: \(key), as: (\(type)).self, default: { \($0.trimmedDescription) })" } ?? "\(state).value(for: \(key))\(optional ? " ?? nil" : "")") }
           set { \(state).\(optional ? "set" : "setOptional")(newValue, for: \(key)) }
       }
       """
+  }
+
+  private func requirementDefault(
+    type: TypeSyntax, attributes: AttributeListSyntax, trivia: Trivia
+  ) throws -> ExprSyntax? {
+    try FixtureSyntax.explicitDefault(attributes: attributes, trivia: trivia, type: type)
+      ?? (fixtureDefaults ? FixtureSyntax.fixtureDefault(for: type) : nil)
   }
 
   private func selector(_ method: FunctionDeclSyntax) -> String {

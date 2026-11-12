@@ -1,3 +1,4 @@
+import MockGenerationSupport
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -12,11 +13,19 @@ public struct MockableMacro: PeerMacro {
       throw MockableDiagnostic("@Mockable can only be applied to a protocol")
     }
     var baseClassName: String?
+    var fixtureDefaults = false
     var excludedMethods = Set<String>()
     var publicMock = false
     var inheritedRequirementsAreDeclared = false
     if case .argumentList(let arguments) = node.arguments {
       for argument in arguments {
+        if argument.label?.text == "defaults" {
+          guard let member = argument.expression.as(MemberAccessExprSyntax.self),
+            ["none", "fixtures"].contains(member.declName.baseName.text)
+          else { throw MockableDiagnostic("defaults must be .none or .fixtures") }
+          fixtureDefaults = member.declName.baseName.text == "fixtures"
+          continue
+        }
         if ["publicMock", "inheritedRequirementsAreDeclared"].contains(argument.label?.text ?? "") {
           guard let literal = argument.expression.as(BooleanLiteralExprSyntax.self) else {
             throw MockableDiagnostic("\(argument.label!.text) must be a Boolean literal")
@@ -56,7 +65,8 @@ public struct MockableMacro: PeerMacro {
     return [
       try MockBuilder(
         protocolDeclaration, baseClassName: baseClassName, excluding: excludedMethods,
-        publicMock: publicMock, inheritedRequirementsAreDeclared: inheritedRequirementsAreDeclared
+        publicMock: publicMock, inheritedRequirementsAreDeclared: inheritedRequirementsAreDeclared,
+        fixtureDefaults: fixtureDefaults
       ).build()
     ]
   }

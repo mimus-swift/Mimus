@@ -23,9 +23,16 @@ let package = Package(
     runtime,
   ],
   targets: [
+    .target(
+      name: "MockGenerationSupport",
+      dependencies: [
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+      ]),
     .macro(
       name: "MockableMacro",
       dependencies: [
+        "MockGenerationSupport",
         .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
         .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
       ]),
@@ -33,6 +40,7 @@ let package = Package(
     .executableTarget(
       name: "MimusMockDeclarations",
       dependencies: [
+        "MockGenerationSupport",
         .product(name: "SwiftParser", package: "swift-syntax"),
         .product(name: "SwiftSyntax", package: "swift-syntax"),
       ]),

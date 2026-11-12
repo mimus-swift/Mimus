@@ -1,9 +1,22 @@
 import Foundation
 
+/// Opt in to the consumer's .mock() factories for unstubbed values.
+public enum MockDefaults: Sendable {
+  case none
+  case fixtures
+}
+
+/// A per-requirement factory choice, evaluated in the generated mock.
+public enum MockDefaultSource: Sendable {
+  case fixture
+  case nestedMock
+}
+
 /// Generates a Mimus mock beside a protocol declared in a test or mocks target.
 @attached(peer, names: prefixed(Mock))
 public macro Mockable(
   baseClassName: String? = nil,
+  defaults: MockDefaults = .none,
   excluding: [String] = [],
   publicMock: Bool = false,
   inheritedRequirementsAreDeclared: Bool = false
@@ -11,6 +24,16 @@ public macro Mockable(
   #externalMacro(
     module: "MockableMacro", type: "MockableMacro"
   )
+
+/// Supplies a lazy default for a generated property or return value.
+/// A configured simulated value or handler takes precedence.
+@attached(peer)
+public macro MockDefault<Value>(_ value: Value) =
+  #externalMacro(module: "MockableMacro", type: "MockDefaultMacro")
+
+@attached(peer)
+public macro MockDefault(_ source: MockDefaultSource) =
+  #externalMacro(module: "MockableMacro", type: "MockDefaultMacro")
 
 /// Keeps argument types in overloaded verifier signatures.
 public struct Argument<Value> {
@@ -36,21 +59,44 @@ public struct NonEscapingArgument: CustomStringConvertible {
   public var description: String { "<non-escaping closure>" }
 }
 
-/// All mutable generated stub state is accessed under this lock. Handlers are
-/// copied while locked and invoked after unlocking, allowing reentrant mocks.
+/// Explicit stubs and factory cells are registered under a lock. Each cell
+/// serializes its lazy initialization separately. Handlers are copied while
+/// locked and invoked after unlocking, allowing reentrant mocks.
 /// Sendable mocks require @Sendable handlers; referenced return values retain
 /// their own concurrency contracts. This invariant permits unchecked conformance
 /// until the deployment minimum supports a standard-library Mutex everywhere.
 public final class MockState: @unchecked Sendable {
   private let lock = NSLock()
   private var values: [String: Any] = [:]
+  private var defaults: [String: Any] = [:]
 
   public init() {}
 
   public func value<Value>(for key: String, as type: Value.Type = Value.self) -> Value? {
     lock.lock()
     defer { lock.unlock() }
-    return values[key] as? Value
+    guard let stored = values[key] else { return nil }
+    return stored as? Value
+  }
+
+  /// Select a per-key initialization cell while locked, then run the consumer's
+  /// factory outside the state lock. Concurrent first reads share the same cell.
+  public func value<Value>(
+    for key: String, as type: Value.Type = Value.self, default makeValue: () -> Value
+  ) -> Value {
+    lock.lock()
+    if let stored = values[key], let configured = stored as? Value {
+      lock.unlock()
+      return configured
+    }
+    let cell = defaults[key] as? DefaultValue<Value> ?? DefaultValue<Value>()
+    defaults[key] = cell
+    lock.unlock()
+    let fallback = cell.value(makeValue)
+    lock.lock()
+    defer { lock.unlock() }
+    if let stored = values[key], let configured = stored as? Value { return configured }
+    return fallback
   }
 
   public func set<Value>(_ value: Value, for key: String) {
@@ -62,7 +108,12 @@ public final class MockState: @unchecked Sendable {
   public func setOptional<Value>(_ value: Value?, for key: String) {
     lock.lock()
     defer { lock.unlock() }
-    if let value { values[key] = value } else { values.removeValue(forKey: key) }
+    if let value {
+      values[key] = value
+    } else {
+      values.removeValue(forKey: key)
+      defaults.removeValue(forKey: key)
+    }
   }
 
   public func require<Value>(for key: String, as type: Value.Type = Value.self) -> Value {
@@ -77,5 +128,25 @@ public final class MockState: @unchecked Sendable {
     lock.lock()
     defer { lock.unlock() }
     values.removeAll()
+    defaults.removeAll()
+  }
+}
+
+private final class DefaultValue<Value> {
+  private let lock = NSRecursiveLock()
+  private var cached: Value?
+  private var initializing = false
+
+  func value(_ makeValue: () -> Value) -> Value {
+    lock.lock()
+    defer { lock.unlock() }
+    if let cached { return cached }
+    precondition(
+      !initializing, "A mock default recursively depends on itself. Configure an explicit value.")
+    initializing = true
+    defer { initializing = false }
+    let value = makeValue()
+    cached = .some(value)
+    return value
   }
 }

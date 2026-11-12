@@ -23,3 +23,19 @@ import Testing
   mock.selection = "Fixture selection"
   #expect(store.selection == "Fixture selection")
 }
+
+@Test func buildsFixtureDefaultsInADedicatedMocksModule() {
+  let mock = MockStorefront()
+  let storefront: any Storefront = mock
+  #expect(storefront.featured == .mock())
+  #expect(storefront.pair.main == .mock())
+  #expect(storefront.pair.alternatives.0 == .mock())
+  #expect(storefront.pair.alternatives.1 == .mock())
+  #expect(storefront.load() == .mock())
+  #expect(storefront.special.code == "special")
+  #expect(storefront.specialProduct().code == "returned")
+  #expect(storefront.formatter is MockLabelFormatter)
+  #expect(storefront.optionalFormatter is MockLabelFormatter)
+  #expect(storefront.formatter as AnyObject === storefront.formatter as AnyObject)
+  mock.verify().load()
+}

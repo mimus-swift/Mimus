@@ -56,4 +56,11 @@ final class DeclarationToolTests: XCTestCase {
     XCTAssertNotEqual(result.status, 0)
     XCTAssertTrue(result.error.contains("inheritance cycle"))
   }
+
+  func testReportsInvalidFixturePolicies() throws {
+    let result = try run(
+      "// mimus: mockable\n// mimus: defaults = \"unknown\"\npublic protocol Service {}")
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Mock defaults must be 'none' or 'fixtures'"))
+  }
 }

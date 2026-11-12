@@ -41,4 +41,50 @@ final class DiagnosticsTests: XCTestCase {
     )
   }
 
+  func testDiagnosesInvalidFixturePolicy() {
+    assertMacroExpansion(
+      "@Mockable(defaults: true)\nprotocol Service {}",
+      expandedSource: "protocol Service {}",
+      diagnostics: [
+        DiagnosticSpec(message: "defaults must be .none or .fixtures", line: 1, column: 1)
+      ],
+      macros: ["Mockable": MockableMacro.self]
+    )
+  }
+
+  func testRejectsDefaultMarkersOnTypes() {
+    assertMacroExpansion(
+      "@MockDefault(42)\nstruct Service {}",
+      expandedSource: "struct Service {}",
+      diagnostics: [
+        DiagnosticSpec(
+          message: "@MockDefault applies to a property, method, or subscript", line: 1, column: 1)
+      ],
+      macros: ["MockDefault": MockDefaultMacro.self]
+    )
+  }
+
+  func testRejectsDefaultsOnVoidRequirements() {
+    assertMacroExpansion(
+      """
+      @Mockable
+      protocol Service {
+        @MockDefault(42)
+        func perform()
+      }
+      """,
+      expandedSource: """
+        protocol Service {
+          @MockDefault(42)
+          func perform()
+        }
+        """,
+      diagnostics: [
+        DiagnosticSpec(
+          message: "Void requirements do not accept a mock default", line: 1, column: 1)
+      ],
+      macros: ["Mockable": MockableMacro.self]
+    )
+  }
+
 }

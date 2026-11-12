@@ -43,6 +43,59 @@ Observation tracking. `resetMock()` clears calls and configured stub state.
 Static stubs are shared for their generated type; tests that use them must control
 that shared lifetime.
 
+## Fixture defaults
+
+Use `@MockDefault` on a property, method, or subscript to supply a lazy default:
+
+```swift
+@Mockable
+protocol Catalog {
+    @MockDefault(Product.mock())
+    var featured: Product { get }
+
+    @MockDefault(Product(name: "Featured"))
+    func product() -> Product
+
+    @MockDefault(.nestedMock)
+    var cache: any Cache { get }
+}
+```
+
+`Product` and its nonthrowing, synchronous `.mock()` factory are defined by the
+consumer. `.nestedMock` constructs the corresponding generated mock, such as
+`MockCache()`. Use this choice when referring to another generated mock rather
+than placing its constructor in a macro argument.
+
+To apply the `.mock()` convention to a whole protocol, use
+`@Mockable(defaults: .fixtures)`. Concrete leaf types must have a visible
+no-argument `.mock()` factory. Tuple values are built element by element, retaining
+their labels and nesting. Optionals default to `nil`; arrays and dictionaries
+default to empty collections. Explicit `any Dependency` types default to
+`MockDependency()`. A per-member `@MockDefault` takes precedence; `.fixture` can
+also opt an individual requirement into the convention.
+
+Defaults are cached separately for each mock and requirement, including method
+return values. Concurrent first reads share one initialization. Explicit property
+values and simulated return values override the default, and handlers retain
+priority over return values and simulated errors. `resetMock()` clears configured
+stubs and cached defaults. Factories should avoid cyclic dependencies. Generic
+methods continue to use explicit stubs rather than inferred fixtures.
+
+For production protocols processed by the build plugin, use source comments:
+
+```swift
+// mimus: mockable
+// mimus: defaults = "fixtures"
+public protocol Catalog {
+    // mimus: default = "Product.mock()"
+    var featured: Product { get }
+}
+```
+
+The adapter also accepts existing `mockValue` and `forceMock` annotations and
+recognizes nested protocols selected for mock generation. Define fixture factories
+in the mocks target or a module imported by the generated declarations.
+
 ## Protocols in production modules
 
 Use `MimusMocksPlugin` on a dedicated mocks target that depends on its production
@@ -101,8 +154,9 @@ and `--output` arguments, then compile its output in the mocks target.
   operator requirements, and static requirements combined with generic associated
   types require an adapter or custom implementation. Unsupported requirements
   should produce a diagnostic rather than silently disappear.
-- App-specific `.mock()` defaults and Combine subjects from custom Sourcery
-  templates need explicit property or handler setup; they are not inferred.
+- Fixture factories are opt-in; `defaults: .none` is the default policy.
+- Combine subjects are not generated automatically. Publisher values can be
+  configured explicitly through properties, fixture defaults, or handlers.
 - This nested package currently uses a local path to the parent runtime. Remote
   distribution needs a package/release arrangement that exposes both packages.
 
