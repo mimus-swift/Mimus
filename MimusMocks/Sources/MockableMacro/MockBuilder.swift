@@ -75,6 +75,13 @@ struct MockBuilder {
       throw MockableDiagnostic("A protocol member conflicts with the generated stub() API")
     }
     for member in declaration.memberBlock.members {
+      if !member.decl.is(FunctionDeclSyntax.self),
+        let attributed = member.decl.asProtocol(WithAttributesSyntax.self),
+        try CallControlSyntax.isEnabled(
+          attributes: attributed.attributes, trivia: member.decl.leadingTrivia)
+      {
+        throw MockableDiagnostic("@MockCallControl applies to a protocol method")
+      }
       if !member.decl.is(VariableDeclSyntax.self),
         let attributed = member.decl.asProtocol(WithAttributesSyntax.self),
         try PublisherSyntax.configuration(
@@ -329,6 +336,42 @@ struct MockBuilder {
     let handlerType =
       "\(isSendable ? "@Sendable " : "")(\(parameters.map(handlerParameterType).joined(separator: ", ")))\(handlerEffect) -> \(handlerResult)"
     var stubs = [String]()
+    var callControl = ""
+    if try CallControlSyntax.isEnabled(attributes: method.attributes, trivia: method.leadingTrivia)
+    {
+      let name = stem.prefix(1).lowercased() + stem.dropFirst() + "Calls"
+      let conflicts = declaration.memberBlock.members.contains { member in
+        if member.decl.as(FunctionDeclSyntax.self)?.name.text == name { return true }
+        return member.decl.as(VariableDeclSyntax.self)?.bindings.contains {
+          $0.pattern.as(IdentifierPatternSyntax.self)?.identifier.text == name
+        } ?? false
+      }
+      guard !conflicts else {
+        throw MockableDiagnostic(
+          "A protocol member conflicts with generated call control '\(name)'")
+      }
+      let type = asyncMethod ? "MimusMocks.AsyncCallControl" : "MimusMocks.CallObserver"
+      let make = "\(state).\(asyncMethod ? "asyncCallControl" : "callObserver")(for: \(key))"
+      let availability = method.attributes.filter {
+        $0.as(AttributeSyntax.self).map {
+          ["available", "MainActor"].contains(FixtureSyntax.attributeName($0))
+        } ?? false
+      }.trimmedDescription
+      if isGeneric {
+        stubs.append(
+          """
+          \(availability)
+          \(access)\(isolation)\(staticPrefix)func \(name)\(method.genericParameterClause!.trimmedDescription)(for specialization: (\(generics.joined(separator: ", "))).Type) -> \(type) \(method.genericWhereClause?.trimmedDescription ?? "") { \(make) }
+          """)
+      } else {
+        stubs.append(
+          """
+          \(availability)
+          \(access)\(isolation)\(staticPrefix)var \(name): \(type) { \(make) }
+          """)
+      }
+      callControl = asyncMethod ? "await \(make).enter()" : "\(make).recordCall()"
+    }
     if !isGeneric {
       stubs.append(
         """
@@ -421,7 +464,7 @@ struct MockBuilder {
       let guardItems = ["\(argumentName).count == \(parameters.count)"] + bindings
       let attributes = method.attributes.filter {
         $0.as(AttributeSyntax.self).map {
-          !["MockDefault", "Mockable", "discardableResult"].contains(
+          !["MockDefault", "Mockable", "MockCallControl", "discardableResult"].contains(
             FixtureSyntax.attributeName($0))
         } ?? true
       }.trimmedDescription
@@ -448,7 +491,8 @@ struct MockBuilder {
     var witness = method
     witness.attributes = method.attributes.filter {
       guard let attribute = $0.as(AttributeSyntax.self) else { return true }
-      return !["Mockable", "MockDefault"].contains(FixtureSyntax.attributeName(attribute))
+      return !["Mockable", "MockDefault", "MockCallControl"].contains(
+        FixtureSyntax.attributeName(attribute))
     }
     witness.modifiers = method.modifiers.filter {
       !["mutating", "nonmutating", "optional"].contains($0.name.text)
@@ -460,7 +504,7 @@ struct MockBuilder {
     if rethrowsMethod { witness.signature.effectSpecifiers?.throwsClause = nil }
     witness.body = CodeBlockSyntax(
       stringLiteral:
-        "{\n\(capturePrelude)\n\(record)(withIdentifier: \(id), arguments: [\(arguments)])\n\(ruleDispatch)\n\(useHandler)\n\(useError)\n\(result)\n}"
+        "{\n\(capturePrelude)\n\(record)(withIdentifier: \(id), arguments: [\(arguments)])\n\(callControl)\n\(ruleDispatch)\n\(useHandler)\n\(useError)\n\(result)\n}"
     )
     let typed = overloaded || isGeneric
     var verifierParameters = parameters.map { parameter -> String in

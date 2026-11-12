@@ -58,3 +58,15 @@ import Testing
   mock.resetMock()
   #expect(try await catalog.product(id: 42) == .mock())
 }
+
+@Test func generatesPublicCallControlsFromSourceAnnotations() async throws {
+  let mock = MockProductCatalog()
+  mock.productIdCalls.pause()
+  let operation = Task { try await mock.product(id: 42) }
+  try await mock.productIdCalls.waitForCall()
+  mock.verify().product(id: mEqual(42))
+  #expect(mock.name(id: 42) == "unnamed")
+  try await mock.nameIdCalls.waitForCall()
+  mock.productIdCalls.resume()
+  #expect(try await operation.value == .mock())
+}

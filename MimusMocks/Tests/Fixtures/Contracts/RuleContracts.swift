@@ -3,6 +3,7 @@ public enum CatalogFailure: Error, Equatable {
 }
 
 public protocol CatalogParent {
+  // mimus: callControl
   // mimus: default = "\"unnamed\""
   func name(id: Int) -> String
 }
@@ -12,6 +13,7 @@ public protocol CatalogParent {
 // mimus: stubbing = "argumentMatching"
 // mimus: excluding = "hasStock"
 public protocol ProductCatalog: CatalogParent, Sendable {
+  // sourcery: includeExpectation
   func product(id: Int) async throws(CatalogFailure) -> FixtureProduct
   func hasStock(id: Int) async throws -> Bool
 }

@@ -237,6 +237,13 @@ func run() throws {
       guard let item = rewritten.as(MemberBlockItemSyntax.self) else {
         throw GenerationError("Cannot prepare protocol member for " + entry.key)
       }
+      if !item.decl.is(FunctionDeclSyntax.self),
+        let attributed = item.decl.asProtocol(WithAttributesSyntax.self),
+        try CallControlSyntax.isEnabled(
+          attributes: attributed.attributes, trivia: item.decl.leadingTrivia)
+      {
+        throw GenerationError("Call control applies only to protocol methods")
+      }
       if !item.decl.is(VariableDeclSyntax.self),
         let attributed = item.decl.asProtocol(WithAttributesSyntax.self),
         try PublisherSyntax.configuration(

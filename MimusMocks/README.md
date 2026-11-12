@@ -113,6 +113,63 @@ methods, including static and inherited requirements prepared by the adapter.
 Properties and subscripts keep their existing stubbing interfaces. With argument
 matching enabled, `stub`, `Stubber`, and `StaticStubber` are reserved member names.
 
+## Opt-in call coordination
+
+Add `@MockCallControl` to a method to observe entry and optionally pause async calls:
+
+```swift
+@Mockable
+protocol Catalog {
+    @MockCallControl
+    func fetch(id: Int) async -> String
+}
+
+let mock = MockCatalog()
+mock.simulatedFetchId = "Ready"
+mock.fetchIdCalls.pause()
+let operation = Task { await mock.fetch(id: 42) }
+try await mock.fetchIdCalls.waitForCall()
+mock.verify().fetch(id: mEqual(42))
+mock.fetchIdCalls.resume()
+let value = await operation.value
+```
+
+Helpers follow the method's simulated-stub stem with a `Calls` suffix. Overloads
+retain their type suffixes. Generic methods expose a helper function, for example
+`mock.identityCalls(for: Int.self)` or `mock.convertCalls(for: (Int, String).self)`;
+each specialization has independent coordination state.
+
+`waitForCall(count:)` waits for the total number of entries since reset. Calls
+that occurred before waiting still count, and multiple observers can wait safely.
+Invocation recording precedes notification, so verification is available as soon
+as the wait finishes. This observes entry, not completion of the method's response.
+
+Async helpers start unpaused. `pause()` holds future calls before rule selection,
+handlers, errors, or defaults run. `resumeNext()` releases the oldest paused call
+and keeps pausing future calls. `resume()` releases all paused calls and stops
+pausing. Resuming before a call installs its continuation does not lose the release.
+No thread is blocked while a call is paused.
+
+Cancelling a waiting observer throws `CancellationError`. Cancelling a paused call
+releases its gate and continues the normal response path with cancellation still
+set on the task. This preserves nonthrowing and typed-throws method contracts; a
+handler can respond to cancellation according to its own declared error type.
+`resetMock()` clears counts, releases paused calls, and fails pending observers
+with `CallCoordinationError.reset`. Retained helper values observe the new lifetime.
+Released calls use the current stubs, so finish or cancel operations before reset
+when their responses depend on configuration that reset clears.
+
+Synchronous methods receive a `CallObserver` with `waitForCall(count:)` and
+`callCount`; they are never paused. Only annotated methods emit coordination hooks.
+Static controls follow static reset; instance controls remain independent. Actor
+ownership of the original method and its response is preserved. The coordination
+runtime is Foundation-only and stores no invocation arguments or response values.
+
+Production protocols can opt in with `// mimus: callControl` on a method. The
+adapter also recognizes the legacy `// sourcery: includeExpectation` flag,
+including annotations on inherited requirements. It emits the generic call-control
+helpers described here and does not depend on an application's suspender type.
+
 ## Fixture defaults
 
 Use `@MockDefault` on a property, method, or subscript to supply a lazy default:

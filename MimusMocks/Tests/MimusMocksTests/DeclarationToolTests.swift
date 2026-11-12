@@ -2,6 +2,13 @@ import Foundation
 import XCTest
 
 final class DeclarationToolTests: XCTestCase {
+  func testReportsCallControlCommentsOnProperties() throws {
+    let result = try run(
+      "// mimus: mockable\npublic protocol Service {\n  // mimus: callControl\n  var name: String { get }\n}"
+    )
+    XCTAssertNotEqual(result.status, 0)
+    XCTAssertTrue(result.error.contains("Call control applies only to protocol methods"))
+  }
   private func run(_ source: String) throws -> (status: Int32, error: String) {
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

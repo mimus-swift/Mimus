@@ -54,6 +54,11 @@ public macro MockPublisher() =
 public macro MockPublisher(initial: Any?) =
   #externalMacro(module: "MockableMacro", type: "MockPublisherMacro")
 
+/// Adds a method-entry observer and, for async methods, optional suspension control.
+@attached(peer)
+public macro MockCallControl() =
+  #externalMacro(module: "MockableMacro", type: "MockCallControlMacro")
+
 /// Keeps argument types in overloaded verifier signatures.
 public struct Argument<Value> {
   private let predicate: (Value?) -> Bool
@@ -89,6 +94,7 @@ public final class MockState: @unchecked Sendable {
   private var values: [String: Any] = [:]
   private var defaults: [String: Any] = [:]
   private var rules: StubRules?
+  private var callControls: [String: CallCoordinationState] = [:]
 
   public init() {}
 
@@ -100,6 +106,23 @@ public final class MockState: @unchecked Sendable {
     let rules = StubRules()
     self.rules = rules
     return rules
+  }
+
+  private func callControl(for key: String) -> CallCoordinationState {
+    lock.lock()
+    defer { lock.unlock() }
+    if let state = callControls[key] { return state }
+    let state = CallCoordinationState()
+    callControls[key] = state
+    return state
+  }
+
+  public func callObserver(for key: String) -> CallObserver {
+    CallObserver(state: callControl(for: key))
+  }
+
+  public func asyncCallControl(for key: String) -> AsyncCallControl {
+    AsyncCallControl(state: callControl(for: key))
   }
 
   public func value<Value>(for key: String, as type: Value.Type = Value.self) -> Value? {
@@ -159,8 +182,10 @@ public final class MockState: @unchecked Sendable {
     values.removeAll()
     defaults.removeAll()
     let rules = rules
+    let controls = Array(callControls.values)
     lock.unlock()
     rules?.reset()
+    for control in controls { control.reset() }
   }
 }
 

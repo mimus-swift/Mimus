@@ -4,6 +4,42 @@ import XCTest
 
 final class DiagnosticsTests: XCTestCase {
 
+  func testRejectsCallControlOnProperties() {
+    assertMacroExpansion(
+      "@Mockable\nprotocol Service {\n  @MockCallControl\n  var title: String { get }\n}",
+      expandedSource: "protocol Service {\n  @MockCallControl\n  var title: String { get }\n}",
+      diagnostics: [
+        DiagnosticSpec(message: "@MockCallControl applies to a protocol method", line: 1, column: 1)
+      ],
+      macros: ["Mockable": MockableMacro.self]
+    )
+  }
+
+  func testRejectsCallControlNameCollisions() {
+    assertMacroExpansion(
+      "@Mockable\nprotocol Service {\n  var finishCalls: Int { get }\n  @MockCallControl\n  func finish() async\n}",
+      expandedSource:
+        "protocol Service {\n  var finishCalls: Int { get }\n  @MockCallControl\n  func finish() async\n}",
+      diagnostics: [
+        DiagnosticSpec(
+          message: "A protocol member conflicts with generated call control 'finishCalls'", line: 1,
+          column: 1)
+      ],
+      macros: ["Mockable": MockableMacro.self]
+    )
+  }
+
+  func testRejectsCallControlOnConcreteMethods() {
+    assertMacroExpansion(
+      "struct Service {\n  @MockCallControl\n  func finish() {}\n}",
+      expandedSource: "struct Service {\n  func finish() {}\n}",
+      diagnostics: [
+        DiagnosticSpec(message: "@MockCallControl applies to a protocol method", line: 2, column: 3)
+      ],
+      macros: ["MockCallControl": MockCallControlMacro.self]
+    )
+  }
+
   func testRejectsNonProtocols() {
     assertMacroExpansion(
       "@Mockable\nstruct Service {}",
