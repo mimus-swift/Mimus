@@ -57,7 +57,7 @@ final class DiagnosticsTests: XCTestCase {
       "@Mockable(stubbing: true)\nprotocol Service {}",
       expandedSource: "protocol Service {}",
       diagnostics: [
-        DiagnosticSpec(message: "stubbing must be .simple or .rules", line: 1, column: 1)
+        DiagnosticSpec(message: "stubbing must be .simple or .argumentMatching", line: 1, column: 1)
       ],
       macros: ["Mockable": MockableMacro.self]
     )
@@ -69,7 +69,7 @@ final class DiagnosticsTests: XCTestCase {
       "typealias StaticStubber = Int",
     ] {
       assertMacroExpansion(
-        "@Mockable(stubbing: .rules)\nprotocol Service {\n  \(member)\n}",
+        "@Mockable(stubbing: .argumentMatching)\nprotocol Service {\n  \(member)\n}",
         expandedSource: "protocol Service {\n  \(member)\n}",
         diagnostics: [
           DiagnosticSpec(

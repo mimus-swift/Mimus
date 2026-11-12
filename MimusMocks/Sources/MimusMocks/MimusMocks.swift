@@ -7,8 +7,10 @@ public enum MockDefaults: Sendable {
 }
 
 public enum MockStubbing: Sendable {
+  /// Configure simulated values, errors, and handlers directly.
   case simple
-  case rules
+  /// Add typed stub() builders with argument matchers, answers, and response sequences.
+  case argumentMatching
 }
 
 /// A per-requirement factory choice, evaluated in the generated mock.

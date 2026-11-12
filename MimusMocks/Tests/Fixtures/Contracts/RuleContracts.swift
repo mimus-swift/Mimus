@@ -9,7 +9,7 @@ public protocol CatalogParent {
 
 // mimus: mockable
 // mimus: defaults = "fixtures"
-// mimus: stubbing = "rules"
+// mimus: stubbing = "argumentMatching"
 // mimus: excluding = "hasStock"
 public protocol ProductCatalog: CatalogParent, Sendable {
   func product(id: Int) async throws(CatalogFailure) -> FixtureProduct

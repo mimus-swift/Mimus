@@ -22,9 +22,9 @@ public struct MockableMacro: PeerMacro {
       for argument in arguments {
         if argument.label?.text == "stubbing" {
           guard let member = argument.expression.as(MemberAccessExprSyntax.self),
-            ["simple", "rules"].contains(member.declName.baseName.text)
-          else { throw MockableDiagnostic("stubbing must be .simple or .rules") }
-          ruleStubbing = member.declName.baseName.text == "rules"
+            ["simple", "argumentMatching"].contains(member.declName.baseName.text)
+          else { throw MockableDiagnostic("stubbing must be .simple or .argumentMatching") }
+          ruleStubbing = member.declName.baseName.text == "argumentMatching"
           continue
         }
         if argument.label?.text == "defaults" {

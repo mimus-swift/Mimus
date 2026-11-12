@@ -9,7 +9,7 @@ private struct RuleEntry: Equatable, Sendable {
 }
 private enum RuleFailure: Error, Equatable { case offline, invalid }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol RuleCatalog: Sendable {
   @MockDefault(RuleEntry.mock())
   func fetch(id: Int) async throws -> RuleEntry
@@ -22,12 +22,12 @@ private protocol RuleCatalog: Sendable {
   func notify(id: Int)
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol TypedRuleCatalog: Sendable {
   func fetch(id: Int) async throws(RuleFailure) -> RuleEntry
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol OverloadedRules: Sendable {
   func fetch(_ id: Int) -> String
   func fetch(_ id: String) -> String
@@ -39,7 +39,7 @@ private protocol OverloadedRules: Sendable {
   func copy<Value>(_ value: Value) -> Value where Value: Equatable & Sendable
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol CallbackRules {
   func perform(_ operation: () -> Int) -> Int
   func mutate(_ value: inout Int)
@@ -49,29 +49,29 @@ private protocol CallbackRules {
   func forward(handler: Int) -> Int
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol ConcurrentCallbackRules: Sendable {
   func request(completion: @escaping @Sendable (Int) -> Void)
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol AssociatedRules {
   associatedtype Element: Equatable
   func load() -> Element
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol ActorRules: Actor {
   func value(id: Int) async -> Int
 }
 
 @MainActor
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol PresenterRules {
   func title(id: Int) -> String
 }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol StaticRules: Sendable {
   static func value(id: Int) -> Int
   func value(id: Int) -> Int
@@ -341,7 +341,7 @@ private protocol SimpleStubMember {
 
 private struct UnmatchedPayload { let id: Int }
 
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 private protocol PayloadRules {
   func identify(_ payload: UnmatchedPayload) -> Int
 }

@@ -45,10 +45,10 @@ that shared lifetime.
 
 ## Argument-specific stubbing
 
-Opt a protocol into typed rule builders with `stubbing: .rules`:
+Opt a protocol into typed stub builders with `stubbing: .argumentMatching`:
 
 ```swift
-@Mockable(stubbing: .rules)
+@Mockable(stubbing: .argumentMatching)
 protocol Catalog {
     func title(id: Int) async throws -> String?
 }
@@ -107,11 +107,11 @@ response selection is synchronized. Under concurrent calls, response order follo
 selection order, not task completion order. Return values keep their own concurrency
 contracts.
 
-The production-source equivalent is `// mimus: stubbing = "rules"` on the protocol.
-The default `.simple` mode adds no builders or rule dispatch. Rule selectors cover
+The production-source equivalent is `// mimus: stubbing = "argumentMatching"` on
+the protocol. The default `.simple` mode adds no builders or rule dispatch. Rule selectors cover
 methods, including static and inherited requirements prepared by the adapter.
-Properties and subscripts keep their existing stubbing interfaces. In rules mode,
-`stub`, `Stubber`, and `StaticStubber` are reserved member names.
+Properties and subscripts keep their existing stubbing interfaces. With argument
+matching enabled, `stub`, `Stubber`, and `StaticStubber` are reserved member names.
 
 ## Fixture defaults
 
@@ -262,7 +262,7 @@ and `--output` arguments, then compile its output in the mocks target.
 - Overloaded stub names include parameter and return types, e.g.
   `simulatedFetchIntReturningString`.
 - Generic return values use `stubIdentity(42)` or `stubIdentity("Fixture value")`
-  in simple mode. Rules mode also supports typed answers and per-specialization
+  in simple mode. Argument matching also supports typed answers and per-specialization
   return sequences; generic methods do not expose a polymorphic handler property.
 - Associated types become generic mock parameters, e.g. `MockRepository<Int>()`.
 - Properties, initializers, static throwing methods, subscripts, `async`, typed

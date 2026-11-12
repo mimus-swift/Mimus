@@ -68,7 +68,7 @@ final class DeclarationToolTests: XCTestCase {
     let result = try run(
       "// mimus: mockable\n// mimus: stubbing = \"unknown\"\npublic protocol Service {}")
     XCTAssertNotEqual(result.status, 0)
-    XCTAssertTrue(result.error.contains("Mock stubbing must be 'simple' or 'rules'"))
+    XCTAssertTrue(result.error.contains("Mock stubbing must be 'simple' or 'argumentMatching'"))
   }
 
   func testReportsInvalidPublisherConfigurations() throws {

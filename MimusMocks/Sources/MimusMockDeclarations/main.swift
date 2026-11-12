@@ -218,8 +218,8 @@ func run() throws {
     let flat = try flattened(entry, entries: entries)
     let defaults = annotation(entry.annotations, named: "defaults")
     let stubbing = annotation(entry.annotations, named: "stubbing")
-    guard stubbing == nil || stubbing == "simple" || stubbing == "rules" else {
-      throw GenerationError("Mock stubbing must be 'simple' or 'rules' for " + entry.key)
+    guard stubbing == nil || stubbing == "simple" || stubbing == "argumentMatching" else {
+      throw GenerationError("Mock stubbing must be 'simple' or 'argumentMatching' for " + entry.key)
     }
     guard defaults == nil || defaults == "none" || defaults == "fixtures" else {
       throw GenerationError("Mock defaults must be 'none' or 'fixtures' for " + entry.key)
@@ -295,7 +295,7 @@ func run() throws {
       options.append("baseClassName: " + String(reflecting: base))
     }
     if defaults == "fixtures" { options.append("defaults: .fixtures") }
-    if stubbing == "rules" { options.append("stubbing: .rules") }
+    if stubbing == "argumentMatching" { options.append("stubbing: .argumentMatching") }
     if let excluded = annotation(entry.annotations, named: "excluding") {
       options.append(
         "excluding: ["
