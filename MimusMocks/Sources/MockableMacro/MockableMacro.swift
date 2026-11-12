@@ -14,11 +14,19 @@ public struct MockableMacro: PeerMacro {
     }
     var baseClassName: String?
     var fixtureDefaults = false
+    var ruleStubbing = false
     var excludedMethods = Set<String>()
     var publicMock = false
     var inheritedRequirementsAreDeclared = false
     if case .argumentList(let arguments) = node.arguments {
       for argument in arguments {
+        if argument.label?.text == "stubbing" {
+          guard let member = argument.expression.as(MemberAccessExprSyntax.self),
+            ["simple", "rules"].contains(member.declName.baseName.text)
+          else { throw MockableDiagnostic("stubbing must be .simple or .rules") }
+          ruleStubbing = member.declName.baseName.text == "rules"
+          continue
+        }
         if argument.label?.text == "defaults" {
           guard let member = argument.expression.as(MemberAccessExprSyntax.self),
             ["none", "fixtures"].contains(member.declName.baseName.text)
@@ -66,7 +74,7 @@ public struct MockableMacro: PeerMacro {
       try MockBuilder(
         protocolDeclaration, baseClassName: baseClassName, excluding: excludedMethods,
         publicMock: publicMock, inheritedRequirementsAreDeclared: inheritedRequirementsAreDeclared,
-        fixtureDefaults: fixtureDefaults
+        fixtureDefaults: fixtureDefaults, ruleStubbing: ruleStubbing
       ).build()
     ]
   }

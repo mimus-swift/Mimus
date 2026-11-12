@@ -43,6 +43,76 @@ Observation tracking. `resetMock()` clears calls and configured stub state.
 Static stubs are shared for their generated type; tests that use them must control
 that shared lifetime.
 
+## Argument-specific stubbing
+
+Opt a protocol into typed rule builders with `stubbing: .rules`:
+
+```swift
+@Mockable(stubbing: .rules)
+protocol Catalog {
+    func title(id: Int) async throws -> String?
+}
+
+let mock = MockCatalog()
+mock.stub().title(id: .any).returns("Other")
+mock.stub().title(id: .value(42)).returns(nil)
+mock.stub().title(id: .matching { $0 < 0 }).throws(CatalogError.invalidID)
+mock.stub().title(id: .value(7))
+    .throws(CatalogError.offline)
+    .thenReturn("Recovered")
+    .thenAnswer { id in "Item \(id)" }
+```
+
+`CatalogError` is an error type defined by the consumer. Matchers are `.any`,
+`.value(value)` for Equatable values, and `.matching { argument in ... }` for a
+typed predicate. Optional inputs and explicit `nil` responses retain their meaning.
+The latest matching registration wins, including when a later broad matcher
+overrides an earlier specific one. Configuration does not call or record the method.
+
+`.returns(first, second, ...)` starts a response sequence; `.thenReturn`,
+`.thenThrow`, and `.thenAnswer` append to that same rule. The final response repeats.
+A separate terminal call, such as another `.returns`, registers a new rule instead.
+Nonthrowing methods expose no throwing action. Void methods also support
+`.doesNothing()`. Return values, errors, and answer signatures are checked by the
+compiler. Async methods are configured synchronously; their answers can suspend.
+Typed-throws answers return `Result<Return, Failure>`, like existing handlers.
+
+Rules run before simulated handlers, errors, values, and fixture defaults. If no
+rule matches, those existing fallback paths apply. Every actual invocation is
+recorded once. `resetMock()` clears rules and sequence positions along with calls
+and existing stubs. Register new rules after reset; appending to an old sequence
+handle fails with its original configuration location.
+
+Overloads retain their argument and return types:
+
+```swift
+mock.stub().fetch(.any(Int.self)).returns("Integer")
+mock.stub().fetch(.any(String.self)).returns("String")
+mock.stub().identity(.any).returns(42) // Generic Value inferred as Int.
+mock.stub().count().returning(Int.self).throws(CatalogError.offline)
+```
+
+Use `.returning(Type.self)` when an error-only action or answer needs help selecting
+a return-type overload or generic specialization. `.returns(value)` can usually
+infer it directly. These examples refer to matching requirements on the consumer's
+protocol.
+
+Answers receive the original arguments: `inout` remains mutable, variadics become
+arrays, and autoclosures are evaluated once. Escaping callbacks can be retained by
+an answer. Non-escaping closures accept only `.any` as a matcher and are forwarded
+directly to answers; they are never stored in the rule table or call history.
+Concurrent mocks require `@Sendable` predicates and answers. Predicates and answers
+run outside the rule-store lock, on the invoking method's executor; sequence
+response selection is synchronized. Under concurrent calls, response order follows
+selection order, not task completion order. Return values keep their own concurrency
+contracts.
+
+The production-source equivalent is `// mimus: stubbing = "rules"` on the protocol.
+The default `.simple` mode adds no builders or rule dispatch. Rule selectors cover
+methods, including static and inherited requirements prepared by the adapter.
+Properties and subscripts keep their existing stubbing interfaces. In rules mode,
+`stub`, `Stubber`, and `StaticStubber` are reserved member names.
+
 ## Fixture defaults
 
 Use `@MockDefault` on a property, method, or subscript to supply a lazy default:
@@ -191,8 +261,9 @@ and `--output` arguments, then compile its output in the mocks target.
   Return-type-only overloads also require `returning: Int.self`.
 - Overloaded stub names include parameter and return types, e.g.
   `simulatedFetchIntReturningString`.
-- Generic return values use `stubIdentity(42)` or `stubIdentity("Fixture value")`;
-  generic methods do not expose a polymorphic handler property.
+- Generic return values use `stubIdentity(42)` or `stubIdentity("Fixture value")`
+  in simple mode. Rules mode also supports typed answers and per-specialization
+  return sequences; generic methods do not expose a polymorphic handler property.
 - Associated types become generic mock parameters, e.g. `MockRepository<Int>()`.
 - Properties, initializers, static throwing methods, subscripts, `async`, typed
   throws, variadics, autoclosures, and `inout` parameters are covered by tests.

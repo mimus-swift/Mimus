@@ -6,6 +6,11 @@ public enum MockDefaults: Sendable {
   case fixtures
 }
 
+public enum MockStubbing: Sendable {
+  case simple
+  case rules
+}
+
 /// A per-requirement factory choice, evaluated in the generated mock.
 public enum MockDefaultSource: Sendable {
   case fixture
@@ -17,6 +22,7 @@ public enum MockDefaultSource: Sendable {
 public macro Mockable(
   baseClassName: String? = nil,
   defaults: MockDefaults = .none,
+  stubbing: MockStubbing = .simple,
   excluding: [String] = [],
   publicMock: Bool = false,
   inheritedRequirementsAreDeclared: Bool = false
@@ -80,8 +86,19 @@ public final class MockState: @unchecked Sendable {
   private let lock = NSLock()
   private var values: [String: Any] = [:]
   private var defaults: [String: Any] = [:]
+  private var rules: StubRules?
 
   public init() {}
+
+  /// A rule table is allocated only for mocks that use rule stubbing.
+  public func stubRules() -> StubRules {
+    lock.lock()
+    defer { lock.unlock() }
+    if let rules { return rules }
+    let rules = StubRules()
+    self.rules = rules
+    return rules
+  }
 
   public func value<Value>(for key: String, as type: Value.Type = Value.self) -> Value? {
     lock.lock()
@@ -137,9 +154,11 @@ public final class MockState: @unchecked Sendable {
 
   public func reset() {
     lock.lock()
-    defer { lock.unlock() }
     values.removeAll()
     defaults.removeAll()
+    let rules = rules
+    lock.unlock()
+    rules?.reset()
   }
 }
 

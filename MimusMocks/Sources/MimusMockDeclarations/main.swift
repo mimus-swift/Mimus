@@ -217,6 +217,10 @@ func run() throws {
     }
     let flat = try flattened(entry, entries: entries)
     let defaults = annotation(entry.annotations, named: "defaults")
+    let stubbing = annotation(entry.annotations, named: "stubbing")
+    guard stubbing == nil || stubbing == "simple" || stubbing == "rules" else {
+      throw GenerationError("Mock stubbing must be 'simple' or 'rules' for " + entry.key)
+    }
     guard defaults == nil || defaults == "none" || defaults == "fixtures" else {
       throw GenerationError("Mock defaults must be 'none' or 'fixtures' for " + entry.key)
     }
@@ -286,18 +290,22 @@ func run() throws {
       }
       return item.trimmedDescription
     }.joined(separator: "\n")
-    var options = ["publicMock: \(entry.isPublic)", "inheritedRequirementsAreDeclared: true"]
-    if defaults == "fixtures" { options.insert("defaults: .fixtures", at: 0) }
+    var options = [String]()
     if let base = flat.baseClass {
-      options.insert("baseClassName: " + String(reflecting: base), at: 0)
+      options.append("baseClassName: " + String(reflecting: base))
     }
+    if defaults == "fixtures" { options.append("defaults: .fixtures") }
+    if stubbing == "rules" { options.append("stubbing: .rules") }
     if let excluded = annotation(entry.annotations, named: "excluding") {
-      options.insert(
+      options.append(
         "excluding: ["
           + excluded.split(separator: ",").map {
             String(reflecting: $0.trimmingCharacters(in: .whitespaces))
-          }.joined(separator: ", ") + "]", at: 0)
+          }.joined(separator: ", ") + "]")
     }
+    options.append(contentsOf: [
+      "publicMock: \(entry.isPublic)", "inheritedRequirementsAreDeclared: true",
+    ])
     let attributes = entry.declaration.attributes.filter {
       $0.as(AttributeSyntax.self)?.attributeName.trimmedDescription != "Mockable"
     }.trimmedDescription

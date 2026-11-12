@@ -13,15 +13,17 @@ struct MockBuilder {
   let methods: [FunctionDeclSyntax]
   let associatedTypes: [AssociatedTypeDeclSyntax]
   let fixtureDefaults: Bool
+  let ruleStubbing: Bool
 
   init(
     _ declaration: ProtocolDeclSyntax, baseClassName: String?, excluding: Set<String> = [],
     publicMock: Bool = false, inheritedRequirementsAreDeclared: Bool = false,
-    fixtureDefaults: Bool = false
+    fixtureDefaults: Bool = false, ruleStubbing: Bool = false
   ) throws {
     self.declaration = declaration
     self.baseClassName = baseClassName
     self.fixtureDefaults = fixtureDefaults
+    self.ruleStubbing = ruleStubbing
     access =
       publicMock || declaration.modifiers.contains { $0.name.text == "public" } ? "public " : ""
     let inherited =
@@ -55,6 +57,22 @@ struct MockBuilder {
       .filter { !excluding.contains($0.name.text) }
     associatedTypes = declaration.memberBlock.members.compactMap {
       $0.decl.as(AssociatedTypeDeclSyntax.self)
+    }
+    if ruleStubbing
+      && declaration.memberBlock.members.contains(where: { member in
+        if member.decl.as(FunctionDeclSyntax.self)?.name.text == "stub" { return true }
+        if let variable = member.decl.as(VariableDeclSyntax.self) {
+          return variable.bindings.contains { $0.pattern.trimmedDescription == "stub" }
+        }
+        if let associatedType = member.decl.as(AssociatedTypeDeclSyntax.self) {
+          return ["Stubber", "StaticStubber"].contains(associatedType.name.text)
+        }
+        return member.decl.as(TypeAliasDeclSyntax.self).map {
+          ["Stubber", "StaticStubber"].contains($0.name.text)
+        } ?? false
+      })
+    {
+      throw MockableDiagnostic("A protocol member conflicts with the generated stub() API")
     }
     for member in declaration.memberBlock.members {
       if !member.decl.is(VariableDeclSyntax.self),
@@ -111,14 +129,18 @@ struct MockBuilder {
     var members = [String]()
     var instanceVerifications = [String]()
     var staticVerifications = [String]()
+    var instanceStubs = [String]()
+    var staticStubs = [String]()
     for method in methods {
       let overloaded = methods.filter { selector($0) == selector(method) }.count > 1
       let generated = try generate(method, overloaded: overloaded)
       members.append(generated.members)
       if isStatic(method) {
         staticVerifications.append(generated.verification)
+        staticStubs.append(generated.stubbing)
       } else {
         instanceVerifications.append(generated.verification)
+        instanceStubs.append(generated.stubbing)
       }
     }
     for member in declaration.memberBlock.members {
@@ -190,6 +212,20 @@ struct MockBuilder {
           \(initializer)
           \(access)\(isolation)func resetMock() { storage.reset(); _mimusState.reset() }
           \(members.joined(separator: "\n"))
+          \(ruleStubbing ? """
+            \(access)\(isolation)func stub() -> Stubber { Stubber(_mimusRules: _mimusState.stubRules()) }
+            \(access)struct Stubber {
+                fileprivate let _mimusRules: MimusMocks.StubRules
+                \(instanceStubs.joined(separator: "\n"))
+            }
+            """ : "")
+          \(ruleStubbing && !staticVerifications.isEmpty ? """
+            \(access)static func stub() -> StaticStubber { StaticStubber(_mimusRules: Self._mimusStaticState.stubRules()) }
+            \(access)struct StaticStubber {
+                fileprivate let _mimusRules: MimusMocks.StubRules
+                \(staticStubs.joined(separator: "\n"))
+            }
+            """ : "")
           \(access)\(isolation)func verify(mode: Mimus.VerificationMode = .times(1), file: StaticString = #filePath,
               fileId: StaticString = #fileID, line: UInt = #line, column: UInt = #column) -> Verifier {
               Verifier(mock: self, mode: mode, file: file, fileId: fileId, line: line, column: column)
@@ -224,9 +260,10 @@ struct MockBuilder {
   }
 
   private func generate(
-    _ originalMethod: FunctionDeclSyntax, overloaded: Bool, defaultExpression: ExprSyntax? = nil
+    _ originalMethod: FunctionDeclSyntax, overloaded: Bool, defaultExpression: ExprSyntax? = nil,
+    allowRules: Bool = true
   ) throws -> (
-    members: String, verification: String
+    members: String, verification: String, stubbing: String
   ) {
     var method = originalMethod
     method.signature.parameterClause.parameters = FunctionParameterListSyntax(
@@ -239,6 +276,14 @@ struct MockBuilder {
       }
     )
     let parameters = Array(method.signature.parameterClause.parameters)
+    let parameterNames = Set(parameters.map { local($0).replacingOccurrences(of: "`", with: "") })
+    func unique(_ base: String) -> String {
+      var name = base
+      while parameterNames.contains(name) { name += "_" }
+      return name
+    }
+    let handlerName = unique("_mimusHandler")
+    let actionName = unique("_mimusAction")
     let returnType = method.signature.returnClause?.type.trimmedDescription ?? "Void"
     let returnsVoid = returnType == "Void" || returnType == "Swift.Void" || returnType == "()"
     let generics = method.genericParameterClause?.parameters.map { $0.name.text } ?? []
@@ -325,12 +370,71 @@ struct MockBuilder {
         : ($0.type.is(SomeOrAnyTypeSyntax.self) ? local($0) : (isInout($0) ? "&" : "") + local($0))
     }.joined(separator: ", ")
     let handlerCall =
-      "\(throwing && !typedThrows ? "try " : "")\(asyncMethod ? "await " : "")handler(\(handlerArguments))"
+      "\(throwing && !typedThrows ? "try " : "")\(asyncMethod ? "await " : "")\(handlerName)(\(handlerArguments))"
     let handlerBody =
       typedThrows
       ? "switch \(handlerCall) { case .success(let value): return value; case .failure(let error): throw error }"
       : "\(returnsVoid ? "" : "return ")\(handlerCall)\(returnsVoid ? "; return" : "")"
-    let useHandler = isGeneric ? "" : "if let handler = simulated\(stem)Handler { \(handlerBody) }"
+    let useHandler =
+      isGeneric ? "" : "if let \(handlerName) = simulated\(stem)Handler { \(handlerBody) }"
+    var ruleDispatch = ""
+    var stubbing = ""
+    if ruleStubbing && allowRules {
+      let specialization =
+        generics.isEmpty ? "" : ", specialization: (" + generics.joined(separator: ", ") + ").self"
+      let methodKey = "MimusMocks.StubMethodKey(\(id)\(specialization))"
+      let actualArguments = parameters.map { capture($0) + " as Any" }.joined(separator: ", ")
+      ruleDispatch = """
+        if case .matched(let \(actionName)) = \(state).stubRules().resolve(method: \(methodKey), arguments: [\(actualArguments)]) {
+            switch \(actionName) {
+            case .value:
+                \(returnsVoid ? "return" : "return \(actionName).returned(as: (\(returnType)).self)")
+            case .failure:
+                \(throwing ? "throw \(actionName).error(as: (\(errorType)).self)" : "preconditionFailure(\"A nonthrowing method cannot use a throwing stub\")")
+            case .answer:
+                let \(handlerName) = \(actionName).handler(as: (\(handlerType)).self)
+                \(handlerBody)
+            }
+        }
+        """
+      let argumentName = unique("_mimusArguments")
+      var bindings = [String]()
+      var conditions = [String]()
+      let stubParameters = parameters.enumerated().map { index, parameter -> String in
+        let label = parameter.firstName.trimmedDescription
+        let name = local(parameter)
+        let labelAndName = label == name ? name : label + " " + name
+        if isNonEscaping(parameter) {
+          return labelAndName + ": MimusMocks.NonEscapingStubArgument"
+        }
+        let matcherType = isSendable ? "SendableStubArgument" : "StubArgument"
+        let valueName = unique("_mimusValue\(index)")
+        bindings.append(
+          "let \(valueName) = \(argumentName)[\(index)] as? (\(valueType(parameter)))")
+        conditions.append("\(name).matches(\(valueName))")
+        return labelAndName + ": MimusMocks.\(matcherType)<\(valueType(parameter))>"
+      }
+      let stubType =
+        throwing
+        ? "MimusMocks.ThrowingStub<\(returnType), \(errorType), \(handlerType)>"
+        : "MimusMocks.Stub<\(returnType), \(handlerType)>"
+      let guardItems = ["\(argumentName).count == \(parameters.count)"] + bindings
+      let attributes = method.attributes.filter {
+        $0.as(AttributeSyntax.self).map {
+          !["MockDefault", "Mockable", "discardableResult"].contains(
+            FixtureSyntax.attributeName($0))
+        } ?? true
+      }.trimmedDescription
+      stubbing = """
+        \(attributes)
+        \(access)func \(method.name)\(method.genericParameterClause?.trimmedDescription ?? "")(\(stubParameters.joined(separator: ", "))) -> \(stubType) \(method.genericWhereClause?.trimmedDescription ?? "") {
+            \(stubType)(rules: self._mimusRules, method: \(methodKey), matches: { \(argumentName) in
+                guard \(guardItems.joined(separator: ", ")) else { return false }
+                return \(conditions.isEmpty ? "true" : conditions.joined(separator: " && "))
+            })
+        }
+        """
+    }
     let useError =
       throwing
       ? "if let error: \(errorType) = \(state).value(for: \(key) + \".error\") { throw error }" : ""
@@ -356,7 +460,7 @@ struct MockBuilder {
     if rethrowsMethod { witness.signature.effectSpecifiers?.throwsClause = nil }
     witness.body = CodeBlockSyntax(
       stringLiteral:
-        "{\n\(capturePrelude)\n\(record)(withIdentifier: \(id), arguments: [\(arguments)])\n\(useHandler)\n\(useError)\n\(result)\n}"
+        "{\n\(capturePrelude)\n\(record)(withIdentifier: \(id), arguments: [\(arguments)])\n\(ruleDispatch)\n\(useHandler)\n\(useError)\n\(result)\n}"
     )
     let typed = overloaded || isGeneric
     var verifierParameters = parameters.map { parameter -> String in
@@ -384,7 +488,8 @@ struct MockBuilder {
       }
       """
     return (
-      (stubs + [witness.formatted().trimmedDescription]).joined(separator: "\n"), verification
+      (stubs + [witness.formatted().trimmedDescription]).joined(separator: "\n"), verification,
+      stubbing
     )
   }
 
@@ -415,7 +520,8 @@ struct MockBuilder {
       if !effects.isEmpty {
         let fake = try FunctionDeclSyntax(
           "\(raw: prefix)func _get\(raw: upper(name))() \(raw: effects) -> \(raw: type)")
-        let generated = try generate(fake, overloaded: false, defaultExpression: fixture)
+        let generated = try generate(
+          fake, overloaded: false, defaultExpression: fixture, allowRules: false)
         result.append(generated.members)
         result.append(
           "\(access)\(prefix)var \(name): \(type) { get \(effects) { return \(effects.contains("throws") ? "try " : "")\(effects.contains("async") ? "await " : "")_get\(upper(name))() } }"
@@ -528,7 +634,8 @@ struct MockBuilder {
     let fixture = try requirementDefault(
       type: subscriptDecl.returnClause.type, attributes: subscriptDecl.attributes,
       trivia: subscriptDecl.leadingTrivia)
-    let generated = try generate(fake, overloaded: false, defaultExpression: fixture)
+    let generated = try generate(
+      fake, overloaded: false, defaultExpression: fixture, allowRules: false)
     var signature = subscriptDecl
     signature.accessorBlock = nil
     signature.attributes = signature.attributes.filter {
@@ -564,7 +671,7 @@ struct MockBuilder {
   }
 
   private func selector(_ method: FunctionDeclSyntax) -> String {
-    method.name.text
+    (isStatic(method) ? "static " : "") + method.name.text
       + method.signature.parameterClause.parameters.map { $0.firstName.text + ":" }.joined()
   }
   private func parameterTypes(_ method: FunctionDeclSyntax) -> String {
@@ -617,7 +724,9 @@ struct MockBuilder {
     return parameter.ellipsis == nil ? value : "[\(value)]"
   }
   private func handlerParameterType(_ parameter: FunctionParameterSyntax) -> String {
-    (isInout(parameter) ? "inout " : "") + valueType(parameter)
+    let escaping = attributes(parameter).contains("escaping") && !isAutoclosure(parameter)
+    return (isInout(parameter) ? "inout " : "") + (escaping ? "@escaping " : "")
+      + valueType(parameter)
   }
   private func capture(_ parameter: FunctionParameterSyntax) -> String {
     if isAutoclosure(parameter) { return "_captured_" + local(parameter) }

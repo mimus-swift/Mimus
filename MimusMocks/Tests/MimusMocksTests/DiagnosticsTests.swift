@@ -52,6 +52,35 @@ final class DiagnosticsTests: XCTestCase {
     )
   }
 
+  func testDiagnosesInvalidStubbingPolicy() {
+    assertMacroExpansion(
+      "@Mockable(stubbing: true)\nprotocol Service {}",
+      expandedSource: "protocol Service {}",
+      diagnostics: [
+        DiagnosticSpec(message: "stubbing must be .simple or .rules", line: 1, column: 1)
+      ],
+      macros: ["Mockable": MockableMacro.self]
+    )
+  }
+
+  func testDiagnosesReservedRuleBuilderNames() {
+    for member in [
+      "func stub()", "var stub: String { get }", "associatedtype Stubber",
+      "typealias StaticStubber = Int",
+    ] {
+      assertMacroExpansion(
+        "@Mockable(stubbing: .rules)\nprotocol Service {\n  \(member)\n}",
+        expandedSource: "protocol Service {\n  \(member)\n}",
+        diagnostics: [
+          DiagnosticSpec(
+            message: "A protocol member conflicts with the generated stub() API", line: 1, column: 1
+          )
+        ],
+        macros: ["Mockable": MockableMacro.self]
+      )
+    }
+  }
+
   func testRejectsDefaultMarkersOnTypes() {
     assertMacroExpansion(
       "@MockDefault(42)\nstruct Service {}",

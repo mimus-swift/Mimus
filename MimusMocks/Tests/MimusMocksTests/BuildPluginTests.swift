@@ -1,6 +1,7 @@
 import FixtureContracts
 import FixtureMocks
 import Mimus
+import MimusMocks
 import Testing
 
 @Test func generatesPublicMocksAcrossModuleBoundaries() async throws {
@@ -38,4 +39,22 @@ import Testing
   #expect(storefront.optionalFormatter is MockLabelFormatter)
   #expect(storefront.formatter as AnyObject === storefront.formatter as AnyObject)
   mock.verify().load()
+}
+
+@Test func generatesRuleBuildersForPublicAndInheritedRequirements() async throws {
+  let mock = MockProductCatalog()
+  let catalog: any ProductCatalog = mock
+  mock.stub().name(id: .value(42)).returns("Selected")
+  mock.stub().product(id: .value(42)).throws(.unavailable)
+    .thenReturn(FixtureProduct(code: "empty"))
+    .thenAnswer { id in .success(FixtureProduct(code: "product-\(id)")) }
+  #expect(catalog.name(id: 42) == "Selected")
+  #expect(try await catalog.product(id: 1) == .mock())
+  await #expect(throws: CatalogFailure.unavailable) { try await catalog.hasStock(id: 42) }
+  #expect(try await !catalog.hasStock(id: 42))
+  #expect(try await catalog.hasStock(id: 42))
+  mock.verify().name(id: mEqual(42))
+  mock.verify(mode: .times(3)).product(id: mEqual(42))
+  mock.resetMock()
+  #expect(try await catalog.product(id: 42) == .mock())
 }
